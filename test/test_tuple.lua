@@ -27,35 +27,35 @@ assert(t1:equals { 0, 0, 0 })
 assert(t2:equals { 1, 2, 3 })
 assert(t3:equals { 4, 5, 6 })
 
-assert(t1 == { 0, 0, 0 })
-assert(t2 == { 1, 2, 3 })
-assert(t3 == { 4, 5, 6 })
+assert(t1:equals { 0, 0, 0 })
+assert(t2:equals { 1, 2, 3 })
+assert(t3:equals { 4, 5, 6 })
 
-assert(t2:add(t3) == { 5, 7, 9 })
-assert(t1:add(t2, t3) == { 9, 12, 15 })
+assert(t2:add(t3):equals { 5, 7, 9 })
+assert(t1:add(t2, t3):equals { 9, 12, 15 })
 
-assert(t2:sub(t3) == { 1, 2, 3 })
-assert(t1:sub(t3, t2) == { 3, 3, 3 })
-
-local t = tuple3()
-assert(t:negate { -1, 0, 1 } == { 1, 0, -1 })
-assert(t:negate() == { -1, 0, 1 })
+assert(t2:sub(t3):equals { 1, 2, 3 })
+assert(t1:sub(t3, t2):equals { 3, 3, 3 })
 
 local t = tuple3()
-assert(t:clamp(1, 5, { 0, 3, 6 }) == { 1, 3, 5 })
-assert(t:clamp(2, 4) == { 2, 3, 4 })
+assert(t:negate { -1, 0, 1 }:equals { 1, 0, -1 })
+assert(t:negate():equals { -1, 0, 1 })
 
 local t = tuple3()
-assert(t:clamp_min(1, { 0, 2, 4 }) == { 1, 2, 4 })
-assert(t:clamp_min(3) == { 3, 3, 4 })
+assert(t:clamp(1, 5, { 0, 3, 6 }):equals { 1, 3, 5 })
+assert(t:clamp(2, 4):equals { 2, 3, 4 })
 
 local t = tuple3()
-assert(t:clamp_max(3, { 0, 2, 4 }) == { 0, 2, 3 })
-assert(t:clamp_max(1) == { 0, 1, 1 })
+assert(t:clamp_min(1, { 0, 2, 4 }):equals { 1, 2, 4 })
+assert(t:clamp_min(3):equals { 3, 3, 4 })
 
 local t = tuple3()
-assert(t:absolute { -1, 0, 1 } == { 1, 0, 1 })
-assert(t:set( -1, 0, 1 ):absolute()  == { 1, 0, 1 })
+assert(t:clamp_max(3, { 0, 2, 4 }):equals { 0, 2, 3 })
+assert(t:clamp_max(1):equals { 0, 1, 1 })
+
+local t = tuple3()
+assert(t:absolute { -1, 0, 1 }:equals { 1, 0, 1 })
+assert(t:set( -1, 0, 1 ):absolute() :equals { 1, 0, 1 })
 
 local t = tuple3(1, 2, 3)
 assert(t.x == 1)
@@ -65,9 +65,11 @@ assert(t.z == 3)
 t.x = 2
 t.y = 3
 t.z = 4
-assert(t == { 2, 3, 4 })
+assert(t:equals { 2, 3, 4 })
 
 t[1] = 3
 t[2] = 4
 t[3] = 5
-assert(t == { 3, 4, 5 })
+assert(t:equals { 3, 4, 5 })
+
+print(tostring(t))

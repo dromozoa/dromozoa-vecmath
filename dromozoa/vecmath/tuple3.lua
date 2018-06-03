@@ -16,8 +16,19 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local rawset = rawset
+local format = string.format
 
-local function set(a, x, y, z)
+local index = {
+  1, 2, 3;
+  x = 1;
+  y = 2;
+  z = 3;
+}
+
+local class = {}
+local metatable = { __tostring = tostring }
+
+function class.set(a, x, y, z)
   if x then
     if y then
       a[1] = x
@@ -35,16 +46,6 @@ local function set(a, x, y, z)
   end
   return a
 end
-
-local function equals(a, b)
-  return #a == #b and a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
-end
-
-local class = {
-  set = set;
-  equals = equals;
-}
-local metatable = { __eq = equals }
 
 function class.get(a, b)
   b[1] = a[1]
@@ -116,6 +117,10 @@ function class.scale_add(a, s, b, c)
     a[3] = s * a[3] + b[3]
   end
   return a
+end
+
+function class.equals(a, b)
+  return a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
 end
 
 function class.epsilon_equals(a, b, epsilon)
@@ -228,13 +233,6 @@ function class.interpolate(a, b, c, d)
   return a
 end
 
-local index = {
-  1, 2, 3;
-  x = 1;
-  y = 2;
-  z = 3;
-}
-
 function metatable.__index(a, key)
   local value = class[key]
   if value then
@@ -248,8 +246,12 @@ function metatable.__newindex(a, key, value)
   rawset(a, index[key], value)
 end
 
+function metatable.__tostring(a)
+  return format("(%.17g,%.17g,%.17g)", a[1], a[2], a[3])
+end
+
 return setmetatable(class, {
   __call = function (_, x, y, z)
-    return setmetatable(set({}, x, y, z), metatable)
+    return setmetatable(class.set({}, x, y, z), metatable)
   end;
 })
