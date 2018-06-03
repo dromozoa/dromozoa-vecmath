@@ -29,13 +29,15 @@ local metatable = {
 }
 
 function class.cross(a, b, c)
-  -- alias-safety
-  local x = b[2] * c[3] - b[3] * c[2]
-  local y = b[3] * c[1] - b[1] * c[3]
-  local z = b[1] * c[2] - b[2] * c[1]
-  a[1] = x
-  a[2] = y
-  a[3] = z
+  local bx = b[1]
+  local by = b[2]
+  local bz = b[3]
+  local cx = c[1]
+  local cy = c[2]
+  local cz = c[3]
+  a[1] = by * cz - bz * cy
+  a[2] = bz * cx - bx * cz
+  a[3] = bx * cy - by * cx
   return a
 end
 
@@ -54,14 +56,14 @@ function class.dot(a, b)
   return a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
 end
 
-function class.length_squared()
+function class.length_squared(a)
   local x = a[1]
   local y = a[2]
   local z = a[3]
   return x * x + y * y + z * z
 end
 
-function class.length()
+function class.length(a)
   local x = a[1]
   local y = a[2]
   local z = a[3]
@@ -75,10 +77,10 @@ function class.angle(a, b)
   local bx = b[1]
   local by = b[2]
   local bz = b[3]
-  local cx = ay * bz - az * by
-  local cy = az * bx - ax * bz
-  local cz = ax * by - ay * bx
-  local cross = sqrt(cx * cx + cy * cy + cz * cz)
+  local x = ay * bz - az * by
+  local y = az * bx - ax * bz
+  local z = ax * by - ay * bx
+  local cross = sqrt(x * x + y * y + z * z)
   local dot = ax * bx + ay * by + az * bz
   local angle = atan2(cross, dot)
   if angle < 0 then

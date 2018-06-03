@@ -19,11 +19,26 @@ local vector3 = require "dromozoa.vecmath.vector3"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
-local v1 = vector3(1, 0, 0)
-local v2 = vector3(1, 1, 0)
+local v1 = vector3(3,4,1)
+local v2 = vector3(3,7,5)
+local v3 = vector3()
 
-local angle = v1:angle(v2)
+assert(v1:dot(v2) == 42)
+assert(v3:cross(v1, v2) :equals {13,-12,9})
+assert(v1:cross(v1, v2) :equals {13,-12,9})
+
+local v = vector3(3,7,5)
+assert(v:length_squared() == 83)
+assert(v:length() == math.sqrt(83))
+v:normalize()
+assert(v.x == 3 / math.sqrt(83))
+assert(v.y == 7 / math.sqrt(83))
+assert(v.z == 5 / math.sqrt(83))
+
+local v1 = vector3(1,2,3)
+local v2 = vector3(3,4,5)
+local angle = v1:angle(v2) * 180 / math.pi
 if verbose then
   print(angle)
 end
-assert(angle == math.pi / 4)
+assert(10.67069 < angle and angle < 10.67070)
