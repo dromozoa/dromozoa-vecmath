@@ -72,4 +72,8 @@ t[2] = 4
 t[3] = 5
 assert(t:equals { 3, 4, 5 })
 
-print(tostring(t))
+local s = tostring(t)
+if verbose then
+  print(s)
+end
+assert(s == "(3,4,5)")
