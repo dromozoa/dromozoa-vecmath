@@ -228,28 +228,24 @@ function class.interpolate(a, b, c, d)
   return a
 end
 
+local index = {
+  1, 2, 3;
+  x = 1;
+  y = 2;
+  z = 3;
+}
+
 function metatable.__index(a, key)
-  if key == "x" then
-    return a[1]
-  elseif key == "y" then
-    return a[2]
-  elseif key == "z" then
-    return a[3]
+  local value = class[key]
+  if value then
+    return value
   else
-    return class[key]
+    return a[index[key]]
   end
 end
 
 function metatable.__newindex(a, key, value)
-  if key == "x" then
-    rawset(a, 1, value)
-  elseif key == "y" then
-    rawset(a, 2, value)
-  elseif key == "z" then
-    rawset(a, 3, value)
-  else
-    rawset(a, key, value)
-  end
+  rawset(a, index[key], value)
 end
 
 return setmetatable(class, {
