@@ -18,15 +18,15 @@
 local rawset = rawset
 local format = string.format
 
-local index = {
-  1, 2, 3;
-  x = 1;
-  y = 2;
-  z = 3;
+local class = {
+  index = {
+    1, 2, 3;
+    x = 1;
+    y = 2;
+    z = 3;
+  };
 }
-
-local class = {}
-local metatable = { __tostring = tostring }
+local metatable = {}
 
 function class.set(a, x, y, z)
   if x then
@@ -238,12 +238,12 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return a[index[key]]
+    return a[class.index[key]]
   end
 end
 
 function metatable.__newindex(a, key, value)
-  rawset(a, index[key], value)
+  rawset(a, class.index[key], value)
 end
 
 function metatable.__tostring(a)

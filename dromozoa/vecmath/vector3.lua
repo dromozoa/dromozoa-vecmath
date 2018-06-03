@@ -93,7 +93,7 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return super_metatable.__index(a, key)
+    return a[class.index[key]]
   end
 end
 
