@@ -17,16 +17,13 @@
 
 local tuple3 = require "dromozoa.vecmath.tuple3"
 
+local rawset = rawset
 local atan2 = math.atan2
 local sqrt = math.sqrt
 
 local super = tuple3
-local super_metatable = getmetatable(super())
 local class = {}
-local metatable = {
-  __tostring = super_metatable.__tostring;
-  __newindex = super_metatable.__newindex;
-}
+local metatable = { __tostring = super.to_string }
 
 function class.cross(a, b, c)
   local bx = b[1]
@@ -93,8 +90,12 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return a[class.index[key]]
+    return a[super.index[key]]
   end
+end
+
+function metatable.__newindex(a, key, value)
+  rawset(a, super.index[key], value)
 end
 
 return setmetatable(class, {

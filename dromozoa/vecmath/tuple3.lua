@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local rawset = rawset
 local format = string.format
 
 local class = {
@@ -26,7 +25,6 @@ local class = {
     z = 3;
   };
 }
-local metatable = {}
 
 function class.set(a, x, y, z)
   if x then
@@ -117,6 +115,10 @@ function class.scale_add(a, s, b, c)
     a[3] = s * a[3] + b[3]
   end
   return a
+end
+
+function class.to_string(a)
+  return format("(%.17g, %.17g, %.17g)", a[1], a[2], a[3])
 end
 
 function class.equals(a, b)
@@ -224,25 +226,4 @@ function class.interpolate(a, b, c, d)
   return a
 end
 
-function metatable.__index(a, key)
-  local value = class[key]
-  if value then
-    return value
-  else
-    return a[class.index[key]]
-  end
-end
-
-function metatable.__newindex(a, key, value)
-  rawset(a, class.index[key], value)
-end
-
-function metatable.__tostring(a)
-  return format("(%.17g, %.17g, %.17g)", a[1], a[2], a[3])
-end
-
-return setmetatable(class, {
-  __call = function (_, x, y, z)
-    return setmetatable(class.set({}, x, y, z), metatable)
-  end;
-})
+return class
