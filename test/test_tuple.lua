@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local point3 = require "dromozoa.vecmath.point3"
 local tuple3 = require "dromozoa.vecmath.tuple3"
 local vector3 = require "dromozoa.vecmath.vector3"
 
@@ -127,4 +128,5 @@ local function test(n, class)
 end
 
 test(3, tuple3)
+test(3, point3)
 test(3, vector3)
