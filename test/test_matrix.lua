@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local matrix3 = require "dromozoa.vecmath.matrix3"
+local vector3 = require "dromozoa.vecmath.vector3"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
@@ -77,15 +78,38 @@ local m = matrix3():rot_x(math.pi / 4)
 if verbose then
   print(tostring(m))
 end
+local v = vector3(1,1,1)
+m:transform(v)
+if verbose then
+  print(tostring(v))
+end
+assert(v:epsilon_equals({1,0,math.sqrt(2)}, 0.0001))
+
 local m = matrix3():rot_y(math.pi / 4)
 if verbose then
   print(tostring(m))
 end
+local v = vector3(1,1,1)
+m:transform(v)
+if verbose then
+  print(tostring(v))
+end
+assert(v:epsilon_equals({math.sqrt(2),1,0}, 0.0001))
+
 local m = matrix3():rot_z(math.pi / 4)
 if verbose then
   print(tostring(m))
 end
+local v = vector3(1,1,1)
+m:transform(v)
+if verbose then
+  print(tostring(v))
+end
+assert(v:epsilon_equals({0,math.sqrt(2),1}, 0.0001))
 
-
+local m = matrix3(2)
+local v = vector3(1,1,1)
+m:transform(v, v)
+assert(v :equals {2,2,2})
 
 
