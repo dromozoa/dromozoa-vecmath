@@ -119,11 +119,11 @@ local function test(n, class)
     print(s)
   end
   if n == 2 then
-    assert(s == "(3,4)")
+    assert(s == "(3, 4)")
   elseif n == 3 then
-    assert(s == "(3,4,5)")
+    assert(s == "(3, 4, 5)")
   elseif n == 4 then
-    assert(s == "(3,4,5,6)")
+    assert(s == "(3, 4, 5, 6)")
   end
 end
 

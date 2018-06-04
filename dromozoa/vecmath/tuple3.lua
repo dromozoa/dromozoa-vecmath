@@ -238,7 +238,7 @@ function metatable.__newindex(a, key, value)
 end
 
 function metatable.__tostring(a)
-  return format("(%.17g,%.17g,%.17g)", a[1], a[2], a[3])
+  return format("(%.17g, %.17g, %.17g)", a[1], a[2], a[3])
 end
 
 return setmetatable(class, {
