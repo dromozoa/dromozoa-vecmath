@@ -299,7 +299,7 @@ function class.mul_normalize(a, b, c)
 end
 
 function class.mul_transpose_both(a, b, c)
-  class.mul(a, b, c)
+  class.mul(a, c, b)
   class.transpose(a)
   return a
 end
@@ -332,6 +332,19 @@ function class.set_zero(a)
   a[1] = 0 ; a[2] = 0 ; a[3] = 0
   a[4] = 0 ; a[5] = 0 ; a[6] = 0
   a[7] = 0 ; a[8] = 0 ; a[9] = 0
+  return a
+end
+
+function class.negate(a, b)
+  if b then
+    a[1] = -b[1] ; a[2] = -b[2] ; a[3] = -b[3]
+    a[4] = -b[4] ; a[5] = -b[5] ; a[6] = -b[6]
+    a[7] = -b[7] ; a[8] = -b[8] ; a[9] = -b[9]
+  else
+    a[1] = -a[1] ; a[2] = -a[2] ; a[3] = -a[3]
+    a[4] = -a[4] ; a[5] = -a[5] ; a[6] = -a[6]
+    a[7] = -a[7] ; a[8] = -a[8] ; a[9] = -a[9]
+  end
   return a
 end
 

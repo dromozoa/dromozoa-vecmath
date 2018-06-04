@@ -103,4 +103,17 @@ assert(m:mul(m1, m:set(m2)):equals(data.mul))
 assert(m:set(m1):mul(m2):equals(data.mul))
 
 -- assert(m:mul_normalize(m1, m2):equals(data.mul_normalize))
--- assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
+-- assert(m:mul_normalize_cp(m1, m2):equals(data.mul_normalize_cp))
+
+assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
+
+assert(m:negate(m1):equals(data.negate))
+assert(m:negate(m:set(m1)):equals(data.negate))
+assert(m:set(m1):negate():equals(data.negate))
+
+v:set(v1)
+m:set(m1):transform(v)
+assert(v:equals(data.transform))
+v:set()
+m:set(m1):transform(v1, v)
+assert(v:equals(data.transform))
