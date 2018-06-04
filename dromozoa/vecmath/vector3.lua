@@ -80,9 +80,7 @@ function class.angle(a, b)
   local x = ay * bz - az * by
   local y = az * bx - ax * bz
   local z = ax * by - ay * bx
-  local cross = sqrt(x * x + y * y + z * z)
-  local dot = ax * bx + ay * by + az * bz
-  local angle = atan2(cross, dot)
+  local angle = atan2(sqrt(x * x + y * y + z * z), ax * bx + ay * by + az * bz)
   if angle < 0 then
     return -angle
   else
