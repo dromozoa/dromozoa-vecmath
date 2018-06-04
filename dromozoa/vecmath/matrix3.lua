@@ -295,11 +295,13 @@ end
 function class.mul_normalize(a, b, c)
   class.mul(a, b, c)
   svd(a, a)
+  return a
 end
 
 function class.mul_transpose_both(a, b, c)
   class.mul(a, b, c)
   class.transpose(a)
+  return a
 end
 
 function class.equals(a, b)
