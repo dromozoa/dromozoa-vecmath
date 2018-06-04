@@ -120,30 +120,21 @@ function class.scale_add(a, s, b, c)
 end
 
 function class.equals(a, b)
-  return a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
+  return a and b and a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
 end
 
 function class.epsilon_equals(a, b, epsilon)
-  local x = a[1] - b[1]
-  if x < 0 then
-    if epsilon < -x then return false end
-  else
-    if epsilon < x then return false end
-  end
+  local v = a[1] - b[1]
+  if v < 0 then v = -v end
+  if v > epsilon then return false end
 
-  local y = a[2] - b[2]
-  if y < 0 then
-    if epsilon < -y then return false end
-  else
-    if epsilon < y then return false end
-  end
+  local v = a[2] - b[2]
+  if v < 0 then v = -v end
+  if v > epsilon then return false end
 
-  local z = a[3] - b[3]
-  if z < 0 then
-    if epsilon < -z then return false end
-  else
-    if epsilon < z then return false end
-  end
+  local v = a[3] - b[3]
+  if v < 0 then v = -v end
+  if v > epsilon then return false end
 
   return true
 end
