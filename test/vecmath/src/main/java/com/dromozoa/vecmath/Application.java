@@ -20,15 +20,96 @@ package com.dromozoa.vecmath;
 import javax.vecmath.*;
 
 public class Application {
-  public static void main(String[] args) {
-    // Tuple3d t = new Tuple3d(1, 2, 3);
-    Point3d p = new Point3d(2, 3, 4);
-    Vector3d v = new Vector3d(3, 4, 5);
-    Matrix3d m = new Matrix3d(1, 2, 3, 4, 5, 6, 7, 8, 9);
+  private static String s(Tuple3d t) {
+    return "{" + t.x + "," + t.y + "," + t.z + "}";
+  }
 
-    // System.out.println("t=" + t);
-    System.out.println("p=" + p);
-    System.out.println("v=" + v);
-    System.out.println("m=" + m);
+  private static String s(Matrix3d m) {
+    return "{"
+        + m.m00 + "," + m.m01 + "," + m.m02 + ","
+        + m.m10 + "," + m.m11 + "," + m.m12 + ","
+        + m.m20 + "," + m.m21 + "," + m.m22 + "}";
+  }
+
+  private static void matrix3d() {
+    Matrix3d m = new Matrix3d();
+    Vector3d v = new Vector3d();
+
+    Matrix3d m1 = new Matrix3d(2, 1, 4, 1, -2, 3, -3, -1, 1);
+    Matrix3d m2 = new Matrix3d(1, 2, 1, 2, 1, 0, 1, 1, 2);
+    Vector3d v1 = new Vector3d(1, 2, 3);
+
+    System.out.println("return {");
+    System.out.println("  " + s(m1) + ";");
+    System.out.println("  " + s(m2) + ";");
+    System.out.println("  " + s(v1) + ";");
+
+    System.out.println("  get_scale = " + m1.getScale() + ";");
+
+    m.add(2, m1);
+    System.out.println("  add2 = " + s(m) + ";");
+
+    m.add(m1, m2);
+    System.out.println("  add = " + s(m) + ";");
+
+    m.sub(m1, m2);
+    System.out.println("  sub = " + s(m) + ";");
+
+    m.transpose(m1);
+    System.out.println("  transpose = " + s(m) + ";");
+
+    m.invert(m1);
+    System.out.println("  invert = " + s(m) + ";");
+
+    System.out.println("  determinant = " + m1.determinant() + ";");
+
+    m.rotX(2);
+    System.out.println("  rot_x2 = " + s(m) + ";");
+
+    m.rotY(2);
+    System.out.println("  rot_y2 = " + s(m) + ";");
+
+    m.rotZ(2);
+    System.out.println("  rot_z2 = " + s(m) + ";");
+
+    m.mul(2, m1);
+    System.out.println("  mul2 = " + s(m) + ";");
+
+    m.mul(m1, m2);
+    System.out.println("  mul = " + s(m) + ";");
+
+    m.mulNormalize(m1, m2);
+    System.out.println("  mul_normalize = " + s(m) + ";");
+
+    m.mulTransposeBoth(m1, m2);
+    System.out.println("  mul_transpose_both = " + s(m) + ";");
+
+    m.mulTransposeRight(m1, m2);
+    System.out.println("  mul_transpose_right = " + s(m) + ";");
+
+    m.mulTransposeLeft(m1, m2);
+    System.out.println("  mul_transpose_left = " + s(m) + ";");
+
+    m.normalize(m1);
+    System.out.println("  normalize = " + s(m) + ";");
+
+    m.normalizeCP(m1);
+    System.out.println("  normalize_cp = " + s(m) + ";");
+
+    m.negate(m1);
+    System.out.println("  negate = " + s(m) + ";");
+
+    m.set(m1);
+    m.transform(v1, v);
+    System.out.println("  transform = " + s(v) + ";");
+
+    System.out.println("}");
+  }
+
+  public static void main(String[] args) {
+    String name = "matrix3d";
+    if (name.equals("matrix3d")) {
+      matrix3d();
+    }
   }
 }

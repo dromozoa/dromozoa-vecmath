@@ -23,7 +23,7 @@ local sqrt = math.sqrt
 local format = string.format
 
 local function to_string(a)
-  return format("%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g",
+  return format("%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n",
       a[1], a[2], a[3],
       a[4], a[5], a[6],
       a[7], a[8], a[9])

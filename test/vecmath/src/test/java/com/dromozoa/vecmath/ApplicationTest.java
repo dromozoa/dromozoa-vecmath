@@ -17,10 +17,18 @@
 
 package com.dromozoa.vecmath;
 
+import javax.vecmath.*;
 import junit.framework.TestCase;
 
 public class ApplicationTest extends TestCase {
-  public void testMain() {
-    Application.main(null);
+  public void testToString() {
+    System.out.println("Matrix3d\n" + new Matrix3d(1, 2, 3, 4, 5, 6, 7, 8, 9));
+    System.out.println("Point3d\n" + new Point3d(2, 3, 4));
+    System.out.println("Vector3d\n" + new Vector3d(3, 4, 5));
+  }
+
+  public void testMatrix3d() {
+    String[] args = { "matrix3d" };
+    Application.main(args);
   }
 }
