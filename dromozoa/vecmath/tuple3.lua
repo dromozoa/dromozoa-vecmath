@@ -126,10 +126,14 @@ function class.equals(a, b)
 end
 
 function class.epsilon_equals(a, b, epsilon)
-  local v = a[1] - b[1] if v < 0 then v = -v end if v > epsilon then return false end
-  local v = a[2] - b[2] if v < 0 then v = -v end if v > epsilon then return false end
-  local v = a[3] - b[3] if v < 0 then v = -v end if v > epsilon then return false end
-  return true
+  if a and b and epsilon then
+    local v = a[1] - b[1] if v < 0 then v = -v end if v > epsilon then return false end
+    local v = a[2] - b[2] if v < 0 then v = -v end if v > epsilon then return false end
+    local v = a[3] - b[3] if v < 0 then v = -v end if v > epsilon then return false end
+    return true
+  else
+    return false
+  end
 end
 
 function class.clamp(a, min, max, b)

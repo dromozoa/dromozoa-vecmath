@@ -19,7 +19,7 @@ local matrix3 = require "dromozoa.vecmath.matrix3"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
-local m = matrix3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+local m = matrix3(1,2,3,4,5,6,7,8,9)
 local s = tostring(m)
 if verbose then
   print(s)
@@ -38,6 +38,54 @@ assert(s == [[
 1, 0, 0
 0, 1, 0
 0, 0, 1]])
+
+assert(m:set_scale(2) :equals {2,0,0,0,2,0,0,0,2})
+
+m:set_identity()
+for i = 1, 16 do
+  m:set_scale(i)
+  assert(m:get_scale() == i)
+end
+
+local m = matrix3(1,2,3,4,5,6,7,8,9)
+assert(m:add(2) :equals {3,4,5,6,7,8,9,10,11})
+local m = matrix3(1,2,3,4,5,6,7,8,9)
+assert(m:add(m) :equals {2,4,6,8,10,12,14,16,18})
+local m = matrix3(1,2,3,4,5,6,7,8,9)
+assert(m:add(2, m) :equals {3,4,5,6,7,8,9,10,11})
+local m = matrix3(1,2,3,4,5,6,7,8,9)
+assert(m:add(m, m) :equals {2,4,6,8,10,12,14,16,18})
+
+local m1 = matrix3(9,9,9,9,9,9,9,9,9)
+local m2 = matrix3(1,2,3,4,5,6,7,8,9)
+assert(m1:sub(m2) :equals {8,7,6,5,4,3,2,1,0})
+local m1 = matrix3(9,9,9,9,9,9,9,9,9)
+local m2 = matrix3(1,2,3,4,5,6,7,8,9)
+assert(m1:sub(m2,m1) :equals {-8,-7,-6,-5,-4,-3,-2,-1,0})
+
+local m = matrix3(1,2,3,4,5,6,7,8,9)
+assert(m:transpose() :equals {1,4,7,2,5,8,3,6,9})
+assert(m:transpose(m) :equals {1,2,3,4,5,6,7,8,9})
+
+local m1 = matrix3(1,2,1,2,1,0,1,1,2)
+local m2 = matrix3(1,2,1,2,1,0,1,1,2)
+assert(m1:determinant() == -5)
+assert(m1:invert() :equals {-0.4,0.6,0.2,0.8,-0.2,-0.4,-0.2,-0.2,0.6})
+assert(m1:invert(m2) :equals {-0.4,0.6,0.2,0.8,-0.2,-0.4,-0.2,-0.2,0.6})
+
+local m = matrix3():rot_x(math.pi / 4)
+if verbose then
+  print(tostring(m))
+end
+local m = matrix3():rot_y(math.pi / 4)
+if verbose then
+  print(tostring(m))
+end
+local m = matrix3():rot_z(math.pi / 4)
+if verbose then
+  print(tostring(m))
+end
+
 
 
 

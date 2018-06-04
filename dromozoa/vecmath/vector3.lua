@@ -39,13 +39,23 @@ function class.cross(a, b, c)
 end
 
 function class.normalize(a, b)
-  local x = a[1]
-  local y = a[2]
-  local z = a[3]
-  local d = sqrt(x * x + y * y + z * z)
-  a[1] = x / d
-  a[2] = y / d
-  a[3] = z / d
+  if b then
+    local x = b[1]
+    local y = b[2]
+    local z = b[3]
+    local d = sqrt(x * x + y * y + z * z)
+    a[1] = x / d
+    a[2] = y / d
+    a[3] = z / d
+  else
+    local x = a[1]
+    local y = a[2]
+    local z = a[3]
+    local d = sqrt(x * x + y * y + z * z)
+    a[1] = x / d
+    a[2] = y / d
+    a[3] = z / d
+  end
   return a
 end
 
@@ -100,7 +110,7 @@ end
 
 return setmetatable(class, {
   __index = super;
-  __call = function (_, x, y, z)
-    return setmetatable(class.set({}, x, y, z), metatable)
+  __call = function (_, ...)
+    return setmetatable(class.set({}, ...), metatable)
   end;
 })

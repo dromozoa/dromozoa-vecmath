@@ -35,6 +35,11 @@ assert(v.x == 3 / math.sqrt(83))
 assert(v.y == 7 / math.sqrt(83))
 assert(v.z == 5 / math.sqrt(83))
 
+v:normalize{1,1,1}
+assert(v.x == 1 / math.sqrt(3))
+assert(v.y == 1 / math.sqrt(3))
+assert(v.z == 1 / math.sqrt(3))
+
 local v1 = vector3(1,2,3)
 local v2 = vector3(3,4,5)
 local angle = v1:angle(v2) * 180 / math.pi

@@ -93,7 +93,7 @@ end
 
 return setmetatable(class, {
   __index = super;
-  __call = function (_, x, y, z)
-    return setmetatable(class.set({}, x, y, z), metatable)
+  __call = function (_, ...)
+    return setmetatable(class.set({}, ...), metatable)
   end;
 })
