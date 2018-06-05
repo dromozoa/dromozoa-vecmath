@@ -19,20 +19,38 @@ local matrix3 = require "dromozoa.vecmath.matrix3"
 local eig3 = require "dromozoa.vecmath.eig3"
 local vector3 = require "dromozoa.vecmath.vector3"
 
-local a = matrix3(16,-1,1,2,12,1,1,3,-24)
--- local a = matrix3(1, 1/2, 1/3, 1/2, 1/3, 1/4, 1/3, 1/4, 1/5)
--- local a = matrix3(2,1,4,1,-2,3,-3,-1,1)
--- local a = matrix3(1, 1, 2, 1, 2, 3, 1, 2, 3)
--- local a = matrix3(1, 1, 1, 1, 1, 1, 1, 1, 1)
--- local a = matrix3(2,1,-1,-2,-1,3,-1,-1,3)
-local b = vector3()
+local verbose = os.getenv "VERBOSE" == "1"
 
-print(tostring(a))
+local epsilon = 1e-3
 
-local x = matrix3():set(a)
-local y = matrix3():transpose(x)
-x:mul(y)
-eig3(x, 6e-20)
+local function test_svd(m, expect)
+  local x = matrix3(m)
+  local y = matrix3(m):transpose()
+  x:mul(y)
+  eig3(x, 6e-20)
+  local result = {
+    math.sqrt(math.abs(x.m11));
+    math.sqrt(math.abs(x.m22));
+    math.sqrt(math.abs(x.m33));
+  }
+  table.sort(result, function (a, b) return b < a end)
+  local e1 = math.abs(result[1] - expect[1])
+  local e2 = math.abs(result[2] - expect[2])
+  local e3 = math.abs(result[3] - expect[3])
+  if verbose then
+    print(tostring(m))
+    print(tostring(x))
+    print(result[1], expect[1], e1)
+    print(result[2], expect[2], e2)
+    print(result[3], expect[3], e3)
+  end
+  assert(e1 < epsilon)
+  assert(e2 < epsilon)
+  assert(e3 < epsilon)
+end
 
-print(vector3(math.sqrt(x.m11), math.sqrt(x.m22), math.sqrt(x.m33)))
-
+test_svd(matrix3(16,-1,1,2,12,1,1,3,-24), {24.22340, 16.17706, 12.02205})
+test_svd(matrix3(1,1/2,1/3,1/2,1/3,1/4,1/3,1/4,1/5), { 1.40832, 0.12233, 0.00269})
+test_svd(matrix3(2,1,4,1,-2,3,-3,-1,1), {5.48428, 3.53075, 1.85916})
+test_svd(matrix3(1,1,2,1,2,3,1,2,3), {5.81572, 0.42118, 0})
+test_svd(matrix3(1,2,3,1,2,3,1,2,3), {6.48074, 0, 0})
