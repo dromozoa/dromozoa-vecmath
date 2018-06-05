@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local svd3 = require "dromozoa.vecmath.svd3"
+
 local rawset = rawset
 local type = type
 local cos = math.cos
@@ -54,9 +56,7 @@ end
 local function determinant(a)
   local a21 = a[4] local a22 = a[5] local a23 = a[6]
   local a31 = a[7] local a32 = a[8] local a33 = a[9]
-  return a[1] * (a22 * a33 - a32 * a23)
-      -  a[2] * (a21 * a33 - a31 * a23)
-      +  a[3] * (a21 * a32 - a31 * a22)
+  return a[1] * (a22 * a33 - a32 * a23) - a[2] * (a21 * a33 - a31 * a23) + a[3] * (a21 * a32 - a31 * a22)
 end
 
 local class = {

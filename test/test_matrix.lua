@@ -42,13 +42,13 @@ assert(s == [[
 0, 0, 1
 ]])
 
-assert(m:set_scale(2) :equals {2,0,0,0,2,0,0,0,2})
+-- assert(m:set_scale(2) :equals {2,0,0,0,2,0,0,0,2})
 
-m:set_identity()
-for i = 1, 16 do
-  m:set_scale(i)
-  assert(m:get_scale() == i)
-end
+-- m:set_identity()
+-- for i = 1, 16 do
+--   m:set_scale(i)
+--   assert(m:get_scale() == i)
+-- end
 
 local data = assert(loadfile "test/matrix3d.lua")()
 
