@@ -17,28 +17,22 @@
 
 local matrix3 = require "dromozoa.vecmath.matrix3"
 local eig3 = require "dromozoa.vecmath.eig3"
-local svd3 = require "dromozoa.vecmath.svd3"
 local vector3 = require "dromozoa.vecmath.vector3"
 
 local a = matrix3(16,-1,1,2,12,1,1,3,-24)
 -- local a = matrix3(1, 1/2, 1/3, 1/2, 1/3, 1/4, 1/3, 1/4, 1/5)
 -- local a = matrix3(2,1,4,1,-2,3,-3,-1,1)
+-- local a = matrix3(1, 1, 2, 1, 2, 3, 1, 2, 3)
+-- local a = matrix3(1, 1, 1, 1, 1, 1, 1, 1, 1)
+-- local a = matrix3(2,1,-1,-2,-1,3,-1,-1,3)
 local b = vector3()
 
-svd3(a, b)
-
 print(tostring(a))
-print(tostring(b))
--- for i = 1, 16, 4 do
---   print(b[i], b[i + 1], b[i + 2], b[i + 3])
--- end
 
 local x = matrix3():set(a)
 local y = matrix3():transpose(x)
 x:mul(y)
-print(tostring(x))
-eig3(x, 1e-8)
-print(tostring(x))
+eig3(x, 6e-20)
 
 print(vector3(math.sqrt(x.m11), math.sqrt(x.m22), math.sqrt(x.m33)))
 

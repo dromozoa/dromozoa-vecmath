@@ -59,8 +59,6 @@ return function (a, epsilon)
     local a_qq = a[qq]
     local a_pi = a[pi]
     local a_qi = a[qi]
-    local a_ip = a[ip]
-    local a_iq = a[iq]
 
     local z = (a_qq - a_pp) / (2 * a_pq)
     local t
@@ -69,16 +67,21 @@ return function (a, epsilon)
     else
       t = 1 / (z + sqrt(1 + z * z))
     end
-    local cos = 1 / sqrt(1 + t * t)
-    local sin = cos * t
+    local c = 1 / sqrt(1 + t * t)
+    local s = c * t
+    local u = s / (1 + c)
 
-    a[pq] = sin * (cos * a_pp - sin * a_pq) + cos * (cos * a_pq - sin * a_qq)
-    a[qp] = a[pq]
-    a[pp] = cos * (cos * a_pp - sin * a_pq) - sin * (cos * a_pq - sin * a_qq)
-    a[qq] = sin * (sin * a_pp + cos * a_pq) + cos * (sin * a_pq + cos * a_qq)
-    a[pi] = cos * a_pi - sin * a_qi
-    a[qi] = sin * a_pi + cos * a_qi
-    a[ip] = cos * a_ip - sin * a_iq
-    a[iq] = sin * a_ip + cos * a_ip
+    local t_a_pq = t * a_pq
+    local a_pi_ip = a_pi - s * (a_qi + u * a_pi)
+    local a_qi_iq = a_qi + s * (a_pi - u * a_qi)
+
+    a[pq] = 0
+    a[qp] = 0
+    a[pp] = a_pp - t_a_pq
+    a[qq] = a_qq + t_a_pq
+    a[pi] = a_pi_ip
+    a[qi] = a_qi_iq
+    a[ip] = a_pi_ip
+    a[iq] = a_qi_iq
   end
 end
