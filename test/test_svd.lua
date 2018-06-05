@@ -20,8 +20,8 @@ local svd3 = require "dromozoa.vecmath.svd3"
 local vector3 = require "dromozoa.vecmath.vector3"
 
 -- local a = matrix3(16,-1,1,2,12,1,1,3,-24)
-local a = matrix3(1, 1/2, 1/3, 1/2, 1/3, 1/4, 1/3, 1/4, 1/5)
--- local a = matrix3(2,1,4,1,-2,3,-3,-1,1)
+-- local a = matrix3(1, 1/2, 1/3, 1/2, 1/3, 1/4, 1/3, 1/4, 1/5)
+local a = matrix3(2,1,4,1,-2,3,-3,-1,1)
 local b = vector3()
 
 svd3(a, b)

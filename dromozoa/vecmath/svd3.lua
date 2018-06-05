@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local epsilon = 1e-6
+local epsilon = 1e-9
 
 return function (a, b)
   local a11 = a[1] local a12 = a[2] local a13 = a[3]
@@ -36,19 +36,28 @@ return function (a, b)
     a31 * a31 + a32 * a32 + a33 * a33;
   }
 
+  local count = 0
+
   while true do
     local p = 1
     local q = 2
-    local v = a[2] if v < 0 then v = -v end
-    local u = a[3] if u < 0 then u = -u end if v < u then p = 1 q = 3 v = u end
-    local u = a[4] if u < 0 then u = -u end if v < u then p = 2 q = 1 v = u end
-    local u = a[6] if u < 0 then u = -u end if v < u then p = 2 q = 3 v = u end
-    local u = a[7] if u < 0 then u = -u end if v < u then p = 3 q = 1 v = u end
-    local u = a[8] if u < 0 then u = -u end if v < u then p = 3 q = 2 v = u end
+    local v = a[2] v = v * v
+    local m = v
+    local u = a[3] u = u * u m = m + u if v < u then p = 1 q = 3 v = u end
+    local u = a[4] u = u * u m = m + u if v < u then p = 2 q = 1 v = u end
+    local u = a[6] u = u * u m = m + u if v < u then p = 2 q = 3 v = u end
+    local u = a[7] u = u * u m = m + u if v < u then p = 3 q = 1 v = u end
+    local u = a[8] u = u * u m = m + u if v < u then p = 3 q = 2 v = u end
 
-    if v <= epsilon then
+    local n = m
+    local u = a[1] n = n + u * u
+    local u = a[5] n = n + u * u
+    local u = a[9] n = n + u * u
+    if m / n <= epsilon then
       break
     end
+    count = count + 1
+    print("!", count, p, q)
 
     local i = 6 - p - q
 
@@ -90,8 +99,6 @@ return function (a, b)
     a[ip] = cos * a_ip - sin * a_iq
     a[iq] = sin * a_ip + cos * a_ip
   end
-
-  print(a[1], a[5], a[9])
 
   b[1] = math.sqrt(a[1])
   b[2] = math.sqrt(a[5])
