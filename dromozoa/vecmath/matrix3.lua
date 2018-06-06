@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local eig3 = require "dromozoa.vecmath.eig3"
+
 local rawset = rawset
 local type = type
 local cos = math.cos

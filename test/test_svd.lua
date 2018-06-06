@@ -27,12 +27,15 @@ local function test_svd(m, expect)
   local x = matrix3(m)
   local y = matrix3(m):transpose()
   x:mul(y)
-  eig3(x, 6e-20)
+  eig3(x, 6e-26)
   local result = {
-    math.sqrt(math.abs(x.m11));
-    math.sqrt(math.abs(x.m22));
-    math.sqrt(math.abs(x.m33));
+    math.sqrt(x.m11);
+    math.sqrt(x.m22);
+    math.sqrt(x.m33);
   }
+  if x.m11 < 0 then result[1] = 0 end
+  if x.m22 < 0 then result[2] = 0 end
+  if x.m33 < 0 then result[3] = 0 end
   table.sort(result, function (a, b) return b < a end)
   local e1 = math.abs(result[1] - expect[1])
   local e2 = math.abs(result[2] - expect[2])

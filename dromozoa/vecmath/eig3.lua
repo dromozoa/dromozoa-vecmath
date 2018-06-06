@@ -32,7 +32,7 @@ return function (a, epsilon)
     local u = a[8] ; u = u * u ; s = s + u if v < u then p = 3 ; q = 2 ; v = u end
 
     if s < epsilon then
-      break
+      return
     end
 
     local i = 6 - p - q
