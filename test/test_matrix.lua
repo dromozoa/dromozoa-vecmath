@@ -20,6 +20,17 @@ local vector3 = require "dromozoa.vecmath.vector3"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
+local m = matrix3()
+local s = tostring(m)
+if verbose then
+  print(s)
+end
+assert(s == [[
+0, 0, 0
+0, 0, 0
+0, 0, 0
+]])
+
 local m = matrix3(1,2,3,4,5,6,7,8,9)
 local s = tostring(m)
 if verbose then

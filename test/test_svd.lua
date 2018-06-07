@@ -24,25 +24,29 @@ local verbose = os.getenv "VERBOSE" == "1"
 local epsilon = 1e-3
 
 local function test_svd(m, expect)
-  local x = matrix3(m)
-  local y = matrix3(m):transpose()
-  x:mul(y)
-  eig3(x, 6e-26)
+  local a = matrix3(m):mul(matrix3(m):transpose()) -- mul_transpose_right
+  local b = matrix3():set_identity()
+  eig3(a, b)
   local result = {
-    math.sqrt(x.m11);
-    math.sqrt(x.m22);
-    math.sqrt(x.m33);
+    math.sqrt(a.m11);
+    math.sqrt(a.m22);
+    math.sqrt(a.m33);
   }
-  if x.m11 < 0 then result[1] = 0 end
-  if x.m22 < 0 then result[2] = 0 end
-  if x.m33 < 0 then result[3] = 0 end
+  if a.m11 < 0 then result[1] = 0 end
+  if a.m22 < 0 then result[2] = 0 end
+  if a.m33 < 0 then result[3] = 0 end
   table.sort(result, function (a, b) return b < a end)
   local e1 = math.abs(result[1] - expect[1])
   local e2 = math.abs(result[2] - expect[2])
   local e3 = math.abs(result[3] - expect[3])
+  local c = matrix3(b):mul(matrix3(b):transpose())
+
   if verbose then
+    print(("="):rep(80))
     print(tostring(m))
-    print(tostring(x))
+    print(tostring(a))
+    print(tostring(b))
+    print(tostring(c))
     print(result[1], expect[1], e1)
     print(result[2], expect[2], e2)
     print(result[3], expect[3], e3)
@@ -50,6 +54,7 @@ local function test_svd(m, expect)
   assert(e1 < epsilon)
   assert(e2 < epsilon)
   assert(e3 < epsilon)
+  assert(c:epsilon_equals(matrix3():set_identity(), epsilon))
 end
 
 test_svd(matrix3(16,-1,1,2,12,1,1,3,-24), {24.22340, 16.17706, 12.02205})

@@ -17,7 +17,9 @@
 
 local sqrt = math.sqrt
 
-return function (a, epsilon)
+local epsilon = 6e-15
+
+return function (a, b)
   while true do
     local v = a[2]
     v = v * v
@@ -83,5 +85,26 @@ return function (a, epsilon)
     a[qi] = a_qi_iq
     a[ip] = a_pi_ip
     a[iq] = a_qi_iq
+
+    if b then
+      local bp = b[p]
+      local bq = b[q]
+      b[p] = c * bp - s * bq
+      b[q] = s * bp + c * bq
+
+      p = p + 3
+      q = q + 3
+      bp = b[p]
+      bq = b[q]
+      b[p] = c * bp - s * bq
+      b[q] = s * bp + c * bq
+
+      p = p + 3
+      q = q + 3
+      bp = b[p]
+      bq = b[q]
+      b[p] = c * bp - s * bq
+      b[q] = s * bp + c * bq
+    end
   end
 end

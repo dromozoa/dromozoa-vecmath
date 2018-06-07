@@ -145,20 +145,26 @@ function class.transpose(a, b)
 end
 
 function class.set(a, m11, m12, m13, m21, m22, m23, m31, m32, m33)
-  if m12 then
-    a[1] = m11 ; a[2] = m12 ; a[3] = m13
-    a[4] = m21 ; a[5] = m22 ; a[6] = m23
-    a[7] = m31 ; a[8] = m32 ; a[9] = m33
-  else
-    if type(m11) == "table" then
-      a[1] = m11[1] ; a[2] = m11[2] ; a[3] = m11[3]
-      a[4] = m11[4] ; a[5] = m11[5] ; a[6] = m11[6]
-      a[7] = m11[7] ; a[8] = m11[8] ; a[9] = m11[9]
+  if m11 then
+    if m12 then
+      a[1] = m11 ; a[2] = m12 ; a[3] = m13
+      a[4] = m21 ; a[5] = m22 ; a[6] = m23
+      a[7] = m31 ; a[8] = m32 ; a[9] = m33
     else
-      a[1] = m11 ; a[2] = 0   ; a[3] = 0
-      a[4] = 0   ; a[5] = m11 ; a[6] = 0
-      a[7] = 0   ; a[8] = 0   ; a[9] = m11
+      if type(m11) == "table" then
+        a[1] = m11[1] ; a[2] = m11[2] ; a[3] = m11[3]
+        a[4] = m11[4] ; a[5] = m11[5] ; a[6] = m11[6]
+        a[7] = m11[7] ; a[8] = m11[8] ; a[9] = m11[9]
+      else
+        a[1] = m11 ; a[2] = 0   ; a[3] = 0
+        a[4] = 0   ; a[5] = m11 ; a[6] = 0
+        a[7] = 0   ; a[8] = 0   ; a[9] = m11
+      end
     end
+  else
+    a[1] = 0 ; a[2] = 0 ; a[3] = 0
+    a[4] = 0 ; a[5] = 0 ; a[6] = 0
+    a[7] = 0 ; a[8] = 0 ; a[9] = 0
   end
   return a
 end
