@@ -17,6 +17,7 @@
 
 local tuple3 = require "dromozoa.vecmath.tuple3"
 
+local rawget = rawget
 local rawset = rawset
 local sqrt = math.sqrt
 
@@ -83,7 +84,7 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return a[super.index[key]]
+    return rawget(a, super.index[key])
   end
 end
 

@@ -124,6 +124,10 @@ local function test(n, class)
   elseif n == 4 then
     assert(s == "(3, 4, 5, 6)")
   end
+
+  local t = class(1,2,3,4)
+  t[n] = nil
+  assert(not t[n])
 end
 
 test(3, point3)

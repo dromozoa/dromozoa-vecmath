@@ -17,6 +17,7 @@
 
 local eig3 = require "dromozoa.vecmath.eig3"
 
+local rawget = rawget
 local rawset = rawset
 local type = type
 local cos = math.cos
@@ -56,7 +57,9 @@ end
 local function determinant(a)
   local a21 = a[4] local a22 = a[5] local a23 = a[6]
   local a31 = a[7] local a32 = a[8] local a33 = a[9]
-  return a[1] * (a22 * a33 - a32 * a23) - a[2] * (a21 * a33 - a31 * a23) + a[3] * (a21 * a32 - a31 * a22)
+  return a[1] * (a22 * a33 - a32 * a23)
+      -  a[2] * (a21 * a33 - a31 * a23)
+      +  a[3] * (a21 * a32 - a31 * a22)
 end
 
 local class = {
@@ -305,8 +308,74 @@ function class.mul_normalize(a, b, c)
 end
 
 function class.mul_transpose_both(a, b, c)
-  class.mul(a, c, b)
-  class.transpose(a)
+  local b11 = b[1] local b12 = b[4] local b13 = b[7]
+  local b21 = b[2] local b22 = b[5] local b23 = b[8]
+  local b31 = b[3] local b32 = b[6] local b33 = b[9]
+
+  local c11 = c[1] local c12 = c[4] local c13 = c[7]
+  local c21 = c[2] local c22 = c[5] local c23 = c[8]
+  local c31 = c[3] local c32 = c[6] local c33 = c[9]
+
+  a[1] = b11 * c11 + b12 * c21 + b13 * c31
+  a[2] = b11 * c12 + b12 * c22 + b13 * c32
+  a[3] = b11 * c13 + b12 * c23 + b13 * c33
+
+  a[4] = b21 * c11 + b22 * c21 + b23 * c31
+  a[5] = b21 * c12 + b22 * c22 + b23 * c32
+  a[6] = b21 * c13 + b22 * c23 + b23 * c33
+
+  a[7] = b31 * c11 + b32 * c21 + b33 * c31
+  a[8] = b31 * c12 + b32 * c22 + b33 * c32
+  a[9] = b31 * c13 + b32 * c23 + b33 * c33
+
+  return a
+end
+
+function class.mul_transpose_right(a, b, c)
+  local b11 = b[1] local b12 = b[2] local b13 = b[3]
+  local b21 = b[4] local b22 = b[5] local b23 = b[6]
+  local b31 = b[7] local b32 = b[8] local b33 = b[9]
+
+  local c11 = c[1] local c12 = c[4] local c13 = c[7]
+  local c21 = c[2] local c22 = c[5] local c23 = c[8]
+  local c31 = c[3] local c32 = c[6] local c33 = c[9]
+
+  a[1] = b11 * c11 + b12 * c21 + b13 * c31
+  a[2] = b11 * c12 + b12 * c22 + b13 * c32
+  a[3] = b11 * c13 + b12 * c23 + b13 * c33
+
+  a[4] = b21 * c11 + b22 * c21 + b23 * c31
+  a[5] = b21 * c12 + b22 * c22 + b23 * c32
+  a[6] = b21 * c13 + b22 * c23 + b23 * c33
+
+  a[7] = b31 * c11 + b32 * c21 + b33 * c31
+  a[8] = b31 * c12 + b32 * c22 + b33 * c32
+  a[9] = b31 * c13 + b32 * c23 + b33 * c33
+
+  return a
+end
+
+function class.mul_transpose_left(a, b, c)
+  local b11 = b[1] local b12 = b[4] local b13 = b[7]
+  local b21 = b[2] local b22 = b[5] local b23 = b[8]
+  local b31 = b[3] local b32 = b[6] local b33 = b[9]
+
+  local c11 = c[1] local c12 = c[2] local c13 = c[3]
+  local c21 = c[4] local c22 = c[5] local c23 = c[6]
+  local c31 = c[7] local c32 = c[8] local c33 = c[9]
+
+  a[1] = b11 * c11 + b12 * c21 + b13 * c31
+  a[2] = b11 * c12 + b12 * c22 + b13 * c32
+  a[3] = b11 * c13 + b12 * c23 + b13 * c33
+
+  a[4] = b21 * c11 + b22 * c21 + b23 * c31
+  a[5] = b21 * c12 + b22 * c22 + b23 * c32
+  a[6] = b21 * c13 + b22 * c23 + b23 * c33
+
+  a[7] = b31 * c11 + b32 * c21 + b33 * c31
+  a[8] = b31 * c12 + b32 * c22 + b33 * c32
+  a[9] = b31 * c13 + b32 * c23 + b33 * c33
+
   return a
 end
 
@@ -378,7 +447,7 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return a[class.index[key]]
+    return rawget(a, class.index[key])
   end
 end
 

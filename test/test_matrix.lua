@@ -117,6 +117,8 @@ assert(m:set(m1):mul(m2):equals(data.mul))
 -- assert(m:mul_normalize_cp(m1, m2):equals(data.mul_normalize_cp))
 
 assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
+assert(m:mul_transpose_right(m1, m2):equals(data.mul_transpose_right))
+assert(m:mul_transpose_left(m1, m2):equals(data.mul_transpose_left))
 
 assert(m:negate(m1):equals(data.negate))
 assert(m:negate(m:set(m1)):equals(data.negate))
@@ -128,3 +130,7 @@ assert(v:equals(data.transform))
 v:set()
 m:set(m1):transform(v1, v)
 assert(v:equals(data.transform))
+
+local m = matrix3(0,0,0,0,0,0,0,0,nil)
+assert(not m[9])
+assert(not m.m33)
