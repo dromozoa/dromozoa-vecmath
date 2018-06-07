@@ -41,6 +41,34 @@
   <li><a href="http://nalab.mind.meiji.ac.jp/~mk/labo/text/eigenvalues-add.pdf">固有値問題ノートの補足</a></li>
 </ul>
 
+<h2>\(3 \times 3\)行列の固有値と特異値</h2>
+
+<p>
+\(3 \times 3\)行列\(m\)が与えられたとき、\(M = m m^*\)を固有値分解して、ユニタリ行列\(U\)と固有値行列\(S\)を得る。
+\[
+  (U, S) = \mathrm{eig}(M)
+\]
+\(m\)を特異値分解する。
+\[\begin{eqnarray}
+  m   &amp;=&amp; u s v^* \\
+  u   &amp;=&amp; U \\
+  s   &amp;=&amp; \sqrt{S} \\
+  v^* &amp;=&amp; s^{-1} U^* m
+\end{eqnarray}\]
+回転成分\(u v^*\)は
+\[\begin{eqnarray}
+  u v^* = U s^{-1} U^* m
+\end{eqnarray}\]
+</p>
+
 </div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  CommonHTML: {
+    undefinedFamily: "sans-serif"
+  }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML"></script>
 </body>
 </html>
