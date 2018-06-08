@@ -17,22 +17,24 @@
 
 local sqrt = math.sqrt
 
-return function (a, epsilon)
+-- sqrt(6) * DBL_EPSILON
+local epsilon = 5.438959822042073e-16
+
+return function (a, b)
   while true do
-    local v = a[2]
-    v = v * v
-    local s = v
     local p = 1
     local q = 2
 
+    local v = a[2]
+    v = v * v
+    local s = v
     local u = a[3] ; u = u * u ; s = s + u if v < u then p = 1 ; q = 3 ; v = u end
     local u = a[4] ; u = u * u ; s = s + u if v < u then p = 2 ; q = 1 ; v = u end
     local u = a[6] ; u = u * u ; s = s + u if v < u then p = 2 ; q = 3 ; v = u end
     local u = a[7] ; u = u * u ; s = s + u if v < u then p = 3 ; q = 1 ; v = u end
     local u = a[8] ; u = u * u ; s = s + u if v < u then p = 3 ; q = 2 ; v = u end
-
     if s < epsilon then
-      break
+      return
     end
 
     local i = 6 - p - q
@@ -44,19 +46,19 @@ return function (a, epsilon)
     local qb = q - 3
     local ib = i - 3
 
-    local pq = pa + qb
-    local qp = qa + pb
     local pp = pa + pb
     local qq = qa + qb
+    local pq = pa + qb
+    local qp = qa + pb
     local pi = pa + ib
     local qi = qa + ib
     local ip = ia + pb
     local iq = ia + qb
 
-    local a_pq = a[pq]
-    local a_qp = a[qp]
     local a_pp = a[pp]
     local a_qq = a[qq]
+    local a_pq = a[pq]
+    local a_qp = a[qp]
     local a_pi = a[pi]
     local a_qi = a[qi]
 
@@ -75,13 +77,34 @@ return function (a, epsilon)
     local a_pi_ip = a_pi - s * (a_qi + u * a_pi)
     local a_qi_iq = a_qi + s * (a_pi - u * a_qi)
 
-    a[pq] = 0
-    a[qp] = 0
     a[pp] = a_pp - t_a_pq
     a[qq] = a_qq + t_a_pq
+    a[pq] = 0
+    a[qp] = 0
     a[pi] = a_pi_ip
     a[qi] = a_qi_iq
     a[ip] = a_pi_ip
     a[iq] = a_qi_iq
+
+    if b then
+      local bp = b[p]
+      local bq = b[q]
+      b[p] = c * bp - s * bq
+      b[q] = s * bp + c * bq
+
+      p = p + 3
+      q = q + 3
+      bp = b[p]
+      bq = b[q]
+      b[p] = c * bp - s * bq
+      b[q] = s * bp + c * bq
+
+      p = p + 3
+      q = q + 3
+      bp = b[p]
+      bq = b[q]
+      b[p] = c * bp - s * bq
+      b[q] = s * bp + c * bq
+    end
   end
 end

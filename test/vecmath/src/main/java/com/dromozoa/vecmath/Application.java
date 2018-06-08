@@ -44,6 +44,10 @@ public class Application {
     System.out.println("  " + s(m2) + ";");
     System.out.println("  " + s(v1) + ";");
 
+    m.set(m1);
+    m.setScale(2);
+    System.out.println("  set_scale2 = " + s(m) + ";");
+
     System.out.println("  get_scale = " + m1.getScale() + ";");
 
     m.add(2, m1);
