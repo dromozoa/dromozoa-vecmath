@@ -53,14 +53,6 @@ assert(s == [[
 0, 0, 1
 ]])
 
--- assert(m:set_scale(2) :equals {2,0,0,0,2,0,0,0,2})
-
--- m:set_identity()
--- for i = 1, 16 do
---   m:set_scale(i)
---   assert(m:get_scale() == i)
--- end
-
 local data = assert(loadfile "test/matrix3d.lua")()
 
 local m = matrix3()
@@ -77,7 +69,18 @@ if verbose then
   print(tostring(v1))
 end
 
--- assert(math.abs(m1:get_scale() - data.get_scale) < 0.0001)
+-- javax.vecmath bug
+local d = data.set_scale2
+d[1], d[2] = d[2], d[1]
+d[4], d[5] = d[5], d[4]
+d[7], d[8] = d[8], d[7]
+if verbose then
+  print(m:set(m1):set_scale(2))
+  print(matrix3(d))
+end
+assert(m:set(m1):set_scale(2):epsilon_equals(d, eps))
+
+assert(math.abs(m1:get_scale() - data.get_scale) < eps)
 
 assert(m:add(2, m1):equals(data.add2))
 assert(m:add(2, m:set(m1)):equals(data.add2))
@@ -113,12 +116,29 @@ assert(m:mul(m1, m2):equals(data.mul))
 assert(m:mul(m1, m:set(m2)):equals(data.mul))
 assert(m:set(m1):mul(m2):equals(data.mul))
 
--- assert(m:mul_normalize(m1, m2):equals(data.mul_normalize))
--- assert(m:mul_normalize_cp(m1, m2):equals(data.mul_normalize_cp))
-
+assert(m:mul_normalize(m1, m2):epsilon_equals(data.mul_normalize, eps))
 assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
 assert(m:mul_transpose_right(m1, m2):equals(data.mul_transpose_right))
 assert(m:mul_transpose_left(m1, m2):equals(data.mul_transpose_left))
+
+-- javax.vecmath bug
+local d = data.normalize
+d[1], d[2] = d[2], d[1]
+d[4], d[5] = d[5], d[4]
+d[7], d[8] = d[8], d[7]
+if verbose then
+  print(m:normalize(m1))
+  print(matrix3(d))
+end
+assert(m:normalize(m1):epsilon_equals(d, eps))
+assert(m:set(m1):normalize():epsilon_equals(d, eps))
+
+if verbose then
+  print(m:normalize_cp(m1))
+  print(matrix3(data.normalize_cp))
+end
+
+assert(m:normalize_cp(m1):epsilon_equals(data.normalize_cp, eps))
 
 assert(m:negate(m1):equals(data.negate))
 assert(m:negate(m:set(m1)):equals(data.negate))

@@ -32,28 +32,6 @@ local function to_string(a)
       a[7], a[8], a[9])
 end
 
-local function svd(a, b)
-  local a11 = a[1] local a12 = a[2] local a13 = a[3]
-  local a21 = a[4] local a22 = a[5] local a23 = a[6]
-  local a31 = a[7] local a32 = a[8] local a33 = a[9]
-
-  local x = a11 * a11 + a21 * a21 + a31 * a31
-  local y = a12 * a12 + a22 * a22 + a32 * a32
-  local z = a13 * a13 + a23 * a23 + a33 * a33
-  local s = sqrt((x + y + z) / 3)
-
-  if b then
-    local x = sqrt(x)
-    local y = sqrt(y)
-    local z = sqrt(z)
-    b[1] = a11 / x ; b[2] = a12 / y ; b[3] = a13 / z
-    b[4] = a21 / x ; b[5] = a22 / y ; b[6] = a23 / z
-    b[7] = a31 / x ; b[8] = a32 / y ; b[9] = a33 / z
-  end
-
-  return s
-end
-
 local function determinant(a)
   local a21 = a[4] local a22 = a[5] local a23 = a[6]
   local a31 = a[7] local a32 = a[8] local a33 = a[9]
@@ -82,15 +60,15 @@ function class.set_identity(a)
 end
 
 function class.set_scale(a, scale)
-  svd(a, a)
-  a[1] = a[1] * scale
-  a[5] = a[5] * scale
-  a[9] = a[9] * scale
+  class.svd(a, a)
+  a[1] = a[1] * scale ; a[2] = a[2] * scale ; a[3] = a[3] * scale
+  a[4] = a[4] * scale ; a[5] = a[5] * scale ; a[6] = a[6] * scale
+  a[7] = a[7] * scale ; a[8] = a[8] * scale ; a[9] = a[9] * scale
   return a
 end
 
 function class.get_scale(a)
-  return svd(a)
+  return class.svd(a)
 end
 
 function class.add(a, b, c)
@@ -303,7 +281,7 @@ end
 
 function class.mul_normalize(a, b, c)
   class.mul(a, b, c)
-  svd(a, a)
+  class.svd(a, a)
   return a
 end
 
@@ -440,6 +418,106 @@ function class.transform(a, b, c)
     b[3] = a[7] * x + a[8] * y + a[9] * z
   end
   return a
+end
+
+function class.normalize(a, b)
+  if b then
+    class.svd(b, a)
+  else
+    class.svd(a, a)
+  end
+  return a
+end
+
+function class.normalize_cp(a, b)
+  if b then
+    local b11 = b[1] local b12 = b[2] local b13 = b[3]
+    local b21 = b[4] local b22 = b[5] local b23 = b[6]
+    local b31 = b[7] local b32 = b[8] local b33 = b[9]
+
+    local d = sqrt(b11 * b11 + b21 * b21 + b31 * b31)
+    b11 = b11 / d
+    b21 = b21 / d
+    b31 = b31 / d
+
+    local d = sqrt(b12 * b12 + b22 * b22 + b32 * b32)
+    b12 = b12 / d
+    b22 = b22 / d
+    b32 = b32 / d
+
+    a[1] = b11 ; a[2] = b12 ; a[3] = b21 * b32 - b22 * b31
+    a[4] = b21 ; a[5] = b22 ; a[6] = b31 * b12 - b32 * b11
+    a[7] = b31 ; a[8] = b32 ; a[9] = b11 * b22 - b12 * b21
+  else
+    local a11 = a[1] local a12 = a[2] local a13 = a[3]
+    local a21 = a[4] local a22 = a[5] local a23 = a[6]
+    local a31 = a[7] local a32 = a[8] local a33 = a[9]
+
+    local d = sqrt(a11 * a11 + a21 * a21 + a31 * a31)
+    a11 = a11 / d
+    a21 = a21 / d
+    a31 = a31 / d
+
+    local d = sqrt(a12 * a12 + a22 * a22 + a32 * a32)
+    a12 = a12 / d
+    a22 = a22 / d
+    a32 = a32 / d
+
+    a[1] = a11 ; a[2] = a12 ; a[3] = a21 * a32 - a22 * a31
+    a[4] = a21 ; a[5] = a22 ; a[6] = a31 * a12 - a32 * a11
+    a[7] = a31 ; a[8] = a32 ; a[9] = a11 * a22 - a12 * a21
+  end
+  return a
+end
+
+function class.svd(a, b)
+  local s = {
+    a[1], a[2], a[3],
+    a[4], a[5], a[6],
+    a[7], a[8], a[9],
+  }
+  local u = {
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+  }
+
+  class.mul_transpose_right(s, s, s)
+
+  eig3(s, u)
+
+  local s1 = s[1] if s1 < 0 then s1 = 0 else s1 = sqrt(s1) end
+  local s2 = s[5] if s2 < 0 then s2 = 0 else s2 = sqrt(s2) end
+  local s3 = s[9] if s3 < 0 then s3 = 0 else s3 = sqrt(s3) end
+
+  -- 0 div?
+  s[1] = 1 / s1 ; s[2] = 0      ; s[3] = 0
+  s[4] = 0      ; s[5] = 1 / s2 ; s[6] = 0
+  s[7] = 0      ; s[8] = 0      ; s[9] = 1 / s3
+
+  class.mul_transpose_right(s, s, u)
+  class.mul(s, a)
+  class.mul(u, s)
+
+  if b then
+    b[1] = u[1] ; b[2] = u[2] ; b[3] = u[3]
+    b[4] = u[4] ; b[5] = u[5] ; b[6] = u[6]
+    b[7] = u[7] ; b[8] = u[8] ; b[9] = u[9]
+  end
+
+  if s1 > s2 then
+    if s1 > s3 then
+      return s1
+    else
+      return s3
+    end
+  else
+    if s2 > s3 then
+      return s2
+    else
+      return s3
+    end
+  end
 end
 
 function metatable.__index(a, key)
