@@ -17,6 +17,7 @@
 
 local matrix3 = require "dromozoa.vecmath.matrix3"
 local eig3 = require "dromozoa.vecmath.eig3"
+local svd3 = require "dromozoa.vecmath.svd3"
 local vector3 = require "dromozoa.vecmath.vector3"
 
 local verbose = os.getenv "VERBOSE" == "1"
@@ -62,3 +63,15 @@ test_svd(matrix3(1,1/2,1/3,1/2,1/3,1/4,1/3,1/4,1/5), { 1.40832, 0.12233, 0.00269
 test_svd(matrix3(2,1,4,1,-2,3,-3,-1,1), {5.48428, 3.53075, 1.85916})
 test_svd(matrix3(1,1,2,1,2,3,1,2,3), {5.81572, 0.42118, 0})
 test_svd(matrix3(1,2,3,1,2,3,1,2,3), {6.48074, 0, 0})
+
+if verbose then
+  print(("="):rep(80))
+end
+local m = matrix3(16,-1,1,2,12,1,1,3,-24)
+-- local m = matrix3(1,1/2,1/3,1/2,1/3,1/4,1/3,1/4,1/5)
+-- local m = matrix3(2,1,4,1,-2,3,-3,-1,1)
+svd3(m)
+if verbose then
+  print(("-"):rep(80))
+  print(m)
+end

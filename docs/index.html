@@ -41,24 +41,86 @@
   <li><a href="http://nalab.mind.meiji.ac.jp/~mk/labo/text/eigenvalues-add.pdf">固有値問題ノートの補足</a></li>
 </ul>
 
-<h2>\(3 \times 3\)行列の固有値と特異値</h2>
+<h2>特異値分解</h2>
+
+<h3>固有値と特異値</h3>
 
 <p>
-\(3 \times 3\)行列\(m\)が与えられたとき、\(M = m m^*\)を固有値分解して、ユニタリ行列\(U\)と固有値行列\(S\)を得る。
+\(3 \times 3\)行列\(m\)が与えられたとき、\(M = m m^*\)を固有値分解してユニタリ行列\(U\)と固有値行列\(S\)を得る。
 \[
   (U, S) = \mathrm{eig}(M)
 \]
-\(m\)を特異値分解する。
+\(m\)を特異値分解すると、
 \[\begin{eqnarray}
   m   &amp;=&amp; u s v^* \\
   u   &amp;=&amp; U \\
   s   &amp;=&amp; \sqrt{S} \\
   v^* &amp;=&amp; s^{-1} U^* m
 \end{eqnarray}\]
-回転成分\(u v^*\)は
-\[\begin{eqnarray}
+回転成分\(u v^*\)は、
+\[
   u v^* = U s^{-1} U^* m
-\end{eqnarray}\]
+\]
+ランクが3でない場合、特異値が0になるので問題がある。
+</p>
+
+<h3>ヤコビ法による固有値分解</h3>
+
+<p>
+適当な\(p,q\)を選び、収束計算を行う。
+\(m_{pq}=m_{qp}\)でなければならない。
+\[
+  \begin{pmatrix}
+    \cos\theta &amp; -\sin\theta \\
+    \sin\theta &amp;  \cos\theta
+  \end{pmatrix}
+  \begin{pmatrix}
+    m_{pp} &amp; m_{pq} \\
+    m_{qp} &amp; m_{qq}
+  \end{pmatrix}
+  \begin{pmatrix}
+     \cos\theta &amp; \sin\theta \\
+    -\sin\theta &amp; \cos\theta
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    s_p &amp;   0 \\
+      0 &amp; s_q
+  \end{pmatrix}
+\]
+</p>
+
+<h3>ヤコビ法による特異値分解</h3>
+
+<p>
+適当な\(p,q\)を選び、収束計算を行う。
+\[
+  \begin{pmatrix}
+    \cos\theta &amp; -\sin\theta \\
+    \sin\theta &amp;  \cos\theta
+  \end{pmatrix}
+  \begin{pmatrix}
+    m_{pp} &amp; m_{pq} \\
+    m_{qp} &amp; m_{qq}
+  \end{pmatrix}
+  \begin{pmatrix}
+     \cos\phi &amp; \sin\phi \\
+    -\sin\phi &amp; \cos\phi
+  \end{pmatrix}
+  \begin{pmatrix}
+     \cos\theta &amp; \sin\theta \\
+    -\sin\theta &amp; \cos\theta
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    s_p &amp;   0 \\
+      0 &amp; s_q
+  \end{pmatrix}
+\]
+\(\phi\)は\(m\)を対称行列にするための回転で、
+\[
+  \tan\phi = \frac{m_{qp} - m_{pq}}{m_{pp} + m_{qq}}
+\]
 </p>
 
 <h2>\(3 \times 3\)行列のクロス積正規化</h2>
