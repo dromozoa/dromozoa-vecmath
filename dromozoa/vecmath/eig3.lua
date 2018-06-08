@@ -17,22 +17,35 @@
 
 local sqrt = math.sqrt
 
--- sqrt(6) * DBL_EPSILON
-local epsilon = 5.438959822042073e-16
+-- sqrt(3) * DBL_EPSILON
+local epsilon = 3.8459253727671227e-16
 
 return function (a, b)
   while true do
+    local u = a[2]
+    local s = u * u
+    local v = s
     local p = 1
     local q = 2
 
-    local v = a[2]
-    v = v * v
-    local s = v
-    local u = a[3] ; u = u * u ; s = s + u if v < u then p = 1 ; q = 3 ; v = u end
-    local u = a[4] ; u = u * u ; s = s + u if v < u then p = 2 ; q = 1 ; v = u end
-    local u = a[6] ; u = u * u ; s = s + u if v < u then p = 2 ; q = 3 ; v = u end
-    local u = a[7] ; u = u * u ; s = s + u if v < u then p = 3 ; q = 1 ; v = u end
-    local u = a[8] ; u = u * u ; s = s + u if v < u then p = 3 ; q = 2 ; v = u end
+    local u = a[3]
+    u = u * u
+    s = s + u
+    if v < u then
+      v = u
+      p = 1
+      q = 3
+    end
+
+    local u = a[6]
+    u = u * u
+    s = s + u
+    if v < u then
+      v = u
+      p = 2
+      q = 3
+    end
+
     if s < epsilon then
       return
     end
