@@ -61,6 +61,45 @@
 \end{eqnarray}\]
 </p>
 
+<h2>\(3 \times 3\)行列のクロス積正規化</h2>
+
+<h3>Sunの実装</h3>
+
+<p>
+\[\begin{eqnarray}
+  A &amp;=&amp; \left(
+    \begin{array}{ccc}
+      a_{11} &amp; a_{12} &amp; a_{13} \\
+      a_{21} &amp; a_{22} &amp; a_{23} \\
+      a_{31} &amp; a_{32} &amp; a_{33}
+    \end{array}
+  \right) \\
+  A_1 &amp;=&amp; (a_{11}, a_{21}, a_{31}) \\
+  A_2 &amp;=&amp; (a_{12}, a_{22}, a_{32}) \\
+  B &amp;=&amp; \left(
+    \begin{array}{ccc}
+      \frac{A_1}{\|A_1\|} &amp; \frac{A_2}{\|A_2\|} &amp; \frac{A_1 \times A_2}{\|A_1\| \|A_2\|}
+    \end{array}
+  \right) \\
+  &amp;=&amp; \left(
+    \begin{array}{ccc}
+      \frac{a_{11}}{\|A_1\|} &amp; \frac{a_{12}}{\|A_2\|} &amp; \frac{a_{21} a_{32} - a_{22} a_{31}}{\|A_1\| \|A_2\|} \\
+      \frac{a_{21}}{\|A_1\|} &amp; \frac{a_{22}}{\|A_2\|} &amp; \frac{a_{31} a_{12} - a_{32} a_{11}}{\|A_1\| \|A_2\|} \\
+      \frac{a_{31}}{\|A_1\|} &amp; \frac{a_{32}}{\|A_2\|} &amp; \frac{a_{11} a_{22} - a_{12} a_{21}}{\|A_1\| \|A_2\|}
+    \end{array}
+  \right)
+\end{eqnarray}\]
+</p>
+
+
+<h3>平鍋の実装</h3>
+
+<p>
+\[
+  B = \sqrt[3]{\mathrm{det}(A)} A
+\]
+</p>
+
 </div>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
