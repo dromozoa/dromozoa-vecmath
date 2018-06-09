@@ -203,20 +203,14 @@
   \end{pmatrix} \\
   &amp;=&amp;
   \begin{pmatrix}
-    m_{pp} \cos\phi - m_{pq} \sin\phi &amp;
-    m_{pp} \sin\phi + m_{pq} \cos\phi &amp;
-    m_{pi} \\
-    m_{qp} \cos\phi - m_{qq} \sin\phi &amp;
-    m_{qp} \sin\phi + m_{qq} \cos\phi &amp;
-    m_{qi} \\
-    m_{ip} \cos\phi - m_{iq} \sin\phi &amp;
-    m_{ip} \sin\phi + m_{iq} \cos\phi &amp;
-    m_{ii}
+    m_{pp} \cos\phi - m_{pq} \sin\phi &amp; m_{pq} \cos\phi + m_{pp} \sin\phi &amp; m_{pi} \\
+    m_{qp} \cos\phi - m_{qq} \sin\phi &amp; m_{qq} \cos\phi + m_{qp} \sin\phi &amp; m_{qi} \\
+    m_{ip} \cos\phi - m_{iq} \sin\phi &amp; m_{iq} \cos\phi + m_{ip} \sin\phi &amp; m_{ii}
   \end{pmatrix}
 \end{eqnarray}\]
 \(\phi\)は
 \[
-  m_{pp} \sin\phi + m_{pq} \cos\phi = m_{qp} \cos\phi - m_{qq} \sin\phi
+  m_{pq} \cos\phi + m_{pp} \sin\phi = m_{qp} \cos\phi - m_{qq} \sin\phi
 \]
 を満たすので
 \[\begin{eqnarray}
@@ -269,15 +263,9 @@
     0          &amp;  0          &amp; 1
   \end{pmatrix}
   \begin{pmatrix}
-    n_{pp} \cos\theta - n_{pq} \sin\theta &amp;
-    n_{pp} \sin\theta + n_{pq} \cos\theta &amp;
-    n_{pi} \\
-    n_{pq} \cos\theta - n_{qq} \sin\theta &amp;
-    n_{pq} \sin\theta + n_{qq} \cos\theta &amp;
-    n_{qi} \\
-    n_{ip} \cos\theta - n_{iq} \sin\theta &amp;
-    n_{ip} \sin\theta + n_{iq} \cos\theta &amp;
-    n_{ii}
+    n_{pp} \cos\theta - n_{pq} \sin\theta &amp; n_{pq} \cos\theta + n_{pp} \sin\theta &amp; n_{pi} \\
+    n_{pq} \cos\theta - n_{qq} \sin\theta &amp; n_{qq} \cos\theta + n_{pq} \sin\theta &amp; n_{qi} \\
+    n_{ip} \cos\theta - n_{iq} \sin\theta &amp; n_{iq} \cos\theta + n_{ip} \sin\theta &amp; n_{ii}
   \end{pmatrix} \\
   &amp;=&amp;
   \begin{pmatrix}
@@ -286,9 +274,9 @@
     n_{pi} \cos\theta - n_{qi} \sin\theta \\
     (n_{pp} - n_{qq}) \cos\theta \sin\theta + n_{pq} (\cos^2\theta - \sin^2\theta) &amp;
     n_{pp} \sin^2\theta + 2 n_{pq} \cos\theta \sin\theta + n_{qq} \cos^2\theta &amp;
-    n_{pi} \sin\theta + n_{qi} \cos\theta \\
+    n_{qi} \cos\theta + n_{pi} \sin\theta \\
     n_{ip} \cos\theta - n_{iq} \sin\theta &amp;
-    n_{ip} \sin\theta + n_{iq} \cos\theta &amp;
+    n_{iq} \cos\theta + n_{ip} \sin\theta &amp;
     n_{ii}
   \end{pmatrix}
 \end{eqnarray}\]
@@ -311,7 +299,9 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
   \tan\theta &amp;=&amp; \frac{\mathrm{sign}(\cot 2\theta)}{|\cot 2\theta| + \sqrt{1 + \cot^2 2\theta}} \\
   \cos\theta &amp;=&amp; \frac{1}{\sqrt{1 + tan^2 \theta}} \\
   \sin\theta &amp;=&amp; \cos\theta \tan\theta \\
-  \tan\frac{\theta}{2} &amp;=&amp; \frac{\sin\theta}{1 + \cos\theta}
+  \tan\frac{\theta}{2} &amp;=&amp; \frac{\sin\theta}{1 + \cos\theta} \\
+  a \cos\theta - b \sin\theta &amp;=&amp; a - (b + a \tan\frac{\theta}{2}) \sin\theta \\
+  a \cos\theta + b \sin\theta &amp;=&amp; a + (b - a \tan\frac{\theta}{2}) \sin\theta
 \end{eqnarray}\]
 を用いて
 \[\begin{eqnarray}
@@ -320,18 +310,7 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
   m_{pi}' &amp;=&amp; n_{pi} - (n_{qi} +  n_{pi} \tan\frac{\theta}{2}) \sin\theta \\
   m_{qi}' &amp;=&amp; n_{qi} + (n_{pi} -  n_{qi} \tan\frac{\theta}{2}) \sin\theta
 \end{eqnarray}\]
-固有値分解では\(m_{pi}' = m_{ip}', m_{qi}' = m_{iq}'\)なので計算を省略できるが、特異値分解では計算する。
-</p>
-
-<p>
-\[\begin{eqnarray}
-  a \cos\theta - b \sin\theta
-  &amp;=&amp;
-  a - (b + a \tan\frac{\theta}{2}) \sin\theta \\
-  a \cos\theta + b \sin\theta
-  &amp;=&amp;
-  a + (b - a \tan\frac{\theta}{2}) \sin\theta
-\end{eqnarray}\]
+固有値分解では\(m_{pi}' = m_{ip}', m_{qi}' = m_{iq}'\)なので計算を省略できるが、特異値分解では計算する必要がある。
 </p>
 
 <h4>回転成分</h4>
@@ -354,19 +333,6 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
     -\sin\theta &amp; \cos\theta &amp; 0 \\
      0          &amp; 0          &amp; 1
   \end{pmatrix} \\
-  &amp;=&amp;
-  \begin{pmatrix}
-    u_{11} \cos\theta - u_{12} \sin\theta &amp;
-    u_{12} \cos\theta + u_{11} \sin\theta &amp;
-    u_{13} \\
-    u_{21} \cos\theta - u_{22} \sin\theta &amp;
-    u_{22} \cos\theta + u_{21} \sin\theta &amp;
-    u_{23} \\
-    u_{31} \cos\theta - u_{32} \sin\theta &amp;
-    u_{32} \cos\theta + u_{31} \sin\theta &amp;
-    u_{33}
-  \end{pmatrix} \\
-
   \begin{pmatrix}
     v_{11}' &amp; v_{12}' &amp; v_{13}' \\
     v_{21}' &amp; v_{22}' &amp; v_{23}' \\
@@ -403,13 +369,11 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
     a_{21} &amp; a_{22} &amp; a_{23} \\
     a_{31} &amp; a_{32} &amp; a_{33}
   \end{pmatrix} \\
-
   A_1,
   A_2
   &amp;=&amp;
   \begin{pmatrix} a_{11} \\  a_{21} \\ a_{31} \end{pmatrix},
   \begin{pmatrix} a_{12} \\  a_{22} \\ a_{32} \end{pmatrix} \\
-
   B
   &amp;=&amp; \begin{pmatrix}
     \frac{A_1}{\|A_1\|} &amp;
