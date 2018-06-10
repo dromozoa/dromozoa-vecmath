@@ -16,25 +16,24 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local matrix3 = require "dromozoa.vecmath.matrix3"
-local eig3 = require "dromozoa.vecmath.eig3"
 local svd3 = require "dromozoa.vecmath.svd3"
-local vector3 = require "dromozoa.vecmath.vector3"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
 local epsilon = 1e-9
 
 local function test_svd(m, expect)
-  local s = matrix3(m)
+  local a = matrix3(m)
   local u = matrix3():set_identity()
   local v = matrix3():set_identity()
-  svd3(s, u, v)
+  local s = svd3(a, u, v)
   local result = {
-    s.m11;
-    s.m22;
-    s.m33;
+    a.m11;
+    a.m22;
+    a.m33;
   }
   table.sort(result, function (a, b) return b < a end)
+  assert(s == result[1])
   local e1 = math.abs(result[1] - expect[1])
   local e2 = math.abs(result[2] - expect[2])
   local e3 = math.abs(result[3] - expect[3])
@@ -48,9 +47,9 @@ local function test_svd(m, expect)
   assert(e1 < epsilon)
   assert(e2 < epsilon)
   assert(e3 < epsilon)
-  local n = matrix3():mul(u, s)
-  n:mul_transpose_right(n, v)
-  assert(m:epsilon_equals(n, epsilon))
+  local b = matrix3():mul(u, a)
+  b:mul_transpose_right(b, v)
+  assert(m:epsilon_equals(b, epsilon))
 end
 
 test_svd(matrix3(16,-1,1,2,12,1,1,3,-24), { 24.2234016039591, 16.1770571732806, 12.0220479098082 })

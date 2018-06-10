@@ -150,4 +150,22 @@ return function (a, b, c)
       jacobi(a, b, c, 5, 6, 4, 8, 9, 7, 2, 3)
     end
   end
+
+  local s1 = a[1]
+  local s2 = a[5]
+  local s3 = a[9]
+
+  if s1 > s2 then
+    if s1 > s3 then
+      return s1
+    else
+      return s3
+    end
+  else
+    if s2 > s3 then
+      return s2
+    else
+      return s3
+    end
+  end
 end
