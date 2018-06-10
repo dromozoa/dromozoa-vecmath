@@ -20,14 +20,105 @@ local sqrt = math.sqrt
 -- sqrt(6) * DBL_EPSILON
 local epsilon = 5.438959822042066e-16
 
+local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
+  local m_pp = m[pp] local m_pq = m[pq] local m_pi = m[pi]
+  local m_qp = m[qp] local m_qq = m[qq] local m_qi = m[qi]
+  local m_ip = m[ip] local m_iq = m[iq]
+
+  if m_qp ~= m_pq then
+    local x = m_qp - m_pq
+    local y = m_pp + m_qq
+    local z = sqrt(x * x + y * y)
+    local s = x / z
+    local c = y / z
+    local h = s / (1 + c)
+
+    m_pp, m_pq = m_pp - (m_pq + m_pp * h) * s, m_pq + (m_pp - m_pq * h) * s
+    m_qp, m_qq = m_pq,                         m_qq + (m_qp - m_qq * h) * s
+    m_ip, m_iq = m_ip - (m_iq + m_ip * h) * s, m_iq + (m_ip - m_iq * h) * s
+
+    if v then
+      local v_pp = v[pp] local v_pq = v[pq]
+      local v_qp = v[qp] local v_qq = v[qq]
+      local v_ip = v[ip] local v_iq = v[iq]
+
+      v[pp] = v_pp - (v_pq + v_pp * h) * s ; v[pq] = v_pq + (v_pp - v_pq * h) * s
+      v[qp] = v_qp - (v_qq + v_qp * h) * s ; v[qq] = v_qq + (v_qp - v_qq * h) * s
+      v[ip] = v_ip - (v_iq + v_ip * h) * s ; v[iq] = v_iq + (v_ip - v_iq * h) * s
+    end
+  end
+
+  local x = (m_qq - m_pp) * 0.5 / m_pq
+  local t
+  if x < 0 then
+    t = 1 / (x - sqrt(1 + x * x))
+  else
+    t = 1 / (x + sqrt(1 + x * x))
+  end
+  local c = 1 / sqrt(1 + t * t)
+  local s = c * t
+  local h = s / (1 + c)
+
+  m[pp] = m_pp - m_pq * t
+  m[pq] = 0
+  m[pi] = m_pi - (m_qi + m_pi * h) * s
+  m[qp] = 0
+  m[qq] = m_qq + m_pq * t
+  m[qi] = m_qi + (m_pi - m_qi * h) * s
+  m[ip] = m_ip - (m_iq + m_ip * h) * s
+  m[iq] = m_iq + (m_ip - m_iq * h) * s
+
+  if u then
+    local u_pp = u[pp] local u_pq = u[pq]
+    local u_qp = u[qp] local u_qq = u[qq]
+    local u_ip = u[ip] local u_iq = u[iq]
+
+    u[pp] = u_pp - (u_pq + u_pp * h) * s ; u[pq] = u_pq + (u_pp - u_pq * h) * s
+    u[qp] = u_qp - (u_qq + u_qp * h) * s ; u[qq] = u_qq + (u_qp - u_qq * h) * s
+    u[ip] = u_ip - (u_iq + u_ip * h) * s ; u[iq] = u_iq + (u_ip - u_iq * h) * s
+  end
+
+  if v then
+    local v_pp = v[pp] local v_pq = v[pq]
+    local v_qp = v[qp] local v_qq = v[qq]
+    local v_ip = v[ip] local v_iq = v[iq]
+
+    v[pp] = v_pp - (v_pq + v_pp * h) * s ; v[pq] = v_pq + (v_pp - v_pq * h) * s
+    v[qp] = v_qp - (v_qq + v_qp * h) * s ; v[qq] = v_qq + (v_qp - v_qq * h) * s
+    v[ip] = v_ip - (v_iq + v_ip * h) * s ; v[iq] = v_iq + (v_ip - v_iq * h) * s
+  end
+end
+
 return function (a, b, c)
+  local a11 = a[1]
+  local a22 = a[5]
+  local a33 = a[9]
+
+  if a11 < 0 then
+    c[1] = -1
+    a[1] = -a11
+    a[4] = -a[4]
+    a[7] = -a[7]
+  end
+  if a22 < 0 then
+    c[5] = -1
+    a[2] = -a[2]
+    a[5] = -a22
+    a[8] = -a[8]
+  end
+  if a33 < 0 then
+    c[9] = -1
+    a[3] = -a[3]
+    a[6] = -a[6]
+    a[9] = -a33
+  end
+
   while true do
     local u = a[2]
     local v = a[4]
     local s = u * u + v * v
     local w = s
-    local p = 1
-    local q = 2
+    local pq = 12
 
     local u = a[3]
     local v = a[7]
@@ -35,8 +126,7 @@ return function (a, b, c)
     s = s + u
     if w < u then
       w = u
-      p = 1
-      q = 3
+      pq = 13
     end
 
     local u = a[6]
@@ -45,113 +135,19 @@ return function (a, b, c)
     s = s + u
     if w < u then
       w = u
-      p = 2
-      q = 3
+      pq = 23
     end
 
     if s < epsilon then
-      return
+      break
     end
 
-    local i = 6 - p - q
-
-    local pa = p * 3
-    local qa = q * 3
-    local ia = i * 3
-    local pb = p - 3
-    local qb = q - 3
-    local ib = i - 3
-
-    local pp = pa + pb
-    local qq = qa + qb
-    local pq = pa + qb
-    local qp = qa + pb
-    local pi = pa + ib
-    local qi = qa + ib
-    local ip = ia + pb
-    local iq = ia + qb
-
-    do
-      local c
-      local s
-
-      local a_pp = a[pp]
-      local a_qq = a[qq]
-      local a_pq = a[pq]
-      local a_qp = a[qp]
-      local a_ip = a[ip]
-      local a_iq = a[iq]
-
-      local x = a_pp + a_qq
-      if x == 0 then
-        c = 0
-        s = 1
-      else
-        local t = (a_qp - a_pq) / x
-        c = 1 / sqrt(1 + t * t)
-        s = c * t
-      end
-
-      a[pp] = a_pp * c - a_pq * s
-      a[pq] = a_pp * s + a_pq * c
-      a[qp] = a_qp * c - a_qq * s
-      a[qq] = a_qp * s + a_qq * c
-      a[ip] = a_ip * c - a_iq * s
-      a[iq] = a_ip * s + a_iq * c
-    end
-
-    local a_pp = a[pp]
-    local a_qq = a[qq]
-    local a_pq = a[pq]
-    local a_qp = a[qp]
-    local a_pi = a[pi]
-    local a_qi = a[qi]
-    local a_ip = a[ip]
-    local a_iq = a[iq]
-
-    local z = (a_qq - a_pp) / (2 * a_pq)
-    local t
-    if z < 0 then
-      t = -1 / (-z + sqrt(1 + z * z))
+    if pq == 12 then
+      jacobi(a, b, c, 1, 2, 3, 4, 5, 6, 7, 8)
+    elseif pq == 13 then
+      jacobi(a, b, c, 1, 3, 2, 7, 9, 8, 4, 6)
     else
-      t = 1 / (z + sqrt(1 + z * z))
-    end
-    local c = 1 / sqrt(1 + t * t)
-    local s = c * t
-    local u = s / (1 + c)
-
-    local t_a_pq = t * a_pq
-    local a_pi_ip = a_pi - s * (a_qi + u * a_pi)
-    local a_qi_iq = a_qi + s * (a_pi - u * a_qi)
-
-    a[pp] = a_pp - t_a_pq
-    a[qq] = a_qq + t_a_pq
-    a[pq] = 0
-    a[qp] = 0
-    a[pi] = a_pi_ip
-    a[qi] = a_qi_iq
-    a[ip] = a_ip * c - a_iq * s
-    a[iq] = a_ip * s + a_iq * c
-
-    if b then
-      local bp = b[p]
-      local bq = b[q]
-      b[p] = c * bp - s * bq
-      b[q] = s * bp + c * bq
-
-      p = p + 3
-      q = q + 3
-      bp = b[p]
-      bq = b[q]
-      b[p] = c * bp - s * bq
-      b[q] = s * bp + c * bq
-
-      p = p + 3
-      q = q + 3
-      bp = b[p]
-      bq = b[q]
-      b[p] = c * bp - s * bq
-      b[q] = s * bp + c * bq
+      jacobi(a, b, c, 5, 6, 4, 8, 9, 7, 2, 3)
     end
   end
 end
