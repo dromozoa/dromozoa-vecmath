@@ -153,143 +153,43 @@
   (G_{\theta_n}^T \dots G_{\theta_1}^T)
   m
   (G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n})
-  = S_n
+  = s_n
 \]
-\(S_n\)の非対角成分の2乗和が閾値を下まわったら、収束したと見なす。
-</p>
-\[
-  m =
+\(s_n\)の非対角成分の2乗和が閾値を下まわったら収束したと見なす。
+特異値が負になった場合も考慮して
+\[\begin{eqnarray}
+  m &amp;=&amp;
   (G_{\theta_1} \dots G_{\theta_n})
-  S_n
-  (G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T)
-\]
+  s
+  (J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T) \\
+  s_n &amp;=&amp; \begin{pmatrix}
+    s_x &amp; 0   &amp; 0 \\
+    0   &amp; s_x &amp; 0 \\
+    0   &amp; 0   &amp; s_z
+  \end{pmatrix} \\
+  s &amp;=&amp; \begin{pmatrix}
+    |s_x| &amp; 0     &amp; 0 \\
+    0     &amp; |s_x| &amp; 0 \\
+    0     &amp; 0     &amp; |s_z|
+  \end{pmatrix} \\
+  J &amp;=&amp; \begin{pmatrix}
+    \frac{s_x}{|s_x|} &amp; 0                 &amp; 0 \\
+    0                 &amp; \frac{s_y}{|s_y|} &amp; 0 \\
+    0                 &amp; 0                 &amp; \frac{s_y}{|s_y|}
+  \end{pmatrix}
+\end{eqnarray}\]
 なので
 \[\begin{eqnarray}
-  u_n     &amp;=&amp; G_{\theta_1} \dots G_{\theta_n} \\
-  u_0     &amp;=&amp; I \\
-  u_{i+1} &amp;=&amp; u_i G_{\theta_i} \\
-  v^*     &amp;=&amp; G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T \\
-  v       &amp;=&amp; G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n} \\
-  v_0     &amp;=&amp; I \\
-  v_{i+1} &amp;=&amp; v_i G_{\phi_i} G_{\theta_i}
+  u_n      &amp;=&amp; G_{\theta_1} \dots G_{\theta_n} \\
+  u_0      &amp;=&amp; I \\
+  u_{i+1}  &amp;=&amp; u_i G_{\theta_i} \\
+  v_n^*    &amp;=&amp; J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T \\
+  v_n      &amp;=&amp; G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n} J \\
+           &amp;=&amp; v_n' J \\
+  v_0'     &amp;=&amp; I \\
+  v_{i+1}' &amp;=&amp; v_i' G_{\phi_i} G_{\theta_i}
 \end{eqnarray}\]
 </p>
-
-<p>
-特異値が負になった場合、ギブンス変換を用いて\(s\)の対角要素の符号を反転させる。
-\[
-  s' = B^T C \begin{pmatrix}
-    s_1 &amp; 0   &amp; 0 \\
-    0   &amp; s_2 &amp; 0 \\
-    0   &amp; 0   &amp; s_3
-  \end{pmatrix} A B
-\]
-</p>
-
-<table>
-  <tr>
-    <th>\(s_1\)</th>
-    <th>\(s_2\)</th>
-    <th>\(s_3\)</th>
-    <th>\(A\)</th>
-    <th>\(B\)</th>
-    <th>\(C\)</th>
-    <th>\(AB\)</th>
-    <th>\(B^TC\)</th>
-  </tr>
-
-  <tr>
-    <td>\(s_1 \ge 0\)</td>
-    <td>\(s_2 \ge 0\)</td>
-    <td>\(s_3 \ge 0\)</td>
-    <td>\(I\)</td>
-    <td>\(I\)</td>
-    <td>\(I\)</td>
-    <td>\(\begin{pmatrix}
-      1 &amp; 0 &amp; 0 \\
-      0 &amp; 1 &amp; 0 \\
-      0 &amp; 0 &amp; 1
-    \end{pmatrix}\)</td>
-    <td>\(\begin{pmatrix}
-      1 &amp; 0 &amp; 0 \\
-      0 &amp; 1 &amp; 0 \\
-      0 &amp; 0 &amp; 1
-    \end{pmatrix}\)</td>
-  </tr>
-  <tr>
-    <td>\(s_1 \ge 0\)</td>
-    <td>\(s_2 \le 0\)</td>
-    <td>\(s_3 \ge 0\)</td>
-    <td>\(G(1,2,\frac{1}{2}\pi)\)</td>
-    <td>\(I\)</td>
-    <td>\(A^T\)</td>
-    <td>\(\begin{pmatrix}
-       0 &amp; 1 &amp; 0 \\
-      -1 &amp; 0 &amp; 0 \\
-       0 &amp; 0 &amp; 1
-    \end{pmatrix}\)</td>
-    <td>\(\begin{pmatrix}
-      0 &amp; -1 &amp; 0 \\
-      1 &amp;  0 &amp; 0 \\
-      0 &amp;  0 &amp; 1
-    \end{pmatrix}\)</td>
-  </tr>
-  <tr>
-    <td>\(s_1 \le 0\)</td>
-    <td>\(s_2 \ge 0\)</td>
-    <td>\(s_3 \ge 0\)</td>
-    <td>\(G(1,2,\frac{3}{2}\pi)\)</td>
-    <td>\(I\)</td>
-    <td>\(A^T\)</td>
-  </tr>
-  <tr>
-    <td>\(s_1 \le 0\)</td>
-    <td>\(s_2 \le 0\)</td>
-    <td>\(s_3 \ge 0\)</td>
-    <td>\(G(1,2,\pi)\)</td>
-    <td>\(I\)</td>
-    <td>\(I\)</td>
-  </tr>
-
-  <tr>
-    <td>\(s_1 \ge 0\)</td>
-    <td>\(s_2 \ge 0\)</td>
-    <td>\(s_3 \ge 0\)</td>
-    <td>\(I\)</td>
-    <td>\(G(2,3,\frac{1}{2}\pi)\)</td>
-    <td>\(I\)</td>
-  </tr>
-  <tr>
-    <td>\(s_1 \ge 0\)</td>
-    <td>\(s_2 \le 0\)</td>
-    <td>\(s_3 \ge 0\)</td>
-    <td>\(G(1,2,\frac{1}{2}\pi)\)</td>
-    <td>\(G(2,3,\frac{1}{2}\pi)\)</td>
-    <td>\(A^T\)</td>
-  </tr>
-  <tr>
-    <td>\(s_1 \le 0\)</td>
-    <td>\(s_2 \ge 0\)</td>
-    <td>\(s_3 \ge 0\)</td>
-    <td>\(G(1,2,\frac{3}{2}\pi)\)</td>
-    <td>\(G(2,3,\frac{1}{2}\pi)\)</td>
-    <td>\(A^T\)</td>
-  </tr>
-  <tr>
-    <td>\(s_1 \le 0\)</td>
-    <td>\(s_2 \le 0\)</td>
-    <td>\(s_3 \ge 0\)</td>
-    <td>\(G(1,2,\pi)\)</td>
-    <td>\(G(2,3,\frac{1}{2}\pi)\)</td>
-    <td>\(I\)</td>
-  </tr>
-
-
-
-
-
-
-</table>
 
 <h3>計算例</h3>
 
