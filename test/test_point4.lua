@@ -17,7 +17,7 @@
 
 local point4 = require "dromozoa.vecmath.point4"
 
-assert(point4{1,2,3} :equals {1,2,3,1})
+assert(point4{1,2,3}:equals{1,2,3,1})
 
 assert(point4(1,2,3,4):distance_linf{0,0,0,0} == 4)
 assert(point4(1,2,4,3):distance_linf{0,0,0,0} == 4)
@@ -43,6 +43,8 @@ assert(point4(4,2,1,3):distance_linf{0,0,0,0} == 4)
 assert(point4(4,2,3,1):distance_linf{0,0,0,0} == 4)
 assert(point4(4,3,1,1):distance_linf{0,0,0,0} == 4)
 assert(point4(4,3,2,1):distance_linf{0,0,0,0} == 4)
+
+assert(point4():project{2,3,4,2}:equals{1,1.5,2,1})
 
 local data = assert(loadfile "test/point4d.lua")()
 
