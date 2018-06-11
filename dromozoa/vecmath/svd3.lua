@@ -137,11 +137,6 @@ return function (a, b, c)
     a[1] = s1
     a[4] = -a[4]
     a[7] = -a[7]
-    -- if b then
-    --   b[1] = -b[1]
-    --   b[4] = -b[4]
-    --   b[7] = -b[7]
-    -- end
     if c then
       c[1] = -c[1]
       c[4] = -c[4]
@@ -154,11 +149,6 @@ return function (a, b, c)
     a[2] = -a[2]
     a[5] = s2
     a[8] = -a[8]
-    -- if b then
-    --   b[2] = -b[2]
-    --   b[5] = -b[5]
-    --   b[8] = -b[8]
-    -- end
     if c then
       c[2] = -c[2]
       c[5] = -c[5]
@@ -171,11 +161,6 @@ return function (a, b, c)
     a[3] = -a[3]
     a[6] = -a[6]
     a[9] = s3
-    -- if b then
-    --   b[3] = -b[3]
-    --   b[6] = -b[6]
-    --   b[9] = -b[9]
-    -- end
     if c then
       c[3] = -c[3]
       c[6] = -c[6]
