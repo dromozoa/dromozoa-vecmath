@@ -21,9 +21,14 @@ local sqrt = math.sqrt
 local epsilon = 5.438959822042066e-16
 
 local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
-  local m_pp = m[pp] local m_pq = m[pq] local m_pi = m[pi]
-  local m_qp = m[qp] local m_qq = m[qq] local m_qi = m[qi]
-  local m_ip = m[ip] local m_iq = m[iq]
+  local m_pp = m[pp]
+  local m_pq = m[pq]
+  local m_pi = m[pi]
+  local m_qp = m[qp]
+  local m_qq = m[qq]
+  local m_qi = m[qi]
+  local m_ip = m[ip]
+  local m_iq = m[iq]
 
   if m_qp ~= m_pq then
     local x = m_qp - m_pq
@@ -34,17 +39,17 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
     local h = s / (1 + c)
 
     m_pp, m_pq = m_pp - (m_pq + m_pp * h) * s, m_pq + (m_pp - m_pq * h) * s
-
     m_qq = m_qq + (m_qp - m_qq * h) * s
     m_qp = m_pq
-
     m_ip, m_iq = m_ip - (m_iq + m_ip * h) * s, m_iq + (m_ip - m_iq * h) * s
 
     if v then
-      local v_pp = v[pp] local v_pq = v[pq]
-      local v_qp = v[qp] local v_qq = v[qq]
-      local v_ip = v[ip] local v_iq = v[iq]
-
+      local v_pp = v[pp]
+      local v_pq = v[pq]
+      local v_qp = v[qp]
+      local v_qq = v[qq]
+      local v_ip = v[ip]
+      local v_iq = v[iq]
       v[pp] = v_pp - (v_pq + v_pp * h) * s
       v[pq] = v_pq + (v_pp - v_pq * h) * s
       v[qp] = v_qp - (v_qq + v_qp * h) * s
@@ -75,10 +80,12 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
   m[iq] = m_iq + (m_ip - m_iq * h) * s
 
   if u then
-    local u_pp = u[pp] local u_pq = u[pq]
-    local u_qp = u[qp] local u_qq = u[qq]
-    local u_ip = u[ip] local u_iq = u[iq]
-
+    local u_pp = u[pp]
+    local u_pq = u[pq]
+    local u_qp = u[qp]
+    local u_qq = u[qq]
+    local u_ip = u[ip]
+    local u_iq = u[iq]
     u[pp] = u_pp - (u_pq + u_pp * h) * s
     u[pq] = u_pq + (u_pp - u_pq * h) * s
     u[qp] = u_qp - (u_qq + u_qp * h) * s
@@ -88,10 +95,12 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
   end
 
   if v then
-    local v_pp = v[pp] local v_pq = v[pq]
-    local v_qp = v[qp] local v_qq = v[qq]
-    local v_ip = v[ip] local v_iq = v[iq]
-
+    local v_pp = v[pp]
+    local v_pq = v[pq]
+    local v_qp = v[qp]
+    local v_qq = v[qq]
+    local v_ip = v[ip]
+    local v_iq = v[iq]
     v[pp] = v_pp - (v_pq + v_pp * h) * s
     v[pq] = v_pq + (v_pp - v_pq * h) * s
     v[qp] = v_qp - (v_qq + v_qp * h) * s

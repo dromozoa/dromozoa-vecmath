@@ -26,18 +26,17 @@ local sqrt = math.sqrt
 local format = string.format
 
 local function to_string(a)
-  return format("%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n",
-      a[1], a[2], a[3],
-      a[4], a[5], a[6],
-      a[7], a[8], a[9])
+  return format("%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n", a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9])
 end
 
 local function determinant(a)
-  local a21 = a[4] local a22 = a[5] local a23 = a[6]
-  local a31 = a[7] local a32 = a[8] local a33 = a[9]
-  return a[1] * (a22 * a33 - a32 * a23)
-      -  a[2] * (a21 * a33 - a31 * a23)
-      +  a[3] * (a21 * a32 - a31 * a22)
+  local a21 = a[4]
+  local a22 = a[5]
+  local a23 = a[6]
+  local a31 = a[7]
+  local a32 = a[8]
+  local a33 = a[9]
+  return a[1] * (a22 * a33 - a32 * a23) - a[2] * (a21 * a33 - a31 * a23) + a[3] * (a21 * a32 - a31 * a22)
 end
 
 local class = {
@@ -53,17 +52,29 @@ local class = {
 local metatable = { __tostring = to_string }
 
 function class.set_identity(a)
-  a[1] = 1 ; a[2] = 0 ; a[3] = 0
-  a[4] = 0 ; a[5] = 1 ; a[6] = 0
-  a[7] = 0 ; a[8] = 0 ; a[9] = 1
+  a[1] = 1
+  a[2] = 0
+  a[3] = 0
+  a[4] = 0
+  a[5] = 1
+  a[6] = 0
+  a[7] = 0
+  a[8] = 0
+  a[9] = 1
   return a
 end
 
 function class.set_scale(a, scale)
   class.svd(a, a)
-  a[1] = a[1] * scale ; a[2] = a[2] * scale ; a[3] = a[3] * scale
-  a[4] = a[4] * scale ; a[5] = a[5] * scale ; a[6] = a[6] * scale
-  a[7] = a[7] * scale ; a[8] = a[8] * scale ; a[9] = a[9] * scale
+  a[1] = a[1] * scale
+  a[2] = a[2] * scale
+  a[3] = a[3] * scale
+  a[4] = a[4] * scale
+  a[5] = a[5] * scale
+  a[6] = a[6] * scale
+  a[7] = a[7] * scale
+  a[8] = a[8] * scale
+  a[9] = a[9] * scale
   return a
 end
 
@@ -74,23 +85,47 @@ end
 function class.add(a, b, c)
   if c then
     if type(b) == "table" then
-      a[1] = b[1] + c[1] ; a[2] = b[2] + c[2] ; a[3] = b[3] + c[3]
-      a[4] = b[4] + c[4] ; a[5] = b[5] + c[5] ; a[6] = b[6] + c[6]
-      a[7] = b[7] + c[7] ; a[8] = b[8] + c[8] ; a[9] = b[9] + c[9]
+      a[1] = b[1] + c[1]
+      a[2] = b[2] + c[2]
+      a[3] = b[3] + c[3]
+      a[4] = b[4] + c[4]
+      a[5] = b[5] + c[5]
+      a[6] = b[6] + c[6]
+      a[7] = b[7] + c[7]
+      a[8] = b[8] + c[8]
+      a[9] = b[9] + c[9]
     else
-      a[1] = c[1] + b ; a[2] = c[2] + b ; a[3] = c[3] + b
-      a[4] = c[4] + b ; a[5] = c[5] + b ; a[6] = c[6] + b
-      a[7] = c[7] + b ; a[8] = c[8] + b ; a[9] = c[9] + b
+      a[1] = c[1] + b
+      a[2] = c[2] + b
+      a[3] = c[3] + b
+      a[4] = c[4] + b
+      a[5] = c[5] + b
+      a[6] = c[6] + b
+      a[7] = c[7] + b
+      a[8] = c[8] + b
+      a[9] = c[9] + b
     end
   else
     if type(b) == "table" then
-      a[1] = a[1] + b[1] ; a[2] = a[2] + b[2] ; a[3] = a[3] + b[3]
-      a[4] = a[4] + b[4] ; a[5] = a[5] + b[5] ; a[6] = a[6] + b[6]
-      a[7] = a[7] + b[7] ; a[8] = a[8] + b[8] ; a[9] = a[9] + b[9]
+      a[1] = a[1] + b[1]
+      a[2] = a[2] + b[2]
+      a[3] = a[3] + b[3]
+      a[4] = a[4] + b[4]
+      a[5] = a[5] + b[5]
+      a[6] = a[6] + b[6]
+      a[7] = a[7] + b[7]
+      a[8] = a[8] + b[8]
+      a[9] = a[9] + b[9]
     else
-      a[1] = a[1] + b ; a[2] = a[2] + b ; a[3] = a[3] + b
-      a[4] = a[4] + b ; a[5] = a[5] + b ; a[6] = a[6] + b
-      a[7] = a[7] + b ; a[8] = a[8] + b ; a[9] = a[9] + b
+      a[1] = a[1] + b
+      a[2] = a[2] + b
+      a[3] = a[3] + b
+      a[4] = a[4] + b
+      a[5] = a[5] + b
+      a[6] = a[6] + b
+      a[7] = a[7] + b
+      a[8] = a[8] + b
+      a[9] = a[9] + b
     end
   end
   return a
@@ -98,24 +133,36 @@ end
 
 function class.sub(a, b, c)
   if c then
-    a[1] = b[1] - c[1] ; a[2] = b[2] - c[2] ; a[3] = b[3] - c[3]
-    a[4] = b[4] - c[4] ; a[5] = b[5] - c[5] ; a[6] = b[6] - c[6]
-    a[7] = b[7] - c[7] ; a[8] = b[8] - c[8] ; a[9] = b[9] - c[9]
+    a[1] = b[1] - c[1]
+    a[2] = b[2] - c[2]
+    a[3] = b[3] - c[3]
+    a[4] = b[4] - c[4]
+    a[5] = b[5] - c[5]
+    a[6] = b[6] - c[6]
+    a[7] = b[7] - c[7]
+    a[8] = b[8] - c[8]
+    a[9] = b[9] - c[9]
   else
-    a[1] = a[1] - b[1] ; a[2] = a[2] - b[2] ; a[3] = a[3] - b[3]
-    a[4] = a[4] - b[4] ; a[5] = a[5] - b[5] ; a[6] = a[6] - b[6]
-    a[7] = a[7] - b[7] ; a[8] = a[8] - b[8] ; a[9] = a[9] - b[9]
+    a[1] = a[1] - b[1]
+    a[2] = a[2] - b[2]
+    a[3] = a[3] - b[3]
+    a[4] = a[4] - b[4]
+    a[5] = a[5] - b[5]
+    a[6] = a[6] - b[6]
+    a[7] = a[7] - b[7]
+    a[8] = a[8] - b[8]
+    a[9] = a[9] - b[9]
   end
   return a
 end
 
 function class.transpose(a, b)
   if b then
-    a[1] = b[1]
     a[2], a[4] = b[4], b[2]
     a[3], a[7] = b[7], b[3]
-    a[5] = b[5]
     a[6], a[8] = b[8], b[6]
+    a[1] = b[1]
+    a[5] = b[5]
     a[9] = b[9]
   else
     a[2], a[4] = a[4], a[2]
@@ -125,69 +172,102 @@ function class.transpose(a, b)
   return a
 end
 
-function class.set(a, m11, m12, m13, m21, m22, m23, m31, m32, m33)
-  if m11 then
+-- TODO support quat4, axis_angle4
+function class.set(a, b, m12, m13, m21, m22, m23, m31, m32, m33)
+  if b then
     if m12 then
-      a[1] = m11 ; a[2] = m12 ; a[3] = m13
-      a[4] = m21 ; a[5] = m22 ; a[6] = m23
-      a[7] = m31 ; a[8] = m32 ; a[9] = m33
+      a[1] = b
+      a[2] = m12
+      a[3] = m13
+      a[4] = m21
+      a[5] = m22
+      a[6] = m23
+      a[7] = m31
+      a[8] = m32
+      a[9] = m33
     else
-      if type(m11) == "table" then
-        a[1] = m11[1] ; a[2] = m11[2] ; a[3] = m11[3]
-        a[4] = m11[4] ; a[5] = m11[5] ; a[6] = m11[6]
-        a[7] = m11[7] ; a[8] = m11[8] ; a[9] = m11[9]
+      if type(b) == "table" then
+        a[1] = b[1]
+        a[2] = b[2]
+        a[3] = b[3]
+        a[4] = b[4]
+        a[5] = b[5]
+        a[6] = b[6]
+        a[7] = b[7]
+        a[8] = b[8]
+        a[9] = b[9]
       else
-        a[1] = m11 ; a[2] = 0   ; a[3] = 0
-        a[4] = 0   ; a[5] = m11 ; a[6] = 0
-        a[7] = 0   ; a[8] = 0   ; a[9] = m11
+        a[1] = b
+        a[2] = 0
+        a[3] = 0
+        a[4] = 0
+        a[5] = b
+        a[6] = 0
+        a[7] = 0
+        a[8] = 0
+        a[9] = b
       end
     end
   else
-    a[1] = 0 ; a[2] = 0 ; a[3] = 0
-    a[4] = 0 ; a[5] = 0 ; a[6] = 0
-    a[7] = 0 ; a[8] = 0 ; a[9] = 0
+    a[1] = 0
+    a[2] = 0
+    a[3] = 0
+    a[4] = 0
+    a[5] = 0
+    a[6] = 0
+    a[7] = 0
+    a[8] = 0
+    a[9] = 0
   end
   return a
 end
 
 function class.invert(a, b)
   if b then
+    -- TODO inline
     local s = determinant(b)
     if s == 0 then
       return
     end
-    local b11 = b[1] local b12 = b[2] local b13 = b[3]
-    local b21 = b[4] local b22 = b[5] local b23 = b[6]
-    local b31 = b[7] local b32 = b[8] local b33 = b[9]
-
+    local b11 = b[1]
+    local b12 = b[2]
+    local b13 = b[3]
+    local b21 = b[4]
+    local b22 = b[5]
+    local b23 = b[6]
+    local b31 = b[7]
+    local b32 = b[8]
+    local b33 = b[9]
     a[1] = (b22 * b33 - b23 * b32) / s
     a[2] = (b13 * b32 - b12 * b33) / s
     a[3] = (b12 * b23 - b13 * b22) / s
-
     a[4] = (b23 * b31 - b21 * b33) / s
     a[5] = (b11 * b33 - b13 * b31) / s
     a[6] = (b13 * b21 - b11 * b23) / s
-
     a[7] = (b21 * b32 - b22 * b31) / s
     a[8] = (b12 * b31 - b11 * b32) / s
     a[9] = (b11 * b22 - b12 * b21) / s
   else
+    -- TODO inline
     local s = determinant(a)
     if s == 0 then
       return
     end
-    local a11 = a[1] local a12 = a[2] local a13 = a[3]
-    local a21 = a[4] local a22 = a[5] local a23 = a[6]
-    local a31 = a[7] local a32 = a[8] local a33 = a[9]
-
+    local a11 = a[1]
+    local a12 = a[2]
+    local a13 = a[3]
+    local a21 = a[4]
+    local a22 = a[5]
+    local a23 = a[6]
+    local a31 = a[7]
+    local a32 = a[8]
+    local a33 = a[9]
     a[1] = (a22 * a33 - a23 * a32) / s
     a[2] = (a13 * a32 - a12 * a33) / s
     a[3] = (a12 * a23 - a13 * a22) / s
-
     a[4] = (a23 * a31 - a21 * a33) / s
     a[5] = (a11 * a33 - a13 * a31) / s
     a[6] = (a13 * a21 - a11 * a23) / s
-
     a[7] = (a21 * a32 - a22 * a31) / s
     a[8] = (a12 * a31 - a11 * a32) / s
     a[9] = (a11 * a22 - a12 * a21) / s
@@ -198,172 +278,257 @@ end
 function class.rot_x(a, angle)
   local c = cos(angle)
   local s = sin(angle)
-  a[1] = 1 ; a[2] = 0 ; a[3] = 0
-  a[4] = 0 ; a[5] = c ; a[6] = -s
-  a[7] = 0 ; a[8] = s ; a[9] = c
+  a[1] = 1
+  a[2] = 0
+  a[3] = 0
+  a[4] = 0
+  a[5] = c
+  a[6] = -s
+  a[7] = 0
+  a[8] = s
+  a[9] = c
   return a
 end
 
 function class.rot_y(a, angle)
   local c = cos(angle)
   local s = sin(angle)
-  a[1] = c  ; a[2] = 0 ; a[3] = s
-  a[4] = 0  ; a[5] = 1 ; a[6] = 0
-  a[7] = -s ; a[8] = 0 ; a[9] = c
+  a[1] = c
+  a[2] = 0
+  a[3] = s
+  a[4] = 0
+  a[5] = 1
+  a[6] = 0
+  a[7] = -s
+  a[8] = 0
+  a[9] = c
   return a
 end
 
 function class.rot_z(a, angle)
   local c = cos(angle)
   local s = sin(angle)
-  a[1] = c ; a[2] = -s ; a[3] = 0
-  a[4] = s ; a[5] = c  ; a[6] = 0
-  a[7] = 0 ; a[8] = 0  ; a[9] = 1
+  a[1] = c
+  a[2] = -s
+  a[3] = 0
+  a[4] = s
+  a[5] = c
+  a[6] = 0
+  a[7] = 0
+  a[8] = 0
+  a[9] = 1
   return a
 end
 
 function class.mul(a, b, c)
   if c then
     if type(b) == "table" then
-      local b11 = b[1] local b12 = b[2] local b13 = b[3]
-      local b21 = b[4] local b22 = b[5] local b23 = b[6]
-      local b31 = b[7] local b32 = b[8] local b33 = b[9]
+      local b11 = b[1]
+      local b12 = b[2]
+      local b13 = b[3]
+      local b21 = b[4]
+      local b22 = b[5]
+      local b23 = b[6]
+      local b31 = b[7]
+      local b32 = b[8]
+      local b33 = b[9]
 
-      local c11 = c[1] local c12 = c[2] local c13 = c[3]
-      local c21 = c[4] local c22 = c[5] local c23 = c[6]
-      local c31 = c[7] local c32 = c[8] local c33 = c[9]
+      local c11 = c[1]
+      local c12 = c[2]
+      local c13 = c[3]
+      local c21 = c[4]
+      local c22 = c[5]
+      local c23 = c[6]
+      local c31 = c[7]
+      local c32 = c[8]
+      local c33 = c[9]
 
       a[1] = b11 * c11 + b12 * c21 + b13 * c31
       a[2] = b11 * c12 + b12 * c22 + b13 * c32
       a[3] = b11 * c13 + b12 * c23 + b13 * c33
-
       a[4] = b21 * c11 + b22 * c21 + b23 * c31
       a[5] = b21 * c12 + b22 * c22 + b23 * c32
       a[6] = b21 * c13 + b22 * c23 + b23 * c33
-
       a[7] = b31 * c11 + b32 * c21 + b33 * c31
       a[8] = b31 * c12 + b32 * c22 + b33 * c32
       a[9] = b31 * c13 + b32 * c23 + b33 * c33
     else
-      a[1] = c[1] * b ; a[2] = c[2] * b ; a[3] = c[3] * b
-      a[4] = c[4] * b ; a[5] = c[5] * b ; a[6] = c[6] * b
-      a[7] = c[7] * b ; a[8] = c[8] * b ; a[9] = c[9] * b
+      a[1] = c[1] * b
+      a[2] = c[2] * b
+      a[3] = c[3] * b
+      a[4] = c[4] * b
+      a[5] = c[5] * b
+      a[6] = c[6] * b
+      a[7] = c[7] * b
+      a[8] = c[8] * b
+      a[9] = c[9] * b
     end
   else
     if type(b) == "table" then
-      local a11 = a[1] local a12 = a[2] local a13 = a[3]
-      local a21 = a[4] local a22 = a[5] local a23 = a[6]
-      local a31 = a[7] local a32 = a[8] local a33 = a[9]
+      local a11 = a[1]
+      local a12 = a[2]
+      local a13 = a[3]
+      local a21 = a[4]
+      local a22 = a[5]
+      local a23 = a[6]
+      local a31 = a[7]
+      local a32 = a[8]
+      local a33 = a[9]
 
-      local b11 = b[1] local b12 = b[2] local b13 = b[3]
-      local b21 = b[4] local b22 = b[5] local b23 = b[6]
-      local b31 = b[7] local b32 = b[8] local b33 = b[9]
+      local b11 = b[1]
+      local b12 = b[2]
+      local b13 = b[3]
+      local b21 = b[4]
+      local b22 = b[5]
+      local b23 = b[6]
+      local b31 = b[7]
+      local b32 = b[8]
+      local b33 = b[9]
 
       a[1] = a11 * b11 + a12 * b21 + a13 * b31
       a[2] = a11 * b12 + a12 * b22 + a13 * b32
       a[3] = a11 * b13 + a12 * b23 + a13 * b33
-
       a[4] = a21 * b11 + a22 * b21 + a23 * b31
       a[5] = a21 * b12 + a22 * b22 + a23 * b32
       a[6] = a21 * b13 + a22 * b23 + a23 * b33
-
       a[7] = a31 * b11 + a32 * b21 + a33 * b31
       a[8] = a31 * b12 + a32 * b22 + a33 * b32
       a[9] = a31 * b13 + a32 * b23 + a33 * b33
     else
-      a[1] = a[1] * b ; a[2] = a[2] * b ; a[3] = a[3] * b
-      a[4] = a[4] * b ; a[5] = a[5] * b ; a[6] = a[6] * b
-      a[7] = a[7] * b ; a[8] = a[8] * b ; a[9] = a[9] * b
+      a[1] = a[1] * b
+      a[2] = a[2] * b
+      a[3] = a[3] * b
+      a[4] = a[4] * b
+      a[5] = a[5] * b
+      a[6] = a[6] * b
+      a[7] = a[7] * b
+      a[8] = a[8] * b
+      a[9] = a[9] * b
     end
   end
   return a
 end
 
 function class.mul_normalize(a, b, c)
+  -- TODO inline
   class.mul(a, b, c)
   class.svd(a, a)
   return a
 end
 
 function class.mul_transpose_both(a, b, c)
-  local b11 = b[1] local b12 = b[4] local b13 = b[7]
-  local b21 = b[2] local b22 = b[5] local b23 = b[8]
-  local b31 = b[3] local b32 = b[6] local b33 = b[9]
+  local b11 = b[1]
+  local b12 = b[4]
+  local b13 = b[7]
+  local b21 = b[2]
+  local b22 = b[5]
+  local b23 = b[8]
+  local b31 = b[3]
+  local b32 = b[6]
+  local b33 = b[9]
 
-  local c11 = c[1] local c12 = c[4] local c13 = c[7]
-  local c21 = c[2] local c22 = c[5] local c23 = c[8]
-  local c31 = c[3] local c32 = c[6] local c33 = c[9]
+  local c11 = c[1]
+  local c12 = c[4]
+  local c13 = c[7]
+  local c21 = c[2]
+  local c22 = c[5]
+  local c23 = c[8]
+  local c31 = c[3]
+  local c32 = c[6]
+  local c33 = c[9]
 
   a[1] = b11 * c11 + b12 * c21 + b13 * c31
   a[2] = b11 * c12 + b12 * c22 + b13 * c32
   a[3] = b11 * c13 + b12 * c23 + b13 * c33
-
   a[4] = b21 * c11 + b22 * c21 + b23 * c31
   a[5] = b21 * c12 + b22 * c22 + b23 * c32
   a[6] = b21 * c13 + b22 * c23 + b23 * c33
-
   a[7] = b31 * c11 + b32 * c21 + b33 * c31
   a[8] = b31 * c12 + b32 * c22 + b33 * c32
   a[9] = b31 * c13 + b32 * c23 + b33 * c33
-
   return a
 end
 
 function class.mul_transpose_right(a, b, c)
-  local b11 = b[1] local b12 = b[2] local b13 = b[3]
-  local b21 = b[4] local b22 = b[5] local b23 = b[6]
-  local b31 = b[7] local b32 = b[8] local b33 = b[9]
+  local b11 = b[1]
+  local b12 = b[2]
+  local b13 = b[3]
+  local b21 = b[4]
+  local b22 = b[5]
+  local b23 = b[6]
+  local b31 = b[7]
+  local b32 = b[8]
+  local b33 = b[9]
 
-  local c11 = c[1] local c12 = c[4] local c13 = c[7]
-  local c21 = c[2] local c22 = c[5] local c23 = c[8]
-  local c31 = c[3] local c32 = c[6] local c33 = c[9]
+  local c11 = c[1]
+  local c12 = c[4]
+  local c13 = c[7]
+  local c21 = c[2]
+  local c22 = c[5]
+  local c23 = c[8]
+  local c31 = c[3]
+  local c32 = c[6]
+  local c33 = c[9]
 
   a[1] = b11 * c11 + b12 * c21 + b13 * c31
   a[2] = b11 * c12 + b12 * c22 + b13 * c32
   a[3] = b11 * c13 + b12 * c23 + b13 * c33
-
   a[4] = b21 * c11 + b22 * c21 + b23 * c31
   a[5] = b21 * c12 + b22 * c22 + b23 * c32
   a[6] = b21 * c13 + b22 * c23 + b23 * c33
-
   a[7] = b31 * c11 + b32 * c21 + b33 * c31
   a[8] = b31 * c12 + b32 * c22 + b33 * c32
   a[9] = b31 * c13 + b32 * c23 + b33 * c33
-
   return a
 end
 
 function class.mul_transpose_left(a, b, c)
-  local b11 = b[1] local b12 = b[4] local b13 = b[7]
-  local b21 = b[2] local b22 = b[5] local b23 = b[8]
-  local b31 = b[3] local b32 = b[6] local b33 = b[9]
+  local b11 = b[1]
+  local b12 = b[4]
+  local b13 = b[7]
+  local b21 = b[2]
+  local b22 = b[5]
+  local b23 = b[8]
+  local b31 = b[3]
+  local b32 = b[6]
+  local b33 = b[9]
 
-  local c11 = c[1] local c12 = c[2] local c13 = c[3]
-  local c21 = c[4] local c22 = c[5] local c23 = c[6]
-  local c31 = c[7] local c32 = c[8] local c33 = c[9]
+  local c11 = c[1]
+  local c12 = c[2]
+  local c13 = c[3]
+  local c21 = c[4]
+  local c22 = c[5]
+  local c23 = c[6]
+  local c31 = c[7]
+  local c32 = c[8]
+  local c33 = c[9]
 
   a[1] = b11 * c11 + b12 * c21 + b13 * c31
   a[2] = b11 * c12 + b12 * c22 + b13 * c32
   a[3] = b11 * c13 + b12 * c23 + b13 * c33
-
   a[4] = b21 * c11 + b22 * c21 + b23 * c31
   a[5] = b21 * c12 + b22 * c22 + b23 * c32
   a[6] = b21 * c13 + b22 * c23 + b23 * c33
-
   a[7] = b31 * c11 + b32 * c21 + b33 * c31
   a[8] = b31 * c12 + b32 * c22 + b33 * c32
   a[9] = b31 * c13 + b32 * c23 + b33 * c33
-
   return a
 end
 
 function class.equals(a, b)
   return a and b
-      and a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
-      and a[4] == b[4] and a[5] == b[5] and a[6] == b[6]
-      and a[7] == b[7] and a[8] == b[8] and a[9] == b[9]
+      and a[1] == b[1]
+      and a[2] == b[2]
+      and a[3] == b[3]
+      and a[4] == b[4]
+      and a[5] == b[5]
+      and a[6] == b[6]
+      and a[7] == b[7]
+      and a[8] == b[8]
+      and a[9] == b[9]
 end
 
+-- TODO refactor
 function class.epsilon_equals(a, b, epsilon)
   if a and b and epsilon then
     local v = a[1] - b[1] if v < 0 then v = -v end if v > epsilon then return false end
@@ -382,21 +547,39 @@ function class.epsilon_equals(a, b, epsilon)
 end
 
 function class.set_zero(a)
-  a[1] = 0 ; a[2] = 0 ; a[3] = 0
-  a[4] = 0 ; a[5] = 0 ; a[6] = 0
-  a[7] = 0 ; a[8] = 0 ; a[9] = 0
+  a[1] = 0
+  a[2] = 0
+  a[3] = 0
+  a[4] = 0
+  a[5] = 0
+  a[6] = 0
+  a[7] = 0
+  a[8] = 0
+  a[9] = 0
   return a
 end
 
 function class.negate(a, b)
   if b then
-    a[1] = -b[1] ; a[2] = -b[2] ; a[3] = -b[3]
-    a[4] = -b[4] ; a[5] = -b[5] ; a[6] = -b[6]
-    a[7] = -b[7] ; a[8] = -b[8] ; a[9] = -b[9]
+    a[1] = -b[1]
+    a[2] = -b[2]
+    a[3] = -b[3]
+    a[4] = -b[4]
+    a[5] = -b[5]
+    a[6] = -b[6]
+    a[7] = -b[7]
+    a[8] = -b[8]
+    a[9] = -b[9]
   else
-    a[1] = -a[1] ; a[2] = -a[2] ; a[3] = -a[3]
-    a[4] = -a[4] ; a[5] = -a[5] ; a[6] = -a[6]
-    a[7] = -a[7] ; a[8] = -a[8] ; a[9] = -a[9]
+    a[1] = -a[1]
+    a[2] = -a[2]
+    a[3] = -a[3]
+    a[4] = -a[4]
+    a[5] = -a[5]
+    a[6] = -a[6]
+    a[7] = -a[7]
+    a[8] = -a[8]
+    a[9] = -a[9]
   end
   return a
 end
@@ -431,9 +614,15 @@ end
 
 function class.normalize_cp(a, b)
   if b then
-    local b11 = b[1] local b12 = b[2] local b13 = b[3]
-    local b21 = b[4] local b22 = b[5] local b23 = b[6]
-    local b31 = b[7] local b32 = b[8] local b33 = b[9]
+    local b11 = b[1]
+    local b12 = b[2]
+    local b13 = b[3]
+    local b21 = b[4]
+    local b22 = b[5]
+    local b23 = b[6]
+    local b31 = b[7]
+    local b32 = b[8]
+    local b33 = b[9]
 
     local d = sqrt(b11 * b11 + b21 * b21 + b31 * b31)
     b11 = b11 / d
@@ -445,13 +634,25 @@ function class.normalize_cp(a, b)
     b22 = b22 / d
     b32 = b32 / d
 
-    a[1] = b11 ; a[2] = b12 ; a[3] = b21 * b32 - b22 * b31
-    a[4] = b21 ; a[5] = b22 ; a[6] = b31 * b12 - b32 * b11
-    a[7] = b31 ; a[8] = b32 ; a[9] = b11 * b22 - b12 * b21
+    a[1] = b11
+    a[2] = b12
+    a[3] = b21 * b32 - b22 * b31
+    a[4] = b21
+    a[5] = b22
+    a[6] = b31 * b12 - b32 * b11
+    a[7] = b31
+    a[8] = b32
+    a[9] = b11 * b22 - b12 * b21
   else
-    local a11 = a[1] local a12 = a[2] local a13 = a[3]
-    local a21 = a[4] local a22 = a[5] local a23 = a[6]
-    local a31 = a[7] local a32 = a[8] local a33 = a[9]
+    local a11 = a[1]
+    local a12 = a[2]
+    local a13 = a[3]
+    local a21 = a[4]
+    local a22 = a[5]
+    local a23 = a[6]
+    local a31 = a[7]
+    local a32 = a[8]
+    local a33 = a[9]
 
     local d = sqrt(a11 * a11 + a21 * a21 + a31 * a31)
     a11 = a11 / d
@@ -463,13 +664,20 @@ function class.normalize_cp(a, b)
     a22 = a22 / d
     a32 = a32 / d
 
-    a[1] = a11 ; a[2] = a12 ; a[3] = a21 * a32 - a22 * a31
-    a[4] = a21 ; a[5] = a22 ; a[6] = a31 * a12 - a32 * a11
-    a[7] = a31 ; a[8] = a32 ; a[9] = a11 * a22 - a12 * a21
+    a[1] = a11
+    a[2] = a12
+    a[3] = a21 * a32 - a22 * a31
+    a[4] = a21
+    a[5] = a22
+    a[6] = a31 * a12 - a32 * a11
+    a[7] = a31
+    a[8] = a32
+    a[9] = a11 * a22 - a12 * a21
   end
   return a
 end
 
+-- TODO hide
 function class.svd(a, b)
   local m = {
     a[1], a[2], a[3],
