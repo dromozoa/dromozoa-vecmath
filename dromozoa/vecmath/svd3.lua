@@ -34,7 +34,8 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
     local h = s / (1 + c)
 
     m_pp, m_pq = m_pp - (m_pq + m_pp * h) * s, m_pq + (m_pp - m_pq * h) * s
-    m_qp, m_qq = m_pq,                         m_qq + (m_qp - m_qq * h) * s
+    m_qq = m_qq + (m_qp - m_qq * h) * s
+    m_qp = m_pq
     m_ip, m_iq = m_ip - (m_iq + m_ip * h) * s, m_iq + (m_ip - m_iq * h) * s
 
     if v then
@@ -62,9 +63,11 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
   m[pp] = m_pp - m_pq * t
   m[pq] = 0
   m[pi] = m_pi - (m_qi + m_pi * h) * s
+
   m[qp] = 0
   m[qq] = m_qq + m_pq * t
   m[qi] = m_qi + (m_pi - m_qi * h) * s
+
   m[ip] = m_ip - (m_iq + m_ip * h) * s
   m[iq] = m_iq + (m_ip - m_iq * h) * s
 
@@ -91,37 +94,40 @@ end
 
 return function (a, b, c)
   while true do
+    -- p,q,i = 1,2,3
     local u = a[2]
     local v = a[4]
     local s = u * u + v * v
     local w = s
-    local pq = 12
+    local pq = 2
 
+    -- p,q,i = 1,3,2
     local u = a[3]
     local v = a[7]
     u = u * u + v * v
     s = s + u
     if w < u then
       w = u
-      pq = 13
+      pq = 3
     end
 
+    -- p,q,i = 2,3,1
     local u = a[6]
     local v = a[8]
     u = u * u + v * v
     s = s + u
     if w < u then
       w = u
-      pq = 23
+      pq = 6
     end
 
     if s < epsilon then
       break
     end
 
-    if pq == 12 then
+    if pq == 2 then
       jacobi(a, b, c, 1, 2, 3, 4, 5, 6, 7, 8)
-    elseif pq == 13 then
+    elseif pq == 3 then
       jacobi(a, b, c, 1, 3, 2, 7, 9, 8, 4, 6)
     else
       jacobi(a, b, c, 5, 6, 4, 8, 9, 7, 2, 3)
