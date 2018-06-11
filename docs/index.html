@@ -45,7 +45,7 @@
 <h2>\(3 \times 3\)行列の特異値分解</h2>
 
 <p>
-\(3 \times 3\)行列なので固有方程式を解けば求まる。
+\(3 \times 3\)行列なので固有方程式を解いて特異値を求めることができる。
 ここではヤコビ法を用いて計算する。
 </p>
 
@@ -125,7 +125,7 @@
       0 &amp; s_q
   \end{pmatrix}
 \]
-\(\phi\)は
+対称行列でなければならないというヤコビ法の制約を満たすために\(\phi\)で回転する。
 \[
   \begin{pmatrix}
     m_{pp} &amp; m_{pq} \\
@@ -141,8 +141,6 @@
     n_{pq} &amp; n_{qq}
   \end{pmatrix}
 \]
-を満たす回転で、
-対称行列でなければならないというヤコビ法の制約を満足させる。
 </p>
 
 <h4>収束計算</h4>
@@ -156,7 +154,7 @@
   = s_n
 \]
 \(s_n\)の非対角成分の2乗和が閾値を下まわったら収束したと見なす。
-特異値が負になった場合も考慮して
+特異値が負に収束した場合を考慮して
 \[\begin{eqnarray}
   m &amp;=&amp;
   (G_{\theta_1} \dots G_{\theta_n})
@@ -164,25 +162,32 @@
   (J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T) \\
   s_n &amp;=&amp; \begin{pmatrix}
     s_x &amp; 0   &amp; 0 \\
-    0   &amp; s_x &amp; 0 \\
+    0   &amp; s_y &amp; 0 \\
     0   &amp; 0   &amp; s_z
   \end{pmatrix} \\
   s &amp;=&amp; \begin{pmatrix}
     |s_x| &amp; 0     &amp; 0 \\
-    0     &amp; |s_x| &amp; 0 \\
+    0     &amp; |s_y| &amp; 0 \\
     0     &amp; 0     &amp; |s_z|
   \end{pmatrix} \\
   J &amp;=&amp; \begin{pmatrix}
-    \frac{s_x}{|s_x|} &amp; 0                 &amp; 0 \\
-    0                 &amp; \frac{s_y}{|s_y|} &amp; 0 \\
-    0                 &amp; 0                 &amp; \frac{s_y}{|s_y|}
-  \end{pmatrix}
+    \mathrm{sign}(s_x) &amp; 0                  &amp; 0 \\
+    0                  &amp; \mathrm{sign}(s_y) &amp; 0 \\
+    0                  &amp; 0                  &amp; \mathrm{sign}(s_z)
+  \end{pmatrix} \\
+  \mathrm{sign}(x) &amp;=&amp; \begin{cases}
+    1 &amp; (x \ge 0) \\
+    -1 &amp; (x \lt 0)
+  \end{cases}
 \end{eqnarray}\]
-なので
+\(u_n\)は
 \[\begin{eqnarray}
-  u_n      &amp;=&amp; G_{\theta_1} \dots G_{\theta_n} \\
-  u_0      &amp;=&amp; I \\
-  u_{i+1}  &amp;=&amp; u_i G_{\theta_i} \\
+  u_n     &amp;=&amp; G_{\theta_1} \dots G_{\theta_n} \\
+  u_0     &amp;=&amp; I \\
+  u_{i+1} &amp;=&amp; u_i G_{\theta_i} \\
+\end{eqnarray}\]
+\(v_n\)は
+\[\begin{eqnarray}
   v_n^*    &amp;=&amp; J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T \\
   v_n      &amp;=&amp; G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n} J \\
            &amp;=&amp; v_n' J \\
@@ -233,7 +238,7 @@
   (m_{qp} - m_{pq}) \cos\phi &amp;=&amp; (m_{pp} + m_{qq}) \sin\phi \\
   \cot\phi &amp;=&amp; \frac{m_{pp} + m_{qq}}{m_{qp} - m_{pq}}
 \end{eqnarray}\]
-\(m_{qp} = m_{pq}\)の場合は、そもそも回転する必要がない（\(\phi = 0\)）。
+\(m_{qp} = m_{pq}\)の場合は回転する必要がない（\(\phi = 0\)）。
 また、
 \[\begin{eqnarray}
   \sin\phi
@@ -326,6 +331,7 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
   m_{pi}' &amp;=&amp; n_{pi} - (n_{qi} +  n_{pi} \tan\frac{\theta}{2}) \sin\theta \\
   m_{qi}' &amp;=&amp; n_{qi} + (n_{pi} -  n_{qi} \tan\frac{\theta}{2}) \sin\theta
 \end{eqnarray}\]
+を与えている。
 固有値分解では\(m_{pi}' = m_{ip}', m_{qi}' = m_{iq}'\)なので計算を省略できるが、特異値分解では計算する必要がある。
 </p>
 
