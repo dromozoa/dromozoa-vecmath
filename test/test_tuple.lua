@@ -17,6 +17,7 @@
 
 local point3 = require "dromozoa.vecmath.point3"
 local vector3 = require "dromozoa.vecmath.vector3"
+local vector4 = require "dromozoa.vecmath.vector4"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
@@ -132,3 +133,4 @@ end
 
 test(3, point3)
 test(3, vector3)
+test(4, vector4)
