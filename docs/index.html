@@ -176,12 +176,120 @@
 </p>
 
 <p>
-特異値が負になった場合、\(s\)の対角要素の符号を反転するように回転する\(J\)を用いて
-\[\begin{eqnarray}
-  s' &amp;=&amp; s J \\
-  v' &amp;=&amp; v J
-\end{eqnarray}\]
+特異値が負になった場合、ギブンス変換を用いて\(s\)の対角要素の符号を反転させる。
+\[
+  s' = B^T C \begin{pmatrix}
+    s_1 &amp; 0   &amp; 0 \\
+    0   &amp; s_2 &amp; 0 \\
+    0   &amp; 0   &amp; s_3
+  \end{pmatrix} A B
+\]
 </p>
+
+<table>
+  <tr>
+    <th>\(s_1\)</th>
+    <th>\(s_2\)</th>
+    <th>\(s_3\)</th>
+    <th>\(A\)</th>
+    <th>\(B\)</th>
+    <th>\(C\)</th>
+    <th>\(AB\)</th>
+    <th>\(B^TC\)</th>
+  </tr>
+
+  <tr>
+    <td>\(s_1 \ge 0\)</td>
+    <td>\(s_2 \ge 0\)</td>
+    <td>\(s_3 \ge 0\)</td>
+    <td>\(I\)</td>
+    <td>\(I\)</td>
+    <td>\(I\)</td>
+    <td>\(\begin{pmatrix}
+      1 &amp; 0 &amp; 0 \\
+      0 &amp; 1 &amp; 0 \\
+      0 &amp; 0 &amp; 1
+    \end{pmatrix}\)</td>
+    <td>\(\begin{pmatrix}
+      1 &amp; 0 &amp; 0 \\
+      0 &amp; 1 &amp; 0 \\
+      0 &amp; 0 &amp; 1
+    \end{pmatrix}\)</td>
+  </tr>
+  <tr>
+    <td>\(s_1 \ge 0\)</td>
+    <td>\(s_2 \le 0\)</td>
+    <td>\(s_3 \ge 0\)</td>
+    <td>\(G(1,2,\frac{1}{2}\pi)\)</td>
+    <td>\(I\)</td>
+    <td>\(A^T\)</td>
+    <td>\(\begin{pmatrix}
+       0 &amp; 1 &amp; 0 \\
+      -1 &amp; 0 &amp; 0 \\
+       0 &amp; 0 &amp; 1
+    \end{pmatrix}\)</td>
+    <td>\(\begin{pmatrix}
+      0 &amp; -1 &amp; 0 \\
+      1 &amp;  0 &amp; 0 \\
+      0 &amp;  0 &amp; 1
+    \end{pmatrix}\)</td>
+  </tr>
+  <tr>
+    <td>\(s_1 \le 0\)</td>
+    <td>\(s_2 \ge 0\)</td>
+    <td>\(s_3 \ge 0\)</td>
+    <td>\(G(1,2,\frac{3}{2}\pi)\)</td>
+    <td>\(I\)</td>
+    <td>\(A^T\)</td>
+  </tr>
+  <tr>
+    <td>\(s_1 \le 0\)</td>
+    <td>\(s_2 \le 0\)</td>
+    <td>\(s_3 \ge 0\)</td>
+    <td>\(G(1,2,\pi)\)</td>
+    <td>\(I\)</td>
+    <td>\(I\)</td>
+  </tr>
+
+  <tr>
+    <td>\(s_1 \ge 0\)</td>
+    <td>\(s_2 \ge 0\)</td>
+    <td>\(s_3 \ge 0\)</td>
+    <td>\(I\)</td>
+    <td>\(G(2,3,\frac{1}{2}\pi)\)</td>
+    <td>\(I\)</td>
+  </tr>
+  <tr>
+    <td>\(s_1 \ge 0\)</td>
+    <td>\(s_2 \le 0\)</td>
+    <td>\(s_3 \ge 0\)</td>
+    <td>\(G(1,2,\frac{1}{2}\pi)\)</td>
+    <td>\(G(2,3,\frac{1}{2}\pi)\)</td>
+    <td>\(A^T\)</td>
+  </tr>
+  <tr>
+    <td>\(s_1 \le 0\)</td>
+    <td>\(s_2 \ge 0\)</td>
+    <td>\(s_3 \ge 0\)</td>
+    <td>\(G(1,2,\frac{3}{2}\pi)\)</td>
+    <td>\(G(2,3,\frac{1}{2}\pi)\)</td>
+    <td>\(A^T\)</td>
+  </tr>
+  <tr>
+    <td>\(s_1 \le 0\)</td>
+    <td>\(s_2 \le 0\)</td>
+    <td>\(s_3 \ge 0\)</td>
+    <td>\(G(1,2,\pi)\)</td>
+    <td>\(G(2,3,\frac{1}{2}\pi)\)</td>
+    <td>\(I\)</td>
+  </tr>
+
+
+
+
+
+
+</table>
 
 <h3>計算例</h3>
 
