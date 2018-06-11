@@ -20,9 +20,7 @@ local format = string.format
 local class = {
   index = {
     1, 2, 3,
-    x = 1,
-    y = 2,
-    z = 3,
+    x = 1, y = 2, z = 3,
   };
 }
 
@@ -122,11 +120,14 @@ function class.to_string(a)
 end
 
 function class.equals(a, b)
-  return a and b and a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
+  return a and b
+      and a[1] == b[1]
+      and a[2] == b[2]
+      and a[3] == b[3]
 end
 
 function class.epsilon_equals(a, b, epsilon)
-  if a and b and epsilon then
+  if a and b then
     local v = a[1] - b[1] if v < 0 then v = -v end if v > epsilon then return false end
     local v = a[2] - b[2] if v < 0 then v = -v end if v > epsilon then return false end
     local v = a[3] - b[3] if v < 0 then v = -v end if v > epsilon then return false end

@@ -75,8 +75,8 @@ d[1], d[2] = d[2], d[1]
 d[4], d[5] = d[5], d[4]
 d[7], d[8] = d[8], d[7]
 if verbose then
-  print(m:set(m1):set_scale(2))
-  print(matrix3(d))
+  print(tostring(m:set(m1):set_scale(2)))
+  print(tostring(matrix3(d)))
 end
 assert(m:set(m1):set_scale(2):epsilon_equals(d, eps))
 
@@ -116,6 +116,10 @@ assert(m:mul(m1, m2):equals(data.mul))
 assert(m:mul(m1, m:set(m2)):equals(data.mul))
 assert(m:set(m1):mul(m2):equals(data.mul))
 
+if verbose then
+  print(tostring(m:mul_normalize(m1, m2)))
+  print(tostring(matrix3(data.mul_normalize)))
+end
 assert(m:mul_normalize(m1, m2):epsilon_equals(data.mul_normalize, eps))
 assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
 assert(m:mul_transpose_right(m1, m2):equals(data.mul_transpose_right))
@@ -127,17 +131,16 @@ d[1], d[2] = d[2], d[1]
 d[4], d[5] = d[5], d[4]
 d[7], d[8] = d[8], d[7]
 if verbose then
-  print(m:normalize(m1))
-  print(matrix3(d))
+  print(tostring(m:normalize(m1)))
+  print(tostring(matrix3(d)))
 end
 assert(m:normalize(m1):epsilon_equals(d, eps))
 assert(m:set(m1):normalize():epsilon_equals(d, eps))
 
 if verbose then
-  print(m:normalize_cp(m1))
-  print(matrix3(data.normalize_cp))
+  print(tostring(m:normalize_cp(m1)))
+  print(tostring(matrix3(data.normalize_cp)))
 end
-
 assert(m:normalize_cp(m1):epsilon_equals(data.normalize_cp, eps))
 
 assert(m:negate(m1):equals(data.negate))

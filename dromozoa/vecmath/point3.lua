@@ -72,10 +72,10 @@ function class.distance_linf(a, b)
 end
 
 function class.project(a, b)
-  local w = b[4]
-  a[1] = b[1] / w
-  a[2] = b[2] / w
-  a[3] = b[3] / w
+  local d = b[4]
+  a[1] = b[1] / d
+  a[2] = b[2] / d
+  a[3] = b[3] / d
   return a
 end
 
