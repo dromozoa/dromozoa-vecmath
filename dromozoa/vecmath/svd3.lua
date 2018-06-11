@@ -90,29 +90,6 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
 end
 
 return function (a, b, c)
-  local a11 = a[1]
-  local a22 = a[5]
-  local a33 = a[9]
-
-  if a11 < 0 then
-    c[1] = -1
-    a[1] = -a11
-    a[4] = -a[4]
-    a[7] = -a[7]
-  end
-  if a22 < 0 then
-    c[5] = -1
-    a[2] = -a[2]
-    a[5] = -a22
-    a[8] = -a[8]
-  end
-  if a33 < 0 then
-    c[9] = -1
-    a[3] = -a[3]
-    a[6] = -a[6]
-    a[9] = -a33
-  end
-
   while true do
     local u = a[2]
     local v = a[4]
@@ -154,6 +131,57 @@ return function (a, b, c)
   local s1 = a[1]
   local s2 = a[5]
   local s3 = a[9]
+
+  if s1 < 0 then
+    s1 = -s1
+    a[1] = s1
+    a[4] = -a[4]
+    a[7] = -a[7]
+    -- if b then
+    --   b[1] = -b[1]
+    --   b[4] = -b[4]
+    --   b[7] = -b[7]
+    -- end
+    if c then
+      c[1] = -c[1]
+      c[4] = -c[4]
+      c[7] = -c[7]
+    end
+  end
+
+  if s2 < 0 then
+    s2 = -s2
+    a[2] = -a[2]
+    a[5] = s2
+    a[8] = -a[8]
+    -- if b then
+    --   b[2] = -b[2]
+    --   b[5] = -b[5]
+    --   b[8] = -b[8]
+    -- end
+    if c then
+      c[2] = -c[2]
+      c[5] = -c[5]
+      c[8] = -c[8]
+    end
+  end
+
+  if s3 < 0 then
+    s3 = -s3
+    a[3] = -a[3]
+    a[6] = -a[6]
+    a[9] = s3
+    -- if b then
+    --   b[3] = -b[3]
+    --   b[6] = -b[6]
+    --   b[9] = -b[9]
+    -- end
+    if c then
+      c[3] = -c[3]
+      c[6] = -c[6]
+      c[9] = -c[9]
+    end
+  end
 
   if s1 > s2 then
     if s1 > s3 then

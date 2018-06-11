@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local eig3 = require "dromozoa.vecmath.eig3"
+local svd3 = require "dromozoa.vecmath.svd3"
 
 local rawget = rawget
 local rawset = rawset
@@ -471,52 +471,27 @@ function class.normalize_cp(a, b)
 end
 
 function class.svd(a, b)
-  local s = {
+  local m = {
     a[1], a[2], a[3],
     a[4], a[5], a[6],
     a[7], a[8], a[9],
   }
-  local u = {
-    1, 0, 0,
-    0, 1, 0,
-    0, 0, 1,
-  }
-
-  class.mul_transpose_right(s, s, s)
-
-  eig3(s, u)
-
-  local s1 = s[1] if s1 < 0 then s1 = 0 else s1 = sqrt(s1) end
-  local s2 = s[5] if s2 < 0 then s2 = 0 else s2 = sqrt(s2) end
-  local s3 = s[9] if s3 < 0 then s3 = 0 else s3 = sqrt(s3) end
-
-  -- 0 div?
-  s[1] = 1 / s1 ; s[2] = 0      ; s[3] = 0
-  s[4] = 0      ; s[5] = 1 / s2 ; s[6] = 0
-  s[7] = 0      ; s[8] = 0      ; s[9] = 1 / s3
-
-  class.mul_transpose_right(s, s, u)
-  class.mul(s, a)
-  class.mul(u, s)
-
   if b then
-    b[1] = u[1] ; b[2] = u[2] ; b[3] = u[3]
-    b[4] = u[4] ; b[5] = u[5] ; b[6] = u[6]
-    b[7] = u[7] ; b[8] = u[8] ; b[9] = u[9]
-  end
-
-  if s1 > s2 then
-    if s1 > s3 then
-      return s1
-    else
-      return s3
-    end
+    local u = {
+      1, 0, 0,
+      0, 1, 0,
+      0, 0, 1,
+    }
+    local v = {
+      1, 0, 0,
+      0, 1, 0,
+      0, 0, 1,
+    }
+    local s = svd3(m, u, v)
+    class.mul_transpose_right(b, u, v)
+    return s
   else
-    if s2 > s3 then
-      return s2
-    else
-      return s3
-    end
+    return svd3(m)
   end
 end
 

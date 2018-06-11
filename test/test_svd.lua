@@ -43,12 +43,18 @@ local function test_svd(m, expect)
     print(result[1], expect[1], e1)
     print(result[2], expect[2], e2)
     print(result[3], expect[3], e3)
+    print(tostring(a))
+    print(tostring(u))
+    print(tostring(v))
   end
   assert(e1 < epsilon)
   assert(e2 < epsilon)
   assert(e3 < epsilon)
   local b = matrix3():mul(u, a)
   b:mul_transpose_right(b, v)
+  if verbose then
+    print(tostring(b))
+  end
   assert(m:epsilon_equals(b, epsilon))
 end
 
