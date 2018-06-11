@@ -24,6 +24,10 @@ public class Application {
     return "{" + t.x + "," + t.y + "," + t.z + "}";
   }
 
+  private static String s(Tuple4d t) {
+    return "{" + t.x + "," + t.y + "," + t.z + "," + t.w + "}";
+  }
+
   private static String s(Matrix3d m) {
     return "{"
         + m.m00 + "," + m.m01 + "," + m.m02 + ","
@@ -110,10 +114,38 @@ public class Application {
     System.out.println("}");
   }
 
+  private static void vector4d() {
+    Vector4d v = new Vector4d();
+
+    Vector4d v1 = new Vector4d(1, 2, 3, 4);
+    Vector4d v2 = new Vector4d(-5, 6, -7, 8);
+
+    System.out.println("return {");
+    System.out.println("  " + s(v1) + ";");
+    System.out.println("  " + s(v2) + ";");
+
+    System.out.println("  length = " + v1.length() + ";");
+
+    System.out.println("  length_squared = " + v1.lengthSquared() + ";");
+
+    System.out.println("  dot = " + v1.dot(v2) + ";");
+
+    v.normalize(v1);
+    System.out.println("  normalize = " + s(v) + ";");
+
+    v.set(v1);
+    System.out.println("  angle = " + v1.angle(v2) + ";");
+
+    System.out.println("}");
+  }
+
+
   public static void main(String[] args) {
-    String name = "matrix3d";
+    String name = args[0];
     if (name.equals("matrix3d")) {
       matrix3d();
+    } else if (name.equals("vector4d")) {
+      vector4d();
     }
   }
 }

@@ -31,4 +31,9 @@ public class ApplicationTest extends TestCase {
     String[] args = { "matrix3d" };
     Application.main(args);
   }
+
+  public void testVector4d() {
+    String[] args = { "vector4d" };
+    Application.main(args);
+  }
 }

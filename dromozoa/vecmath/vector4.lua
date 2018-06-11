@@ -97,10 +97,12 @@ function class.angle(a, b)
   local ax = a[1]
   local ay = a[2]
   local az = a[3]
+  local aw = a[4]
   local bx = b[1]
   local by = b[2]
   local bz = b[3]
-  local u = ax * bx + ay * by + az * bz + cw * bw
+  local bw = b[4]
+  local u = ax * bx + ay * by + az * bz + aw * bw
   local v = sqrt(ax * ax + ay * ay + az * az + aw * aw)
   local w = sqrt(bx * bx + by * by + bz * bz + bw * bw)
   return acos(u / v / w)
