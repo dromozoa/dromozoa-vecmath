@@ -17,8 +17,6 @@
 
 local vector4 = require "dromozoa.vecmath.vector4"
 
-local verbose = os.getenv "VERBOSE" == "1"
-
 assert(vector4{1,2,3} :equals {1,2,3,0})
 
 local data = assert(loadfile "test/vector4d.lua")()
