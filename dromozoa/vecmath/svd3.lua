@@ -34,8 +34,10 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
     local h = s / (1 + c)
 
     m_pp, m_pq = m_pp - (m_pq + m_pp * h) * s, m_pq + (m_pp - m_pq * h) * s
+
     m_qq = m_qq + (m_qp - m_qq * h) * s
     m_qp = m_pq
+
     m_ip, m_iq = m_ip - (m_iq + m_ip * h) * s, m_iq + (m_ip - m_iq * h) * s
 
     if v then
@@ -43,9 +45,12 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
       local v_qp = v[qp] local v_qq = v[qq]
       local v_ip = v[ip] local v_iq = v[iq]
 
-      v[pp] = v_pp - (v_pq + v_pp * h) * s ; v[pq] = v_pq + (v_pp - v_pq * h) * s
-      v[qp] = v_qp - (v_qq + v_qp * h) * s ; v[qq] = v_qq + (v_qp - v_qq * h) * s
-      v[ip] = v_ip - (v_iq + v_ip * h) * s ; v[iq] = v_iq + (v_ip - v_iq * h) * s
+      v[pp] = v_pp - (v_pq + v_pp * h) * s
+      v[pq] = v_pq + (v_pp - v_pq * h) * s
+      v[qp] = v_qp - (v_qq + v_qp * h) * s
+      v[qq] = v_qq + (v_qp - v_qq * h) * s
+      v[ip] = v_ip - (v_iq + v_ip * h) * s
+      v[iq] = v_iq + (v_ip - v_iq * h) * s
     end
   end
 
@@ -63,11 +68,9 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
   m[pp] = m_pp - m_pq * t
   m[pq] = 0
   m[pi] = m_pi - (m_qi + m_pi * h) * s
-
   m[qp] = 0
   m[qq] = m_qq + m_pq * t
   m[qi] = m_qi + (m_pi - m_qi * h) * s
-
   m[ip] = m_ip - (m_iq + m_ip * h) * s
   m[iq] = m_iq + (m_ip - m_iq * h) * s
 
@@ -76,9 +79,12 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
     local u_qp = u[qp] local u_qq = u[qq]
     local u_ip = u[ip] local u_iq = u[iq]
 
-    u[pp] = u_pp - (u_pq + u_pp * h) * s ; u[pq] = u_pq + (u_pp - u_pq * h) * s
-    u[qp] = u_qp - (u_qq + u_qp * h) * s ; u[qq] = u_qq + (u_qp - u_qq * h) * s
-    u[ip] = u_ip - (u_iq + u_ip * h) * s ; u[iq] = u_iq + (u_ip - u_iq * h) * s
+    u[pp] = u_pp - (u_pq + u_pp * h) * s
+    u[pq] = u_pq + (u_pp - u_pq * h) * s
+    u[qp] = u_qp - (u_qq + u_qp * h) * s
+    u[qq] = u_qq + (u_qp - u_qq * h) * s
+    u[ip] = u_ip - (u_iq + u_ip * h) * s
+    u[iq] = u_iq + (u_ip - u_iq * h) * s
   end
 
   if v then
@@ -86,9 +92,12 @@ local function jacobi(m, u, v, pp, pq, pi, qp, qq, qi, ip, iq)
     local v_qp = v[qp] local v_qq = v[qq]
     local v_ip = v[ip] local v_iq = v[iq]
 
-    v[pp] = v_pp - (v_pq + v_pp * h) * s ; v[pq] = v_pq + (v_pp - v_pq * h) * s
-    v[qp] = v_qp - (v_qq + v_qp * h) * s ; v[qq] = v_qq + (v_qp - v_qq * h) * s
-    v[ip] = v_ip - (v_iq + v_ip * h) * s ; v[iq] = v_iq + (v_ip - v_iq * h) * s
+    v[pp] = v_pp - (v_pq + v_pp * h) * s
+    v[pq] = v_pq + (v_pp - v_pq * h) * s
+    v[qp] = v_qp - (v_qq + v_qp * h) * s
+    v[qq] = v_qq + (v_qp - v_qq * h) * s
+    v[ip] = v_ip - (v_iq + v_ip * h) * s
+    v[iq] = v_iq + (v_ip - v_iq * h) * s
   end
 end
 
