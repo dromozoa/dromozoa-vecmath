@@ -17,6 +17,8 @@
 
 local point3 = require "dromozoa.vecmath.point3"
 local point4 = require "dromozoa.vecmath.point4"
+local tex_coord3 = require "dromozoa.vecmath.tex_coord3"
+local tex_coord4 = require "dromozoa.vecmath.tex_coord4"
 local vector3 = require "dromozoa.vecmath.vector3"
 local vector4 = require "dromozoa.vecmath.vector4"
 
@@ -86,6 +88,9 @@ local function test(n, class)
   assert(t:absolute() :equals {2,1,1,1})
 
   local t = class(1,2,3,4)
+  if verbose then
+    print(tostring(t))
+  end
   assert(t.x == 1)
   assert(t.y == 2)
   if n > 2 then
@@ -134,5 +139,8 @@ end
 
 test(3, point3)
 test(3, vector3)
+test(3, tex_coord3)
+
 test(4, point4)
 test(4, vector4)
+test(4, tex_coord4)
