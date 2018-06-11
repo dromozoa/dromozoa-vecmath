@@ -43,3 +43,14 @@ assert(point4(4,2,1,3):distance_linf{0,0,0,0} == 4)
 assert(point4(4,2,3,1):distance_linf{0,0,0,0} == 4)
 assert(point4(4,3,1,1):distance_linf{0,0,0,0} == 4)
 assert(point4(4,3,2,1):distance_linf{0,0,0,0} == 4)
+
+local data = assert(loadfile "test/point4d.lua")()
+
+local p = point4()
+local p1 = point4(data[1])
+local p2 = point4(data[2])
+
+assert(p1:distance_squared(p2) == data.distance_squared)
+assert(p1:distance(p2) == data.distance)
+assert(p1:distance_l1(p2) == data.distance_l1)
+assert(p1:distance_linf(p2) == data.distance_linf)

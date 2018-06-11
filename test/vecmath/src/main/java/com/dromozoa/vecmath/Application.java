@@ -114,6 +114,27 @@ public class Application {
     System.out.println("}");
   }
 
+  private static void point4d() {
+    Point4d p = new Point4d();
+
+    Point4d p1 = new Point4d(1, 2, 3, 4);
+    Point4d p2 = new Point4d(-5, 6, -7, 8);
+
+    System.out.println("return {");
+    System.out.println("  " + s(p1) + ";");
+    System.out.println("  " + s(p2) + ";");
+
+    System.out.println("  distance_squared = " + p1.distanceSquared(p2) + ";");
+
+    System.out.println("  distance = " + p1.distance(p2) + ";");
+
+    System.out.println("  distance_l1 = " + p1.distanceL1(p2) + ";");
+
+    System.out.println("  distance_linf = " + p1.distanceLinf(p2) + ";");
+
+    System.out.println("}");
+  }
+
   private static void vector4d() {
     Vector4d v = new Vector4d();
 
@@ -139,11 +160,12 @@ public class Application {
     System.out.println("}");
   }
 
-
   public static void main(String[] args) {
     String name = args[0];
     if (name.equals("matrix3d")) {
       matrix3d();
+    } else if (name.equals("point4d")) {
+      point4d();
     } else if (name.equals("vector4d")) {
       vector4d();
     }

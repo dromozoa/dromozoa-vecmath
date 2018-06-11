@@ -36,4 +36,3 @@ assert(v:set(v1):normalize():equals(data.normalize))
 
 assert(v1:angle(v2) == data.angle)
 assert(v2:angle(v1) == data.angle)
-
