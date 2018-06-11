@@ -24,6 +24,28 @@ local class = {
   };
 }
 
+function class.set(a, x, y, z, w)
+  if x then
+    if y then
+      a[1] = x
+      a[2] = y
+      a[3] = z
+      a[4] = w
+    else
+      a[1] = x[1]
+      a[2] = x[2]
+      a[3] = x[3]
+      a[4] = x[4]
+    end
+  else
+    a[1] = 0
+    a[2] = 0
+    a[3] = 0
+    a[4] = 0
+  end
+  return a
+end
+
 function class.get(a, b)
   b[1] = a[1]
   b[2] = a[2]

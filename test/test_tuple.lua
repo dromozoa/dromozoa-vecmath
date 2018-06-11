@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local point3 = require "dromozoa.vecmath.point3"
+local point4 = require "dromozoa.vecmath.point4"
 local vector3 = require "dromozoa.vecmath.vector3"
 local vector4 = require "dromozoa.vecmath.vector4"
 
@@ -133,4 +134,5 @@ end
 
 test(3, point3)
 test(3, vector3)
+test(4, point4)
 test(4, vector4)
