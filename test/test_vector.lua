@@ -15,24 +15,31 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local vector2 = require "dromozoa.vecmath.vector2"
+local vector3 = require "dromozoa.vecmath.vector3"
 local vector4 = require "dromozoa.vecmath.vector4"
 
-assert(vector4{1,2,3} :equals {1,2,3,0})
+assert(vector4{1,2,3}:equals{1,2,3,0})
 
-local data = assert(loadfile "test/vector4d.lua")()
+local function check(class, data)
+  local v1 = class(data[1])
+  local v2 = class(data[2])
 
-local v = vector4()
-local v1 = vector4(data[1])
-local v2 = vector4(data[2])
+  assert(v1:length() == data.length)
+  assert(v1:length_squared() == data.length_squared)
+  assert(v1:dot(v2) == data.dot)
+  assert(v2:dot(v1) == data.dot)
+  assert(class():normalize(v1):equals(data.normalize))
+  assert(class(v1):normalize():equals(data.normalize))
+  assert(v1:angle(v2) == data.angle)
+  assert(v2:angle(v1) == data.angle)
 
-assert(v1:length() == data.length)
-assert(v1:length_squared() == data.length_squared)
+  if class == vector3 then
+    assert(class():cross(v1, v2):equals(data.cross))
+  end
+end
 
-assert(v1:dot(v2) == data.dot)
-assert(v2:dot(v1) == data.dot)
-
-assert(v:normalize(v1):equals(data.normalize))
-assert(v:set(v1):normalize():equals(data.normalize))
-
-assert(v1:angle(v2) == data.angle)
-assert(v2:angle(v1) == data.angle)
+local data = assert(loadfile "test/vector.lua")()
+check(vector2, data.vector2)
+check(vector3, data.vector3)
+check(vector4, data.vector4)

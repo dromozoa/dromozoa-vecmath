@@ -20,6 +20,10 @@ package com.dromozoa.vecmath;
 import javax.vecmath.*;
 
 public class Application {
+  private static String s(Tuple2d t) {
+    return "{" + t.x + "," + t.y + "}";
+  }
+
   private static String s(Tuple3d t) {
     return "{" + t.x + "," + t.y + "," + t.z + "}";
   }
@@ -135,30 +139,68 @@ public class Application {
     System.out.println("}");
   }
 
-  private static void vector4d() {
-    Vector4d v = new Vector4d();
+  private static void vector2d() {
+    Vector2d v1 = new Vector2d(1, 2);
+    Vector2d v2 = new Vector2d(-3, 4);
+    Vector2d v3 = new Vector2d(v1);
+    v3.normalize();
 
+    System.out.println("  vector2 = {");
+    System.out.println("    " + s(v1) + ";");
+    System.out.println("    " + s(v2) + ";");
+    System.out.println("    dot = " + v1.dot(v2) + ";");
+    System.out.println("    length = " + v1.length() + ";");
+    System.out.println("    length_squared = " + v1.lengthSquared() + ";");
+    System.out.println("    normalize = " + s(v3) + ";");
+    System.out.println("    angle = " + v1.angle(v2) + ";");
+    System.out.println("  };");
+  }
+
+  private static void vector3d() {
+    Vector3d v1 = new Vector3d(1, 2, 3);
+    Vector3d v2 = new Vector3d(-4, 5, -6);
+    Vector3d v3 = new Vector3d();
+    Vector3d v4 = new Vector3d();
+    v3.cross(v1, v2);
+    v4.normalize(v1);
+
+    System.out.println("  vector3 = {");
+    System.out.println("    " + s(v1) + ";");
+    System.out.println("    " + s(v2) + ";");
+    System.out.println("    cross = " + s(v3) + ";");
+    System.out.println("    normalize = " + s(v4) + ";");
+    System.out.println("    dot = " + v1.dot(v2) + ";");
+    System.out.println("    length_squared = " + v1.lengthSquared() + ";");
+    System.out.println("    length = " + v1.length() + ";");
+    System.out.println("    angle = " + v1.angle(v2) + ";");
+    System.out.println("  };");
+  }
+
+  private static void vector4d() {
     Vector4d v1 = new Vector4d(1, 2, 3, 4);
     Vector4d v2 = new Vector4d(-5, 6, -7, 8);
+    Vector4d v3 = new Vector4d();
+    v3.normalize(v1);
 
+    System.out.println("  vector4 = {");
+    System.out.println("    " + s(v1) + ";");
+    System.out.println("    " + s(v2) + ";");
+    System.out.println("    length = " + v1.length() + ";");
+    System.out.println("    length_squared = " + v1.lengthSquared() + ";");
+    System.out.println("    dot = " + v1.dot(v2) + ";");
+    System.out.println("    normalize = " + s(v3) + ";");
+    System.out.println("    angle = " + v1.angle(v2) + ";");
+    System.out.println("  };");
+  }
+
+  private static void vector() {
     System.out.println("return {");
-    System.out.println("  " + s(v1) + ";");
-    System.out.println("  " + s(v2) + ";");
-
-    System.out.println("  length = " + v1.length() + ";");
-
-    System.out.println("  length_squared = " + v1.lengthSquared() + ";");
-
-    System.out.println("  dot = " + v1.dot(v2) + ";");
-
-    v.normalize(v1);
-    System.out.println("  normalize = " + s(v) + ";");
-
-    v.set(v1);
-    System.out.println("  angle = " + v1.angle(v2) + ";");
-
+    vector2d();
+    vector3d();
+    vector4d();
     System.out.println("}");
   }
+
 
   public static void main(String[] args) {
     String name = args[0];
@@ -166,8 +208,8 @@ public class Application {
       matrix3d();
     } else if (name.equals("point4d")) {
       point4d();
-    } else if (name.equals("vector4d")) {
-      vector4d();
+    } else if (name.equals("vector")) {
+      vector();
     }
   }
 }

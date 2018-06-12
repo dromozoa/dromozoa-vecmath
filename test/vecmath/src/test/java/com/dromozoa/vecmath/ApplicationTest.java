@@ -40,8 +40,8 @@ public class ApplicationTest extends TestCase {
     Application.main(args);
   }
 
-  public void testVector4d() {
-    String[] args = { "vector4d" };
+  public void testVectord() {
+    String[] args = { "vectord" };
     Application.main(args);
   }
 }
