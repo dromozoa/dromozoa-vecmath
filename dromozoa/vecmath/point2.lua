@@ -19,6 +19,7 @@ local tuple2 = require "dromozoa.vecmath.tuple2"
 
 local rawget = rawget
 local rawset = rawset
+local setmetatable = setmetatable
 local sqrt = math.sqrt
 
 local super = tuple2
