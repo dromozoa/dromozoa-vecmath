@@ -22,6 +22,7 @@ local point3 = require "dromozoa.vecmath.point3"
 local point4 = require "dromozoa.vecmath.point4"
 local tex_coord3 = require "dromozoa.vecmath.tex_coord3"
 local tex_coord4 = require "dromozoa.vecmath.tex_coord4"
+local vector2 = require "dromozoa.vecmath.vector2"
 local vector3 = require "dromozoa.vecmath.vector3"
 local vector4 = require "dromozoa.vecmath.vector4"
 
@@ -141,6 +142,7 @@ local function test(n, class)
 end
 
 test(2, point2)
+test(2, vector2)
 
 test(3, point3)
 test(3, vector3)
