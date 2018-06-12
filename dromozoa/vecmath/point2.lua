@@ -22,21 +22,24 @@ local rawset = rawset
 local sqrt = math.sqrt
 
 local super = tuple2
-local class = {}
+local class = { is_point2 = true }
 local metatable = { __tostring = super.to_string }
 
+-- a:distance_squared(point2 b)
 function class.distance_squared(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
   return x * x + y * y
 end
 
+-- a:distance(point2 b)
 function class.distance(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
   return sqrt(x * x + y * y)
 end
 
+-- a:distance_l1(point2 b)
 function class.distance_l1(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -45,6 +48,7 @@ function class.distance_l1(a, b)
   return x + y + z
 end
 
+-- a:distance_linf(point2 b)
 function class.distance_linf(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
