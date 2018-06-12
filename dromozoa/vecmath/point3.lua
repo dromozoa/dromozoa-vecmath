@@ -19,12 +19,14 @@ local tuple3 = require "dromozoa.vecmath.tuple3"
 
 local rawget = rawget
 local rawset = rawset
+local setmetatable = setmetatable
 local sqrt = math.sqrt
 
 local super = tuple3
-local class = {}
+local class = { is_point3 = true }
 local metatable = { __tostring = super.to_string }
 
+-- a:distance_squared(point3 b)
 function class.distance_squared(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -32,6 +34,7 @@ function class.distance_squared(a, b)
   return x * x + y * y + z * z
 end
 
+-- a:distance(point3 b)
 function class.distance(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -39,6 +42,7 @@ function class.distance(a, b)
   return sqrt(x * x + y * y + z * z)
 end
 
+-- a:distance_l1(point3 b)
 function class.distance_l1(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -49,6 +53,7 @@ function class.distance_l1(a, b)
   return x + y + z
 end
 
+-- a:distance_linf(point3 b)
 function class.distance_linf(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -71,6 +76,7 @@ function class.distance_linf(a, b)
   end
 end
 
+-- a:project(point4 b)
 function class.project(a, b)
   local d = b[4]
   a[1] = b[1] / d
@@ -84,14 +90,17 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return rawget(a, super.index[key])
+    return rawget(a, class.index[key])
   end
 end
 
 function metatable.__newindex(a, key, value)
-  rawset(a, super.index[key], value)
+  rawset(a, class.index[key], value)
 end
 
+-- class(number b, number c, number d)
+-- class(tuple3 b)
+-- class()
 return setmetatable(class, {
   __index = super;
   __call = function (_, ...)
