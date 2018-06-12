@@ -95,7 +95,7 @@ table td.subclass {
   </tr>
 
   <tr>
-    <td rowspan="5">4</td>
+    <td rowspan="6">4</td>
     <td>tuple4</td>
     <td>abstract</td>
   </tr>
@@ -109,6 +109,10 @@ table td.subclass {
   </tr>
   <tr>
     <td class="subclass">quat4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord4</td>
     <td></td>
   </tr>
   <tr>
@@ -532,7 +536,6 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 \end{eqnarray}\]
 </p>
 
-
 <h3>平鍋の実装</h3>
 
 <p>
@@ -540,6 +543,30 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 \[
   B = \sqrt[3]{\mathrm{det}(A)} A
 \]
+</p>
+
+<h2>ベクトルの角度</h2>
+
+<p>
+\[
+  \cos\theta = \frac{a \cdot b}{\|a\|\|b\|}
+\]
+2次元と3次元では外積を用いて
+\[\begin{eqnarray}
+  \sin\theta &amp;=&amp; \frac{\|a \times b\|}{\|a\|\|b\|} \\
+  \tan\theta &amp;=&amp; \frac{\|a \times b\|}{a \cdot b}
+\end{eqnarray}\]
+2次元では
+\[\begin{eqnarray}
+  a &amp;=&amp; (a_x, a_y, 0) \\
+  b &amp;=&amp; (b_x, b_y, 0) \\
+  a \times b &amp;=&amp; (0, 0, a_x b_y - a_y b_x)
+\end{eqnarray}\]
+なので
+\[\begin{eqnarray}
+  \|a \times b\| &amp;=&amp; a_x b_y - a_y b_x \\
+  a \cdot b &amp;=&amp; a_x b_x + a_y b_y
+\end{eqnarray}\]
 </p>
 
 </div>
