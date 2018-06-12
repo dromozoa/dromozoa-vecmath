@@ -40,6 +40,9 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
+-- class(number b, number c, number d, number e)
+-- class(tuple4 b)
+-- class()
 return setmetatable(class, {
   __index = super;
   __call = function (_, ...)
