@@ -19,6 +19,7 @@ local matrix3 = require "dromozoa.vecmath.matrix3"
 local vector3 = require "dromozoa.vecmath.vector3"
 
 local verbose = os.getenv "VERBOSE" == "1"
+local epsilon = 1e-6
 
 local m = matrix3()
 local s = tostring(m)
@@ -57,7 +58,6 @@ local data = assert(loadfile "test/matrix3d.lua")()
 
 local m = matrix3()
 local v = vector3()
-local eps = 0.000001
 
 local m1 = matrix3(data[1])
 local m2 = matrix3(data[2])
@@ -78,9 +78,9 @@ if verbose then
   print(tostring(m:set(m1):set_scale(2)))
   print(tostring(matrix3(d)))
 end
-assert(m:set(m1):set_scale(2):epsilon_equals(d, eps))
+assert(m:set(m1):set_scale(2):epsilon_equals(d, epsilon))
 
-assert(math.abs(m1:get_scale() - data.get_scale) < eps)
+assert(math.abs(m1:get_scale() - data.get_scale) < epsilon)
 
 assert(m:add(2, m1):equals(data.add2))
 assert(m:add(2, m:set(m1)):equals(data.add2))
@@ -98,9 +98,9 @@ assert(m:transpose(m1):equals(data.transpose))
 assert(m:transpose(m:set(m1)):equals(data.transpose))
 assert(m:set(m1):transpose():equals(data.transpose))
 
-assert(m:invert(m1):epsilon_equals(data.invert, eps))
-assert(m:invert(m:set(m1)):epsilon_equals(data.invert, eps))
-assert(m:set(m1):invert():epsilon_equals(data.invert, eps))
+assert(m:invert(m1):epsilon_equals(data.invert, epsilon))
+assert(m:invert(m:set(m1)):epsilon_equals(data.invert, epsilon))
+assert(m:set(m1):invert():epsilon_equals(data.invert, epsilon))
 
 assert(m1:determinant() == data.determinant)
 
@@ -120,7 +120,7 @@ if verbose then
   print(tostring(m:mul_normalize(m1, m2)))
   print(tostring(matrix3(data.mul_normalize)))
 end
-assert(m:mul_normalize(m1, m2):epsilon_equals(data.mul_normalize, eps))
+assert(m:mul_normalize(m1, m2):epsilon_equals(data.mul_normalize, epsilon))
 assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
 assert(m:mul_transpose_right(m1, m2):equals(data.mul_transpose_right))
 assert(m:mul_transpose_left(m1, m2):equals(data.mul_transpose_left))
@@ -134,14 +134,14 @@ if verbose then
   print(tostring(m:normalize(m1)))
   print(tostring(matrix3(d)))
 end
-assert(m:normalize(m1):epsilon_equals(d, eps))
-assert(m:set(m1):normalize():epsilon_equals(d, eps))
+assert(m:normalize(m1):epsilon_equals(d, epsilon))
+assert(m:set(m1):normalize():epsilon_equals(d, epsilon))
 
 if verbose then
   print(tostring(m:normalize_cp(m1)))
   print(tostring(matrix3(data.normalize_cp)))
 end
-assert(m:normalize_cp(m1):epsilon_equals(data.normalize_cp, eps))
+assert(m:normalize_cp(m1):epsilon_equals(data.normalize_cp, epsilon))
 
 assert(m:negate(m1):equals(data.negate))
 assert(m:negate(m:set(m1)):equals(data.negate))

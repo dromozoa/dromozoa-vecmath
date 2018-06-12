@@ -19,7 +19,6 @@ local point2 = require "dromozoa.vecmath.point2"
 local point3 = require "dromozoa.vecmath.point3"
 local point4 = require "dromozoa.vecmath.point4"
 
-local verbose = os.getenv "VERBOSE" == "1"
 local epsilon = 1e-9
 
 assert(point4{1,2,3}:equals{1,2,3,1})
