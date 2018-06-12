@@ -19,24 +19,29 @@ local tuple4 = require "dromozoa.vecmath.tuple4"
 
 local rawget = rawget
 local rawset = rawset
+local setmetatable = setmetatable
 local sqrt = math.sqrt
 
 local super = tuple4
-local class = {}
+local class = { is_point4 = true }
 local metatable = { __tostring = super.to_string }
 
-function class.set(a, x, y, z, w)
-  if x then
-    if y then
-      a[1] = x
-      a[2] = y
-      a[3] = z
-      a[4] = w
+-- a:set(number b, number c, number d, number e)
+-- a:set(tuple3 b)
+-- a:set(tuple4 b)
+-- a:set()
+function class.set(a, b, c, d, e)
+  if b then
+    if c then
+      a[1] = b
+      a[2] = c
+      a[3] = d
+      a[4] = e
     else
-      a[1] = x[1]
-      a[2] = x[2]
-      a[3] = x[3]
-      a[4] = x[4] or 1
+      a[1] = b[1]
+      a[2] = b[2]
+      a[3] = b[3]
+      a[4] = b[4] or 1
     end
   else
     a[1] = 0
@@ -47,6 +52,7 @@ function class.set(a, x, y, z, w)
   return a
 end
 
+-- a:distance_squared(point4 b)
 function class.distance_squared(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -55,6 +61,7 @@ function class.distance_squared(a, b)
   return x * x + y * y + z * z + w * w
 end
 
+-- a:distance(point4 b)
 function class.distance(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -63,6 +70,7 @@ function class.distance(a, b)
   return sqrt(x * x + y * y + z * z + w * w)
 end
 
+-- a:distance_l1(point4 b)
 function class.distance_l1(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -75,6 +83,7 @@ function class.distance_l1(a, b)
   return x + y + z + w
 end
 
+-- a:distance_linf(point4 b)
 function class.distance_linf(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
@@ -86,35 +95,20 @@ function class.distance_linf(a, b)
   if w < 0 then w = -w end
   if x > y then
     if z > w then
-      if x > z then
-        return x
-      else
-        return z
-      end
+      if x > z then return x else return z end
     else
-      if x > w then
-        return x
-      else
-        return w
-      end
+      if x > w then return x else return w end
     end
   else
     if z > w then
-      if y > z then
-        return y
-      else
-        return z
-      end
+      if y > z then return y else return z end
     else
-      if y > w then
-        return y
-      else
-        return w
-      end
+      if y > w then return y else return w end
     end
   end
 end
 
+-- a:project(point4 b)
 function class.project(a, b)
   local d = b[4]
   a[1] = b[1] / d
@@ -129,14 +123,18 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return rawget(a, super.index[key])
+    return rawget(a, class.index[key])
   end
 end
 
 function metatable.__newindex(a, key, value)
-  rawset(a, super.index[key], value)
+  rawset(a, class.index[key], value)
 end
 
+-- class(number b, number c, number d, number e)
+-- class(tuple3 b)
+-- class(tuple4 b)
+-- class()
 return setmetatable(class, {
   __index = super;
   __call = function (_, ...)

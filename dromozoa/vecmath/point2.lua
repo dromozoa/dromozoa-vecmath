@@ -55,10 +55,7 @@ function class.distance_linf(a, b)
   local y = a[2] - b[2]
   if x < 0 then x = -x end
   if y < 0 then y = -y end
-  if x > y then
-    return x
-  else
-    return y
+  if x > y then return x else return y
   end
 end
 
