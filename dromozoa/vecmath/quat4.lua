@@ -27,6 +27,8 @@ local metatable = { __tostring = super.to_string }
 
 -- TODO set tuple4 (not quat4)
 
+-- quat4 a
+-- quat4 a, quat4 b
 function class.conjugate(a, b)
   if b then
     a[1] = -b[1]

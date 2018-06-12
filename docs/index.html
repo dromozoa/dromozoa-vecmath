@@ -19,6 +19,9 @@
     padding: 15px;
   }
 }
+table td.subclass {
+  padding-left: 2em;
+}
 </style>
 <body>
 <div class="markdown-body">
@@ -41,6 +44,94 @@
   <li><a href="https://web.stanford.edu/class/cme335/lecture7.pdf">CME 335 - Advanced Topics in Numerical Linear Algebra - Lecture 7</a></li>
   <li><a href="http://nalab.mind.meiji.ac.jp/~mk/labo/text/eigenvalues-add.pdf">固有値問題ノートの補足</a></li>
 </ul>
+
+<h2>型階層</h2>
+
+<table>
+  <tr>
+    <th>#</th>
+    <th>class</th>
+  </tr>
+
+  <tr>
+    <td rowspan="4">2</td>
+    <td>tuple2</td>
+  </tr>
+  <tr>
+    <td class="subclass">point2</td>
+  </tr>
+  <tr>
+    <td class="subclass">vector2</td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord2</td>
+  </tr>
+
+  <tr>
+    <td rowspan="5">3</td>
+    <td>tuple3</td>
+  </tr>
+  <tr>
+    <td class="subclass">point3</td>
+  </tr>
+  <tr>
+    <td class="subclass">vector3</td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord3</td>
+  </tr>
+  <tr>
+    <td class="subclass">color3</td>
+  </tr>
+
+  <tr>
+    <td rowspan="2">3</td>
+    <td>tuple3b</td>
+  </tr>
+  <tr>
+    <td class="subclass">color3b</td>
+  </tr>
+
+  <tr>
+    <td rowspan="5">4</td>
+    <td>tuple4</td>
+  </tr>
+  <tr>
+    <td class="subclass">point4</td>
+  </tr>
+  <tr>
+    <td class="subclass">vector4</td>
+  </tr>
+  <tr>
+    <td class="subclass">quat4</td>
+  </tr>
+  <tr>
+    <td class="subclass">color4</td>
+  </tr>
+
+  <tr>
+    <td rowspan="2">4</td>
+    <td>tuple4b</td>
+  </tr>
+  <tr>
+    <td class="subclass">color4b</td>
+  </tr>
+
+  <tr>
+    <td>4</td>
+    <td>axis_angle4</td>
+  </tr>
+
+  <tr>
+    <td>9</td>
+    <td>matrix3</td>
+  </tr>
+
+  <tr>
+    <td>16</td>
+    <td>matrix4</td>
+  </tr>
+</table>
 
 <h2>\(3 \times 3\)行列の特異値分解</h2>
 
