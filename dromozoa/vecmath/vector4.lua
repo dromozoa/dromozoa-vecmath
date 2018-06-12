@@ -19,25 +19,30 @@ local tuple4 = require "dromozoa.vecmath.tuple4"
 
 local rawget = rawget
 local rawset = rawset
+local setmetatable = setmetatable
 local acos = math.acos
 local sqrt = math.sqrt
 
 local super = tuple4
-local class = {}
+local class = { is_vector4 = true }
 local metatable = { __tostring = super.to_string }
 
-function class.set(a, x, y, z, w)
-  if x then
-    if y then
-      a[1] = x
-      a[2] = y
-      a[3] = z
-      a[4] = w
+-- a:set(number b, number c, number d, number e)
+-- a:set(tuple3 b)
+-- a:set(tuple4 b)
+-- a:set()
+function class.set(a, b, c, d, e)
+  if b then
+    if c then
+      a[1] = b
+      a[2] = c
+      a[3] = d
+      a[4] = e
     else
-      a[1] = x[1]
-      a[2] = x[2]
-      a[3] = x[3]
-      a[4] = x[4] or 0
+      a[1] = b[1]
+      a[2] = b[2]
+      a[3] = b[3]
+      a[4] = b[4] or 0
     end
   else
     a[1] = 0
@@ -48,6 +53,7 @@ function class.set(a, x, y, z, w)
   return a
 end
 
+-- a:length()
 function class.length(a)
   local x = a[1]
   local y = a[2]
@@ -56,6 +62,7 @@ function class.length(a)
   return sqrt(x * x + y * y + z * z + w * w)
 end
 
+-- a:length_squared()
 function class.length_squared(a)
   local x = a[1]
   local y = a[2]
@@ -64,10 +71,13 @@ function class.length_squared(a)
   return x * x + y * y + z * z + w * w
 end
 
+-- a:dot(vector4 b)
 function class.dot(a, b)
   return a[1] * b[1] + a[2] * b[2] + a[3] * b[3] + a[4] * b[4]
 end
 
+-- a:normalize(vector4 b)
+-- a:normalize()
 function class.normalize(a, b)
   if b then
     local x = b[1]
@@ -93,6 +103,7 @@ function class.normalize(a, b)
   return a
 end
 
+-- a:angle(vector4 b)
 function class.angle(a, b)
   local ax = a[1]
   local ay = a[2]
@@ -113,14 +124,18 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return rawget(a, super.index[key])
+    return rawget(a, class.index[key])
   end
 end
 
 function metatable.__newindex(a, key, value)
-  rawset(a, super.index[key], value)
+  rawset(a, class.index[key], value)
 end
 
+-- class(number b, number c, number d, number e)
+-- class(tuple3 b)
+-- class(tuple4 b)
+-- class()
 return setmetatable(class, {
   __index = super;
   __call = function (_, ...)

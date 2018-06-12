@@ -69,7 +69,7 @@ function class.dot(a, b)
   return a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
 end
 
--- a:length_squared(vector3 b)
+-- a:length_squared()
 function class.length_squared(a)
   local x = a[1]
   local y = a[2]
@@ -77,7 +77,7 @@ function class.length_squared(a)
   return x * x + y * y + z * z
 end
 
--- a:length(vector3 b)
+-- a:length()
 function class.length(a)
   local x = a[1]
   local y = a[2]
