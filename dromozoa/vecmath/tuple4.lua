@@ -18,24 +18,28 @@
 local format = string.format
 
 local class = {
+  is_tuple4 = true;
   index = {
     1, 2, 3, 4,
     x = 1, y = 2, z = 3, w = 4,
   };
 }
 
-function class.set(a, x, y, z, w)
-  if x then
-    if y then
-      a[1] = x
-      a[2] = y
-      a[3] = z
-      a[4] = w
+-- a:set(number b, number c, number d, number e)
+-- a:set(tuple4 b)
+-- a:set()
+function class.set(a, b, c, d, e)
+  if b then
+    if c then
+      a[1] = b
+      a[2] = c
+      a[3] = d
+      a[4] = e
     else
-      a[1] = x[1]
-      a[2] = x[2]
-      a[3] = x[3]
-      a[4] = x[4]
+      a[1] = b[1]
+      a[2] = b[2]
+      a[3] = b[3]
+      a[4] = b[4]
     end
   else
     a[1] = 0
@@ -46,6 +50,7 @@ function class.set(a, x, y, z, w)
   return a
 end
 
+-- a:get(tuple4 b)
 function class.get(a, b)
   b[1] = a[1]
   b[2] = a[2]
@@ -54,6 +59,8 @@ function class.get(a, b)
   return a
 end
 
+-- a:add(tuple4 b, tuple4 c)
+-- a:add(tuple4 b)
 function class.add(a, b, c)
   if c then
     a[1] = b[1] + c[1]
@@ -69,6 +76,8 @@ function class.add(a, b, c)
   return a
 end
 
+-- a:sub(tuple4 b, tuple4 c)
+-- a:sub(tuple4 b)
 function class.sub(a, b, c)
   if c then
     a[1] = b[1] - c[1]
@@ -84,6 +93,8 @@ function class.sub(a, b, c)
   return a
 end
 
+-- a:negate(tuple4 b)
+-- a:negate()
 function class.negate(a, b)
   if b then
     a[1] = -b[1]
@@ -99,60 +110,69 @@ function class.negate(a, b)
   return a
 end
 
-function class.scale(a, s, b)
-  if b then
-    a[1] = s * b[1]
-    a[2] = s * b[2]
-    a[3] = s * b[3]
-    a[4] = s * b[4]
-  else
-    a[1] = s * a[1]
-    a[2] = s * a[2]
-    a[3] = s * a[3]
-    a[4] = s * a[4]
-  end
-  return a
-end
-
-function class.scale_add(a, s, b, c)
+-- a:scale(number b, tuple4 c)
+-- a:scale(number b)
+function class.scale(a, b, c)
   if c then
-    a[1] = s * b[1] + c[1]
-    a[2] = s * b[2] + c[2]
-    a[3] = s * b[3] + c[3]
-    a[4] = s * b[4] + c[4]
+    a[1] = b * c[1]
+    a[2] = b * c[2]
+    a[3] = b * c[3]
+    a[4] = b * c[4]
   else
-    a[1] = s * a[1] + b[1]
-    a[2] = s * a[2] + b[2]
-    a[3] = s * a[3] + b[3]
-    a[4] = s * a[4] + b[4]
+    a[1] = b * a[1]
+    a[2] = b * a[2]
+    a[3] = b * a[3]
+    a[4] = b * a[4]
   end
   return a
 end
 
+-- a:scale_add(number b, tuple4 c, tuple4 d)
+-- a:scale_add(number b, tuple4 c)
+function class.scale_add(a, b, c, d)
+  if d then
+    a[1] = b * c[1] + d[1]
+    a[2] = b * c[2] + d[2]
+    a[3] = b * c[3] + d[3]
+    a[4] = b * c[4] + d[4]
+  else
+    a[1] = b * a[1] + c[1]
+    a[2] = b * a[2] + c[2]
+    a[3] = b * a[3] + c[3]
+    a[4] = b * a[4] + c[4]
+  end
+  return a
+end
+
+-- a:to_string()
 function class.to_string(a)
   return format("(%.17g, %.17g, %.17g, %.17g)", a[1], a[2], a[3], a[4])
 end
 
+-- a:equals(tuple4 b)
 function class.equals(a, b)
-  return a and b
-      and a[1] == b[1]
-      and a[2] == b[2]
-      and a[3] == b[3]
-      and a[4] == b[4]
+  return a and b and a[1] == b[1] and a[2] == b[2] and a[3] == b[3] and a[4] == b[4]
 end
 
+-- a:epsilon_equals(tuple4 b, number epsilon)
 function class.epsilon_equals(a, b, epsilon)
   if a and b then
-    local v = a[1] - b[1] if v < 0 then v = -v end if v > epsilon then return false end
-    local v = a[2] - b[2] if v < 0 then v = -v end if v > epsilon then return false end
-    local v = a[3] - b[3] if v < 0 then v = -v end if v > epsilon then return false end
-    local v = a[4] - b[4] if v < 0 then v = -v end if v > epsilon then return false end
-    return true
+    local x = a[1] - b[1]
+    local y = a[2] - b[2]
+    local z = a[3] - b[3]
+    local w = a[4] - b[4]
+    if x < 0 then x = -x end
+    if y < 0 then y = -y end
+    if z < 0 then z = -z end
+    if w < 0 then w = -w end
+    return x <= epsilon and y <= epsilon and z <= epsilon and w <= epsilon
   else
     return false
   end
 end
 
+-- a:clamp(number min, number max, tuple4 b)
+-- a:clamp(number min, number max)
 function class.clamp(a, min, max, b)
   if b then
     local x = b[1]
@@ -176,6 +196,8 @@ function class.clamp(a, min, max, b)
   return a
 end
 
+-- a:clamp_min(number min, tuple4 b)
+-- a:clamp_min(number min)
 function class.clamp_min(a, min, b)
   if b then
     local x = b[1]
@@ -195,6 +217,8 @@ function class.clamp_min(a, min, b)
   return a
 end
 
+-- a:clamp_max(number max, tuple4 b)
+-- a:clamp_max(number max)
 function class.clamp_max(a, max, b)
   if b then
     local x = b[1]
@@ -214,6 +238,8 @@ function class.clamp_max(a, max, b)
   return a
 end
 
+-- a:absolute(tuple4 b)
+-- a:absolute()
 function class.absolute(a, b)
   if b then
     local x = b[1]
@@ -237,6 +263,8 @@ function class.absolute(a, b)
   return a
 end
 
+-- a:interpolate(tuple4 b, tuple4 c, number d)
+-- a:interpolate(tuple4 b, number d)
 function class.interpolate(a, b, c, d)
   if d then
     local beta = 1 - d
