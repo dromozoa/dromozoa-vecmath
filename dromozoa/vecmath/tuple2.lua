@@ -118,12 +118,10 @@ end
 
 -- a:equals(tuple2 b)
 function class.equals(a, b)
-  return a and b
-      and a[1] == b[1]
-      and a[2] == b[2]
+  return a and b and a[1] == b[1] and a[2] == b[2]
 end
 
--- a:equals(tuple2 b, epsilon)
+-- a:equals(tuple2 b, number epsilon)
 function class.epsilon_equals(a, b, epsilon)
   if a and b then
     local x = a[1] - b[1]
