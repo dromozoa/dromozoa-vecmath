@@ -19,22 +19,25 @@ local tuple4 = require "dromozoa.vecmath.tuple4"
 
 local rawget = rawget
 local rawset = rawset
+local setmetatable = setmetatable
 
 local super = tuple4
-local class = {}
+local class = { is_color4 = true }
 local metatable = { __tostring = super.to_string }
+
+-- TODO impl get()
 
 function metatable.__index(a, key)
   local value = class[key]
   if value then
     return value
   else
-    return rawget(a, super.index[key])
+    return rawget(a, class.index[key])
   end
 end
 
 function metatable.__newindex(a, key, value)
-  rawset(a, super.index[key], value)
+  rawset(a, class.index[key], value)
 end
 
 return setmetatable(class, {
