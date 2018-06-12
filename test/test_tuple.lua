@@ -17,6 +17,7 @@
 
 local color3 = require "dromozoa.vecmath.color3"
 local color4 = require "dromozoa.vecmath.color4"
+local point2 = require "dromozoa.vecmath.point2"
 local point3 = require "dromozoa.vecmath.point3"
 local point4 = require "dromozoa.vecmath.point4"
 local tex_coord3 = require "dromozoa.vecmath.tex_coord3"
@@ -138,6 +139,8 @@ local function test(n, class)
   t[n] = nil
   assert(not t[n])
 end
+
+test(2, point2)
 
 test(3, point3)
 test(3, vector3)

@@ -106,7 +106,7 @@ end
 -- a:scale_add(number b, tuple2 c, tuple2 d)
 -- a:scale_add(number b, tuple2 c)
 function class.scale_add(a, b, c, d)
-  if c then
+  if d then
     a[1] = b * c[1] + d[1]
     a[2] = b * c[2] + d[2]
   else
@@ -197,14 +197,11 @@ function class.absolute(a, b)
     local z = b[3]
     if x < 0 then a[1] = -x else a[1] = x end
     if y < 0 then a[2] = -y else a[2] = y end
-    if z < 0 then a[3] = -z else a[3] = z end
   else
     local x = a[1]
     local y = a[2]
-    local z = a[3]
     if x < 0 then a[1] = -x end
     if y < 0 then a[2] = -y end
-    if z < 0 then a[3] = -z end
   end
   return a
 end
