@@ -118,24 +118,61 @@ public class Application {
     System.out.println("}");
   }
 
-  private static void point4d() {
-    Point4d p = new Point4d();
+  private static void point2d() {
+    Point2d p1 = new Point2d(1, 2);
+    Point2d p2 = new Point2d(-3, 4);
 
+    System.out.println("  point2 = {");
+    System.out.println("    " + s(p1) + ";");
+    System.out.println("    " + s(p2) + ";");
+    System.out.println("    distance_squared = " + p1.distanceSquared(p2) + ";");
+    System.out.println("    distance = " + p1.distance(p2) + ";");
+    System.out.println("    distance_l1 = " + p1.distanceL1(p2) + ";");
+    System.out.println("    distance_linf = " + p1.distanceLinf(p2) + ";");
+    System.out.println("  };");
+  }
+
+  private static void point3d() {
+    Point3d p1 = new Point3d(1, 2, 3);
+    Point3d p2 = new Point3d(-4, 5, -6);
+    Point4d p3 = new Point4d(7, -8, 9, -10);
+    Point3d p4 = new Point3d();
+    p4.project(p3);
+
+    System.out.println("  point3 = {");
+    System.out.println("    " + s(p1) + ";");
+    System.out.println("    " + s(p2) + ";");
+    System.out.println("    " + s(p3) + ";");
+    System.out.println("    distance_squared = " + p1.distanceSquared(p2) + ";");
+    System.out.println("    distance = " + p1.distance(p2) + ";");
+    System.out.println("    distance_l1 = " + p1.distanceL1(p2) + ";");
+    System.out.println("    distance_linf = " + p1.distanceLinf(p2) + ";");
+    System.out.println("    project = " + s(p4) + ";");
+    System.out.println("  };");
+  }
+
+  private static void point4d() {
     Point4d p1 = new Point4d(1, 2, 3, 4);
     Point4d p2 = new Point4d(-5, 6, -7, 8);
+    Point4d p3 = new Point4d();
+    p3.project(p1);
 
+    System.out.println("  point4 = {");
+    System.out.println("    " + s(p1) + ";");
+    System.out.println("    " + s(p2) + ";");
+    System.out.println("    distance_squared = " + p1.distanceSquared(p2) + ";");
+    System.out.println("    distance = " + p1.distance(p2) + ";");
+    System.out.println("    distance_l1 = " + p1.distanceL1(p2) + ";");
+    System.out.println("    distance_linf = " + p1.distanceLinf(p2) + ";");
+    System.out.println("    project = " + s(p3) + ";");
+    System.out.println("  };");
+  }
+
+  private static void point() {
     System.out.println("return {");
-    System.out.println("  " + s(p1) + ";");
-    System.out.println("  " + s(p2) + ";");
-
-    System.out.println("  distance_squared = " + p1.distanceSquared(p2) + ";");
-
-    System.out.println("  distance = " + p1.distance(p2) + ";");
-
-    System.out.println("  distance_l1 = " + p1.distanceL1(p2) + ";");
-
-    System.out.println("  distance_linf = " + p1.distanceLinf(p2) + ";");
-
+    point2d();
+    point3d();
+    point4d();
     System.out.println("}");
   }
 
@@ -201,13 +238,12 @@ public class Application {
     System.out.println("}");
   }
 
-
   public static void main(String[] args) {
     String name = args[0];
     if (name.equals("matrix3d")) {
       matrix3d();
-    } else if (name.equals("point4d")) {
-      point4d();
+    } else if (name.equals("point")) {
+      point();
     } else if (name.equals("vector")) {
       vector();
     }

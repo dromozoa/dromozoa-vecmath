@@ -46,7 +46,7 @@ function class.distance_l1(a, b)
   local y = a[2] - b[2]
   if x < 0 then x = -x end
   if y < 0 then y = -y end
-  return x + y + z
+  return x + y
 end
 
 -- a:distance_linf(point2 b)

@@ -15,7 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local point2 = require "dromozoa.vecmath.point2"
+local point3 = require "dromozoa.vecmath.point3"
 local point4 = require "dromozoa.vecmath.point4"
+
+local verbose = os.getenv "VERBOSE" == "1"
+local epsilon = 1e-9
 
 assert(point4{1,2,3}:equals{1,2,3,1})
 
@@ -46,13 +51,23 @@ assert(point4(4,3,2,1):distance_linf{0,0,0,0} == 4)
 
 assert(point4():project{2,3,4,2}:equals{1,1.5,2,1})
 
-local data = assert(loadfile "test/point4d.lua")()
+local function check(class, data)
+  local p1 = class(data[1])
+  local p2 = class(data[2])
 
-local p = point4()
-local p1 = point4(data[1])
-local p2 = point4(data[2])
+  assert(p1:distance_squared(p2) == data.distance_squared)
+  assert(p1:distance(p2) == data.distance)
+  assert(p1:distance_l1(p2) == data.distance_l1)
+  assert(p1:distance_linf(p2) == data.distance_linf)
 
-assert(p1:distance_squared(p2) == data.distance_squared)
-assert(p1:distance(p2) == data.distance)
-assert(p1:distance_l1(p2) == data.distance_l1)
-assert(p1:distance_linf(p2) == data.distance_linf)
+  if class == point3 then
+    assert(class():project(data[3]):epsilon_equals(data.project, epsilon))
+  elseif class == point4 then
+    assert(class():project(p1):epsilon_equals(data.project, epsilon))
+  end
+end
+
+local data = assert(loadfile "test/point.lua")()
+check(point2, data.point2)
+check(point3, data.point3)
+check(point4, data.point4)
