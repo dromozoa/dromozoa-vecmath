@@ -19,13 +19,15 @@ local tuple3 = require "dromozoa.vecmath.tuple3"
 
 local rawget = rawget
 local rawset = rawset
+local setmetatable = setmetatable
 local atan2 = math.atan2
 local sqrt = math.sqrt
 
 local super = tuple3
-local class = {}
+local class = { is_vector3 = true }
 local metatable = { __tostring = super.to_string }
 
+-- a:cross(vector3 b, vector3 c)
 function class.cross(a, b, c)
   local bx = b[1]
   local by = b[2]
@@ -39,6 +41,8 @@ function class.cross(a, b, c)
   return a
 end
 
+-- a:normalize(vector3 b)
+-- a:normalize()
 function class.normalize(a, b)
   if b then
     local x = b[1]
@@ -60,10 +64,12 @@ function class.normalize(a, b)
   return a
 end
 
+-- a:dot(vector3 b)
 function class.dot(a, b)
   return a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
 end
 
+-- a:length_squared(vector3 b)
 function class.length_squared(a)
   local x = a[1]
   local y = a[2]
@@ -71,6 +77,7 @@ function class.length_squared(a)
   return x * x + y * y + z * z
 end
 
+-- a:length(vector3 b)
 function class.length(a)
   local x = a[1]
   local y = a[2]
@@ -78,6 +85,7 @@ function class.length(a)
   return sqrt(x * x + y * y + z * z)
 end
 
+-- a:angle(vector3 b)
 function class.angle(a, b)
   local ax = a[1]
   local ay = a[2]
@@ -101,14 +109,17 @@ function metatable.__index(a, key)
   if value then
     return value
   else
-    return rawget(a, super.index[key])
+    return rawget(a, class.index[key])
   end
 end
 
 function metatable.__newindex(a, key, value)
-  rawset(a, super.index[key], value)
+  rawset(a, class.index[key], value)
 end
 
+-- class(number b, number c, number d)
+-- class(tuple3 b)
+-- class()
 return setmetatable(class, {
   __index = super;
   __call = function (_, ...)
