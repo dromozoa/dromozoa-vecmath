@@ -25,6 +25,9 @@ public class ApplicationTest extends TestCase {
     System.out.println("Matrix3d\n" + new Matrix3d(1, 2, 3, 4, 5, 6, 7, 8, 9));
     System.out.println("Point3d\n" + new Point3d(2, 3, 4));
     System.out.println("Vector3d\n" + new Vector3d(3, 4, 5));
+    System.out.println("AxisAngle4d\n" + new AxisAngle4d(6, 7, 8, 0.5));
+    System.out.println("Point2d\n" + new Point2d(9, 10));
+    System.out.println("Color4b\n" + new Color4b((byte)255, (byte)255, (byte)0, (byte)127));
   }
 
   public void testMatrix3d() {
