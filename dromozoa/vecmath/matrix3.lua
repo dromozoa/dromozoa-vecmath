@@ -166,38 +166,69 @@ local function normalize(a, b)
   mul_transpose_right(b, u, v)
 end
 
+local function normalize_cp(a, b)
+  local b11 = b[1]
+  local b12 = b[2]
+  local b13 = b[3]
+  local b21 = b[4]
+  local b22 = b[5]
+  local b23 = b[6]
+  local b31 = b[7]
+  local b32 = b[8]
+  local b33 = b[9]
+
+  local d = sqrt(b11 * b11 + b21 * b21 + b31 * b31)
+  b11 = b11 / d
+  b21 = b21 / d
+  b31 = b31 / d
+
+  local d = sqrt(b12 * b12 + b22 * b22 + b32 * b32)
+  b12 = b12 / d
+  b22 = b22 / d
+  b32 = b32 / d
+
+  a[1] = b11
+  a[2] = b12
+  a[3] = b21 * b32 - b22 * b31
+  a[4] = b21
+  a[5] = b22
+  a[6] = b31 * b12 - b32 * b11
+  a[7] = b31
+  a[8] = b32
+  a[9] = b11 * b22 - b12 * b21
+  return a
+end
+
+
 local function set_axis_angle4(a, b)
-  -- TODO refactor
   local x = b[1]
   local y = b[2]
   local z = b[3]
   local t = b[4]
-  local n = sqrt(x * x + y * y + z * z)
-  x = x / n
-  y = y / n
-  z = z / n
+  local d = sqrt(x * x + y * y + z * z)
+  x = x / d
+  y = y / d
+  z = z / d
 
   local c = cos(t)
   local s = sin(t)
-  local d = (1 - c)
-
-  local xyd = x * y * d
-  local yzd = y * z * d
-  local zxd = z * x * d
+  local u = (1 - c)
+  local xy = x * y * u
+  local yz = y * z * u
+  local zx = z * x * u
   local xs = x * s
   local ys = y * s
   local zs = z * s
 
-  a[1] = c + x * x * d
-  a[2] = xyd - zs
-  a[3] = zxd + ys
-  a[4] = xyd + zs
-  a[5] = c + y * y * d
-  a[6] = yzd - xs
-  a[7] = zxd - ys
-  a[8] = yzd + xs
-  a[9] = c + z * z * d
-
+  a[1] = c + x * x * u
+  a[2] = xy - zs
+  a[3] = zx + ys
+  a[4] = xy + zs
+  a[5] = c + y * y * u
+  a[6] = yz - xs
+  a[7] = zx - ys
+  a[8] = yz + xs
+  a[9] = c + z * z * u
   return a
 end
 
@@ -206,30 +237,34 @@ local function set_quat4(a, b)
   local y = b[2]
   local z = b[3]
   local w = b[4]
-  -- TODO optimize *(x2,y2,z2), /n
-  local n = x * x + y * y + z * z + w * w
-  local xx = x * x / n
-  local yy = y * y / n
-  local zz = z * z / n
-  local xy = x * y / n
-  local yz = y * z / n
-  local zx = z * x / n
-  local wx = w * x / n
-  local wy = w * y / n
-  local wz = w * z / n
-  local ww = w * w / n
-  a[1] = 1 - 2 * (yy + zz)
-  a[2] = 2 * (xy - wz)
-  a[3] = 2 * (zx + wy)
-  a[4] = 2 * (xy + wz)
-  a[5] = 1 - 2 * (xx + zz)
-  a[6] = 2 * (yz - wx)
-  a[7] = 2 * (zx - wy)
-  a[8] = 2 * (yz + wx)
-  a[9] = 1 - 2 * (xx + yy)
+
+  local d = 2 / (x * x + y * y + z * z + w * w)
+  local xd = x * d
+  local yd = y * d
+  local zd = z * d
+  local wd = w * d
+  local xx = x * xd
+  local yy = y * yd
+  local zz = z * zd
+  local xy = x * yd
+  local yz = y * zd
+  local zx = z * xd
+  local wx = w * xd
+  local wy = w * yd
+  local wz = w * zd
+  local ww = w * wd
+
+  a[1] = 1 - yy - zz
+  a[2] = xy - wz
+  a[3] = zx + wy
+  a[4] = xy + wz
+  a[5] = 1 - xx - zz
+  a[6] = yz - wx
+  a[7] = zx - wy
+  a[8] = yz + wx
+  a[9] = 1 - xx - yy
   return a
 end
-
 
 local class = {
   is_matrix3 = true;
@@ -644,41 +679,11 @@ end
 -- a:normalize_cp(matrix3 b)
 -- a:normalize_cp()
 function class.normalize_cp(a, b)
-  -- TODO refactor
-  if not b then
-    b = a
+  if b then
+    return normalize_cp(a, b)
+  else
+    return normalize_cp(a, a)
   end
-
-  local b11 = b[1]
-  local b12 = b[2]
-  local b13 = b[3]
-  local b21 = b[4]
-  local b22 = b[5]
-  local b23 = b[6]
-  local b31 = b[7]
-  local b32 = b[8]
-  local b33 = b[9]
-
-  local d = sqrt(b11 * b11 + b21 * b21 + b31 * b31)
-  b11 = b11 / d
-  b21 = b21 / d
-  b31 = b31 / d
-
-  local d = sqrt(b12 * b12 + b22 * b22 + b32 * b32)
-  b12 = b12 / d
-  b22 = b22 / d
-  b32 = b32 / d
-
-  a[1] = b11
-  a[2] = b12
-  a[3] = b21 * b32 - b22 * b31
-  a[4] = b21
-  a[5] = b22
-  a[6] = b31 * b12 - b32 * b11
-  a[7] = b31
-  a[8] = b32
-  a[9] = b11 * b22 - b12 * b21
-  return a
 end
 
 -- a:equals(matrix3 b)

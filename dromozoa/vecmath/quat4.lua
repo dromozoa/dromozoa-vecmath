@@ -39,6 +39,7 @@ local function set_axis_angle4(a, b)
 end
 
 local function set_matrix3(a, b)
+  -- TODO refactor
   local b11 = b[1]
   local b12 = b[2]
   local b13 = b[3]
