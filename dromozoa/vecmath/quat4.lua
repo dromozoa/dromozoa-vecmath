@@ -198,9 +198,9 @@ function class.mul(a, b, c)
     local cy = c[2]
     local cz = c[3]
     local cw = c[4]
-    a[1] = bw * cx + bx * cw + by * cz - bz * cy
-    a[2] = bw * cy - bx * cz + by * cw + bz * cx
-    a[3] = bw * cz + bx * cy - by * cx + bz * cw
+    a[1] = bx * cw + bw * cx - bz * cy + by * cz
+    a[2] = by * cw + bz * cx + bw * cy - bx * cz
+    a[3] = bz * cw - by * cx + bx * cy + bw * cz
     a[4] = bw * cw - bx * cx - by * cy - bz * cz
   else
     local ax = a[1]
@@ -211,9 +211,9 @@ function class.mul(a, b, c)
     local by = b[2]
     local bz = b[3]
     local bw = b[4]
-    a[1] = aw * bx + ax * bw + ay * bz - az * by
-    a[2] = aw * by - ax * bz + ay * bw + az * bx
-    a[3] = aw * bz + ax * by - ay * bx + az * bw
+    a[1] = ax * bw + aw * bx - az * by + ay * bz
+    a[2] = ay * bw + az * bx + aw * by - ax * bz
+    a[3] = az * bw - ay * bx + ax * by + aw * bz
     a[4] = aw * bw - ax * bx - ay * by - az * bz
   end
   return a
@@ -222,31 +222,34 @@ end
 -- a:mul_inverse(quat4 b, quat4 c)
 -- a:mul_inverse(quat4 b)
 function class.mul_inverse(a, b, c)
-  -- TODO inline
   if c then
     local bx = b[1]
     local by = b[2]
     local bz = b[3]
     local bw = b[4]
-
     local cx = c[1]
     local cy = c[2]
     local cz = c[3]
     local cw = c[4]
     local d = cx * cx + cy * cy + cz * cz + cw * cw
-    cx = -cx / d
-    cy = -cy / d
-    cz = -cz / d
-    cw = cw / d
-
-    a[1] = bw * cx + bx * cw + by * cz - bz * cy
-    a[2] = bw * cy - bx * cz + by * cw + bz * cx
-    a[3] = bw * cz + bx * cy - by * cx + bz * cw
-    a[4] = bw * cw - bx * cx - by * cy - bz * cz
+    a[1] = (bx * cw - bw * cx + bz * cy - by * cz) / d
+    a[2] = (by * cw - bz * cx - bw * cy + bx * cz) / d
+    a[3] = (bz * cw + by * cx - bx * cy - bw * cz) / d
+    a[4] = (bw * cw + bx * cx + by * cy + bz * cz) / d
   else
-    local q = class(b)
-    class.inverse(q)
-    class.mul(a, q)
+    local ax = a[1]
+    local ay = a[2]
+    local az = a[3]
+    local aw = a[4]
+    local bx = b[1]
+    local by = b[2]
+    local bz = b[3]
+    local bw = b[4]
+    local d = bx * bx + by * by + bz * bz + bw * bw
+    a[1] = (ax * bw - aw * bx + az * by - ay * bz) / d
+    a[2] = (ay * bw - az * bx - aw * by + ax * bz) / d
+    a[3] = (az * bw + ay * bx - ax * by - aw * bz) / d
+    a[4] = (aw * bw + ax * bx + ay * by + az * bz) / d
   end
   return a
 end
