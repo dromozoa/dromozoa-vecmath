@@ -86,6 +86,7 @@ local function check2(data)
       print(tostring(q))
     end
     assert(q:epsilon_equals(data[i], epsilon))
+    assert(quat4(q1):interpolate(q2, alpha):epsilon_equals(data[i], epsilon))
   end
 end
 

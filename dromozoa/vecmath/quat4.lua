@@ -90,6 +90,50 @@ local function set_matrix3(a, b)
   end
 end
 
+local function interpolate(a, b, c, alpha)
+  local bx = b[1]
+  local by = b[2]
+  local bz = b[3]
+  local bw = b[4]
+  local d = sqrt(bx * bx + by * by + bz * bz + bw * bw)
+  bx = bx / d
+  by = by / d
+  bz = bz / d
+  bw = bw / d
+
+  local cx = c[1]
+  local cy = c[2]
+  local cz = c[3]
+  local cw = c[4]
+  local d = sqrt(cx * cx + cy * cy + cz * cz + cw * cw)
+  cx = cx / d
+  cy = cy / d
+  cz = cz / d
+  cw = cw / d
+
+  local dot = bx * cx + by * cy + bz * cz + bw * cw
+  if dot < 0 then
+    local omega = acos(-dot)
+    local s = sin(omega)
+    local beta = -sin((1 - alpha) * omega) / s
+    local alpha = sin(alpha * omega) / s
+    a[1] = beta * bx + alpha * cx
+    a[2] = beta * by + alpha * cy
+    a[3] = beta * bz + alpha * cz
+    a[4] = beta * bw + alpha * cw
+  else
+    local omega = acos(dot)
+    local s = sin(omega)
+    local beta = sin((1 - alpha) * omega) / s
+    local alpha = sin(alpha * omega) / s
+    a[1] = beta * bx + alpha * cx
+    a[2] = beta * by + alpha * cy
+    a[3] = beta * bz + alpha * cz
+    a[4] = beta * bw + alpha * cw
+  end
+  return a
+end
+
 local super = tuple4
 local class = { is_quat4 = true }
 local metatable = { __tostring = super.to_string }
@@ -256,53 +300,11 @@ end
 -- a:interpolate(quat4 b, quat4 c, number d)
 -- a:interpolate(quat4 b, number c)
 function class.interpolate(a, b, c, d)
-  if not d then
-    d = c
-    c = b
-    b = a
-  end
-
-  local bx = b[1]
-  local by = b[2]
-  local bz = b[3]
-  local bw = b[4]
-  local n = sqrt(bx * bx + by * by + bz * bz + bw * bw)
-  bx = bx / n
-  by = by / n
-  bz = bz / n
-  bw = bw / n
-
-  local cx = c[1]
-  local cy = c[2]
-  local cz = c[3]
-  local cw = c[4]
-  local n = sqrt(cx * cx + cy * cy + cz * cz + cw * cw)
-  cx = cx / n
-  cy = cy / n
-  cz = cz / n
-  cw = cw / n
-
-  local dot = bx * cx + by * cy + bz * cz + bw * cw
-  if dot < 0 then
-    local omega = acos(-dot)
-    local s = sin(omega)
-    local beta = -sin((1 - d) * omega) / s
-    local alpha = sin(d * omega) / s
-    a[1] = beta * bx + alpha * cx
-    a[2] = beta * by + alpha * cy
-    a[3] = beta * bz + alpha * cz
-    a[4] = beta * bw + alpha * cw
+  if d then
+    return interpolate(a, b, c, d)
   else
-    local omega = acos(dot)
-    local s = sin(omega)
-    local beta = sin((1 - d) * omega) / s
-    local alpha = sin(d * omega) / s
-    a[1] = beta * bx + alpha * cx
-    a[2] = beta * by + alpha * cy
-    a[3] = beta * bz + alpha * cz
-    a[4] = beta * bw + alpha * cw
+    return interpolate(a, a, b, c)
   end
-  return a
 end
 
 function metatable.__index(a, key)
