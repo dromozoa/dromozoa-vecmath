@@ -228,6 +228,29 @@ public class Application {
     System.out.println("}");
   }
 
+  private static void quat() {
+    Quat4d q1 = new Quat4d(1, 2, 3, Math.PI / 6);
+    Quat4d q2 = new Quat4d(3, 2, 1, Math.PI / 8);
+    Quat4d q = new Quat4d();
+
+    q1.scale(-2);
+
+    System.out.println("return {");
+    System.out.println("  " + s(q1) + ";");
+    System.out.println("  " + s(q2) + ";");
+    q.conjugate(q1);
+    System.out.println("  conjugate = " + s(q) + ";");
+    q.mul(q1, q2);
+    System.out.println("  mul = " + s(q) + ";");
+    q.mulInverse(q1, q2);
+    System.out.println("  mul_inverse = " + s(q) + ";");
+    q.inverse(q1);
+    System.out.println("  inverse = " + s(q) + ";");
+    q.normalize(q1);
+    System.out.println("  normalize = " + s(q) + ";");
+    System.out.println("}");
+  }
+
   private static void rotation1() {
     Quat4d q = new Quat4d(1, 2, 3, Math.PI / 3);
     AxisAngle4d a = new AxisAngle4d();
@@ -312,6 +335,8 @@ public class Application {
       point();
     } else if (name.equals("vector")) {
       vector();
+    } else if (name.equals("quat")) {
+      quat();
     } else if (name.equals("rotation")) {
       rotation();
     }

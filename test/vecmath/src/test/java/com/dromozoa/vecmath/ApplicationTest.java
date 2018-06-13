@@ -45,6 +45,11 @@ public class ApplicationTest extends TestCase {
     Application.main(args);
   }
 
+  public void testQuat() {
+    String[] args = { "quat" };
+    Application.main(args);
+  }
+
   public void testRotation() {
     String[] args = { "rotation" };
     Application.main(args);
