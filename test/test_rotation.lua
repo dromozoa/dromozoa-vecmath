@@ -39,6 +39,8 @@ local function check1(data)
   assert(axis_angle4(q):equals(a))
   assert(axis_angle4(m3):epsilon_equals(a, epsilon))
 
+  local q = quat4(data.quat4)
+  local a = axis_angle4(data.axis_angle4)
   q:normalize()
   a.x = a.x * 2
   a.y = a.y * 2
@@ -54,6 +56,23 @@ local function check1(data)
   end
   assert(quat4(a):epsilon_equals(q, epsilon))
   assert(quat4(m3):equals(q))
+
+  local q = quat4(data.quat4)
+  local a = axis_angle4(data.axis_angle4)
+  a.x = a.x * 2
+  a.y = a.y * 2
+  a.z = a.z * 2
+  if verbose then
+    print "=="
+    print("q", tostring(q))
+    print("a", tostring(a))
+    print("m3", tostring(m3))
+    print "--"
+    print(tostring(matrix3(a)))
+    print(tostring(matrix3(q)))
+  end
+  assert(matrix3(a):epsilon_equals(m3, epsilon))
+  assert(matrix3(q):epsilon_equals(m3, epsilon))
 end
 
 local data = assert(loadfile "test/rotation.lua")()

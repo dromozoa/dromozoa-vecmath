@@ -167,10 +167,66 @@ local function normalize(a, b)
 end
 
 local function set_axis_angle4(a, b)
+  -- TODO refactor
+  local x = b[1]
+  local y = b[2]
+  local z = b[3]
+  local t = b[4]
+  local n = sqrt(x * x + y * y + z * z)
+  x = x / n
+  y = y / n
+  z = z / n
+
+  local c = cos(t)
+  local s = sin(t)
+  local d = (1 - c)
+
+  local xyd = x * y * d
+  local yzd = y * z * d
+  local zxd = z * x * d
+  local xs = x * s
+  local ys = y * s
+  local zs = z * s
+
+  a[1] = c + x * x * d
+  a[2] = xyd - zs
+  a[3] = zxd + ys
+  a[4] = xyd + zs
+  a[5] = c + y * y * d
+  a[6] = yzd - xs
+  a[7] = zxd - ys
+  a[8] = yzd + xs
+  a[9] = c + z * z * d
+
   return a
 end
 
 local function set_quat4(a, b)
+  local x = b[1]
+  local y = b[2]
+  local z = b[3]
+  local w = b[4]
+  -- TODO optimize *(x2,y2,z2), /n
+  local n = x * x + y * y + z * z + w * w
+  local xx = x * x / n
+  local yy = y * y / n
+  local zz = z * z / n
+  local xy = x * y / n
+  local yz = y * z / n
+  local zx = z * x / n
+  local wx = w * x / n
+  local wy = w * y / n
+  local wz = w * z / n
+  local ww = w * w / n
+  a[1] = 1 - 2 * (yy + zz)
+  a[2] = 2 * (xy - wz)
+  a[3] = 2 * (zx + wy)
+  a[4] = 2 * (xy + wz)
+  a[5] = 1 - 2 * (xx + zz)
+  a[6] = 2 * (yz - wx)
+  a[7] = 2 * (zx - wy)
+  a[8] = 2 * (yz + wx)
+  a[9] = 1 - 2 * (xx + yy)
   return a
 end
 
