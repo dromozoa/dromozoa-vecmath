@@ -166,7 +166,7 @@ public class Application {
     System.out.println("}");
   }
 
-  private static void vector2d() {
+  private static void vector2() {
     Vector2d v1 = new Vector2d(1, 2);
     Vector2d v2 = new Vector2d(-3, 4);
     Vector2d v3 = new Vector2d(v1);
@@ -183,7 +183,7 @@ public class Application {
     System.out.println("  };");
   }
 
-  private static void vector3d() {
+  private static void vector3() {
     Vector3d v1 = new Vector3d(1, 2, 3);
     Vector3d v2 = new Vector3d(-4, 5, -6);
     Vector3d v3 = new Vector3d();
@@ -203,7 +203,7 @@ public class Application {
     System.out.println("  };");
   }
 
-  private static void vector4d() {
+  private static void vector4() {
     Vector4d v1 = new Vector4d(1, 2, 3, 4);
     Vector4d v2 = new Vector4d(-5, 6, -7, 8);
     Vector4d v3 = new Vector4d();
@@ -222,9 +222,9 @@ public class Application {
 
   private static void vector() {
     System.out.println("return {");
-    vector2d();
-    vector3d();
-    vector4d();
+    vector2();
+    vector3();
+    vector4();
     System.out.println("}");
   }
 
