@@ -41,14 +41,15 @@ end
 local function set_matrix3(a, b)
   -- TODO refactor
   local b11 = b[1]
+  local b22 = b[5]
+  local b33 = b[9]
+
   local b12 = b[2]
   local b13 = b[3]
   local b21 = b[4]
-  local b22 = b[5]
   local b23 = b[6]
   local b31 = b[7]
   local b32 = b[8]
-  local b33 = b[9]
 
   local t = b11 + b22 + b33
   if t >= 0 then
@@ -62,7 +63,7 @@ local function set_matrix3(a, b)
   else
     if b11 > b22 then
       if b11 > b33 then
-        local x = sqrt(b11 - b22 - v33 + 1) * 0.5
+        local x = sqrt(b11 - b22 - b33 + 1) * 0.5
         local d = x * 4
         a[1] = x
         a[2] = (b21 + b12) / d
@@ -77,7 +78,7 @@ local function set_matrix3(a, b)
         a[1] = (b21 + b12) / d
         a[2] = y
         a[3] = (b32 + b23) / d
-        a[4] = (b13 - b13) / d
+        a[4] = (b13 - b31) / d
         return a
       end
     end

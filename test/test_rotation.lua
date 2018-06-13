@@ -90,6 +90,19 @@ local function check2(data)
   end
 end
 
+local function check3(data)
+  for i = 1, #data.m do
+    local m = matrix3(data.m[i])
+    local q = quat4(data.q[i])
+    if verbose then
+      print(tostring(q))
+      print(tostring(quat4(m)))
+    end
+    assert(quat4(m):epsilon_equals(data.q[i], epsilon))
+  end
+end
+
 local data = assert(loadfile "test/rotation.lua")()
 check1(data[1])
 check2(data[2])
+check3(data[3])

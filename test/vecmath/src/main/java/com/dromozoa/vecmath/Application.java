@@ -284,10 +284,45 @@ public class Application {
     System.out.println("  };");
   }
 
+  private static void rotation3() {
+    Matrix3d m1 = new Matrix3d();
+    Matrix3d m2 = new Matrix3d();
+    Matrix3d m3 = new Matrix3d();
+    Matrix3d m4 = new Matrix3d();
+    m1.rotX(Math.PI * 0.25);
+    m2.rotX(Math.PI * 0.75);
+    m3.rotY(Math.PI * 0.75);
+    m4.rotZ(Math.PI * 0.75);
+    Quat4d q1 = new Quat4d();
+    Quat4d q2 = new Quat4d();
+    Quat4d q3 = new Quat4d();
+    Quat4d q4 = new Quat4d();
+    q1.set(m1);
+    q2.set(m2);
+    q3.set(m3);
+    q4.set(m4);
+
+    System.out.println("  {");
+    System.out.println("    m = {");
+    System.out.println("      " + s(m1) + ";");
+    System.out.println("      " + s(m2) + ";");
+    System.out.println("      " + s(m3) + ";");
+    System.out.println("      " + s(m4) + ";");
+    System.out.println("    };");
+    System.out.println("    q = {");
+    System.out.println("      " + s(q1) + ";");
+    System.out.println("      " + s(q2) + ";");
+    System.out.println("      " + s(q3) + ";");
+    System.out.println("      " + s(q4) + ";");
+    System.out.println("    };");
+    System.out.println("  };");
+  }
+
   private static void rotation() {
     System.out.println("return {");
     rotation1();
     rotation2();
+    rotation3();
     System.out.println("}");
   }
 
