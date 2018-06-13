@@ -75,5 +75,21 @@ local function check1(data)
   assert(matrix3(q):epsilon_equals(m3, epsilon))
 end
 
+local function check2(data)
+  local n = #data
+  local q1 = quat4(data.q1)
+  local q2 = quat4(data.q2)
+
+  for i = 1, n do
+    local alpha = (i - 1) / (n - 1)
+    local q = quat4():interpolate(q1, q2, alpha)
+    if verbose then
+      print(tostring(q))
+    end
+    assert(q:epsilon_equals(data[i], epsilon))
+  end
+end
+
 local data = assert(loadfile "test/rotation.lua")()
 check1(data[1])
+check2(data[2])

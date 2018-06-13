@@ -267,9 +267,27 @@ public class Application {
     System.out.println("  };");
   }
 
+  private static void rotation2() {
+    Quat4d q1 = new Quat4d(1, 2, 3, Math.PI / 6);
+    Quat4d q2 = new Quat4d(3, 2, 1, Math.PI / 8);
+    Quat4d q = new Quat4d();
+
+    q2.scale(-1);
+
+    System.out.println("  {");
+    System.out.println("    q1 = " + s(q1) + ";");
+    System.out.println("    q2 = " + s(q2) + ";");
+    for (int i = 0; i <= 16; ++i) {
+      q.interpolate(q1, q2, i / 16.0);
+      System.out.println("    " + s(q) + ";");
+    }
+    System.out.println("  };");
+  }
+
   private static void rotation() {
     System.out.println("return {");
     rotation1();
+    rotation2();
     System.out.println("}");
   }
 
