@@ -77,7 +77,7 @@ local metatable = { __tostring = tuple4.to_string }
 -- a:set(number b, number c, number d, number e)
 -- a:set(vector3 b, number c)
 -- a:set(quat4 b)
--- a:set(axis_angle4 b)
+-- a:set(tuple4 b)
 -- a:set(matrix3 b)
 -- a:set(matrix4 b)
 function class.set(a, b, c, d, e)

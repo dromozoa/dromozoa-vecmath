@@ -19,7 +19,24 @@ local tuple4 = require "dromozoa.vecmath.tuple4"
 
 local rawget = rawget
 local rawset = rawset
+local setmetatable = setmetatable
+local acos = math.acos
+local cos = math.cos
+local sin = math.sin
 local sqrt = math.sqrt
+
+local function set_axis_angle4(a, b)
+  local x = b[1]
+  local y = b[2]
+  local z = b[3]
+  local t = b[4] * 0.5
+  local u = sin(t) / sqrt(x * x + y * y + z * z)
+  a[1] = x * u
+  a[2] = y * u
+  a[3] = z * u
+  a[4] = cos(t)
+  return a
+end
 
 local function set_matrix3(a, b)
   local b11 = b[1]
@@ -53,7 +70,7 @@ local function set_matrix3(a, b)
         return a
       end
     else
-      if b22 > v33 then
+      if b22 > b33 then
         local y = sqrt(b22 - b33 - b11 + 1) * 0.5
         local d = y * 4
         a[1] = (b21 + b12) / d
@@ -77,10 +94,47 @@ local super = tuple4
 local class = { is_quat4 = true }
 local metatable = { __tostring = super.to_string }
 
--- TODO set tuple4 (not quat4)
+-- a:set(number b, number c, number d, number e)
+-- a:set(axis_angle4 b)
+-- a:set(tuple4 b)
+-- a:set(matrix3 b)
+-- a:set(matrix4 b)
+-- a:set()
+function class.set(a, b, c, d, e)
+  if b then
+    if c then
+      a[1] = b
+      a[2] = c
+      a[3] = d
+      a[4] = e
+    else
+      local n = #b
+      if n == 4 then
+        if b.is_axis_angle4 then
+          return set_axis_angle4(a, b)
+        else
+          a[1] = b[1]
+          a[2] = b[2]
+          a[3] = b[3]
+          a[4] = b[4]
+        end
+      elseif n == 9 then
+        return set_matrix3(a, b)
+      else
+        -- TODO impl set matrix4
+      end
+    end
+  else
+    a[1] = 0
+    a[2] = 0
+    a[3] = 0
+    a[4] = 0
+  end
+  return a
+end
 
--- quat4 a
--- quat4 a, quat4 b
+-- a:conjugate(quat4 b)
+-- a:conjugate()
 function class.conjugate(a, b)
   if b then
     a[1] = -b[1]
@@ -95,6 +149,8 @@ function class.conjugate(a, b)
   return a
 end
 
+-- a:mul(quat4 b, quat4 c)
+-- a:mul(quat4 b)
 function class.mul(a, b, c)
   if c then
     local bx = b[1]
@@ -126,6 +182,8 @@ function class.mul(a, b, c)
   return a
 end
 
+-- a:mul_inverse(quat4 b, quat4 c)
+-- a:mul_inverse(quat4 b)
 function class.mul_inverse(a, b, c)
   -- TODO inline
   if c then
@@ -140,6 +198,9 @@ function class.mul_inverse(a, b, c)
   return a
 end
 
+
+-- a:inverse(quat4 b)
+-- a:inverse()
 function class.inverse(a, b)
   if b then
     local x = b[1]
@@ -165,6 +226,8 @@ function class.inverse(a, b)
   return a
 end
 
+-- a:normalize(quat4 b)
+-- a:normalize()
 function class.normalize(a, b)
   if b then
     local x = b[1]
@@ -190,51 +253,55 @@ function class.normalize(a, b)
   return a
 end
 
+-- a:interpolate(quat4 b, quat4 c, number d)
+-- a:interpolate(quat4 b, number c)
 function class.interpolate(a, b, c, d)
-  if d then
-    class.normalize(a, b)
-    b = c
-    c = d
-  else
-    class.normalize(a)
+  if not d then
+    d = c
+    c = b
+    b = a
   end
 
-  local ax = a[1]
-  local ay = a[2]
-  local az = a[3]
-  local aw = a[4]
   local bx = b[1]
   local by = b[2]
   local bz = b[3]
   local bw = b[4]
+  local n = sqrt(bx * bx + by * by + bz * bz + bw * bw)
+  bx = bx / n
+  by = by / n
+  bz = bz / n
+  bw = bw / n
 
-  -- normalize b
-  local d = sqrt(bx * bx + by * by + bz * bz + bw * bw)
-  bx = bx / d
-  by = by / d
-  bz = bz / d
-  bw = bw / d
+  local cx = c[1]
+  local cy = c[2]
+  local cz = c[3]
+  local cw = c[4]
+  local n = sqrt(cx * cx + cy * cy + cz * cz + cw * cw)
+  cx = cx / n
+  cy = cy / n
+  cz = cz / n
+  cw = cw / n
 
-  -- dot = cos
-  local t = ax * bx + ay * by + az * bz + aw * bw
-
-  -- same quat
-  if math.abs(t) <= 1 then
-    return
+  local dot = bx * cx + by * cy + bz * cz + bw * cw
+  if dot < 0 then
+    local omega = acos(-dot)
+    local s = sin(u)
+    local beta = sin((1 - d) * omega) / s
+    local alpha = sin(d * omega) / s
+    a[1] = beta * bx - alpha * cx
+    a[2] = beta * by - alpha * cy
+    a[3] = beta * bz - alpha * cz
+    a[4] = beta * bw - alpha * cw
+  else
+    local omega = acos(dot)
+    local s = sin(u)
+    local beta = sin((1 - d) * omega) / s
+    local alpha = sin(d * omega) / s
+    a[1] = beta * bx + alpha * cx
+    a[2] = beta * by + alpha * cy
+    a[3] = beta * bz + alpha * cz
+    a[4] = beta * bw + alpha * cw
   end
-
-  -- angle
-  local t = math.acos(t)
-
-  local u = math.sin(c)
-  local s = math.sin((1 - c) * t) / u
-  local t = math.sin(c * t) / u
-
-  a[1] = s * ax + t * bx
-  a[2] = s * ay + t * by
-  a[3] = s * az + t * bz
-  a[4] = s * aw + t * bw
-
   return a
 end
 
@@ -251,6 +318,9 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
+-- class(number b, number c, number d, number e)
+-- class(tuple4 b)
+-- class()
 return setmetatable(class, {
   __index = super;
   __call = function (_, ...)

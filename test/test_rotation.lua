@@ -28,14 +28,32 @@ local function check1(data)
   local m3 = matrix3(data.matrix3)
 
   if verbose then
-    print(tostring(q))
-    print(tostring(a))
-    print(tostring(m3))
+    print "=="
+    print("q", tostring(q))
+    print("a", tostring(a))
+    print("m3", tostring(m3))
+    print "--"
     print(tostring(axis_angle4(q)))
     print(tostring(axis_angle4(m3)))
   end
   assert(axis_angle4(q):equals(a))
   assert(axis_angle4(m3):epsilon_equals(a, epsilon))
+
+  q:normalize()
+  a.x = a.x * 2
+  a.y = a.y * 2
+  a.z = a.z * 2
+  if verbose then
+    print "=="
+    print("q", tostring(q))
+    print("a", tostring(a))
+    print("m3", tostring(m3))
+    print "--"
+    print(tostring(quat4(a)))
+    print(tostring(quat4(m3)))
+  end
+  assert(quat4(a):epsilon_equals(q, epsilon))
+  assert(quat4(m3):equals(q))
 end
 
 local data = assert(loadfile "test/rotation.lua")()
