@@ -256,6 +256,7 @@ end
 -- a:interpolate(quat4 b, quat4 c, number d)
 -- a:interpolate(quat4 b, number c)
 function class.interpolate(a, b, c, d)
+  -- TODO refactor
   if not d then
     d = c
     c = b
