@@ -79,7 +79,6 @@ local function check2(data)
   local n = #data
   local q1 = quat4(data.q1)
   local q2 = quat4(data.q2)
-
   for i = 1, n do
     local alpha = (i - 1) / (n - 1)
     local q = quat4():interpolate(q1, q2, alpha)

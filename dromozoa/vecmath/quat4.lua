@@ -256,7 +256,6 @@ end
 -- a:interpolate(quat4 b, quat4 c, number d)
 -- a:interpolate(quat4 b, number c)
 function class.interpolate(a, b, c, d)
-  -- TODO refactor
   if not d then
     d = c
     c = b
@@ -287,21 +286,21 @@ function class.interpolate(a, b, c, d)
   if dot < 0 then
     local omega = acos(-dot)
     local s = sin(omega)
-    local beta = sin((1 - d) * omega) / s
+    local beta = -sin((1 - d) * omega) / s
     local alpha = sin(d * omega) / s
-    a[1] = alpha * cx - beta * bx
-    a[2] = alpha * cy - beta * by
-    a[3] = alpha * cz - beta * bz
-    a[4] = alpha * cw - beta * bw
+    a[1] = beta * bx + alpha * cx
+    a[2] = beta * by + alpha * cy
+    a[3] = beta * bz + alpha * cz
+    a[4] = beta * bw + alpha * cw
   else
     local omega = acos(dot)
     local s = sin(omega)
     local beta = sin((1 - d) * omega) / s
     local alpha = sin(d * omega) / s
-    a[1] = alpha * cx + beta * bx
-    a[2] = alpha * cy + beta * by
-    a[3] = alpha * cz + beta * bz
-    a[4] = alpha * cw + beta * bw
+    a[1] = beta * bx + alpha * cx
+    a[2] = beta * by + alpha * cy
+    a[3] = beta * bz + alpha * cz
+    a[4] = beta * bw + alpha * cw
   end
   return a
 end
