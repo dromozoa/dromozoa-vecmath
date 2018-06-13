@@ -160,6 +160,7 @@ local function normalize(a, b)
 end
 
 local class = {
+  is_matrix3 = true;
   index = {
     1, 2, 3, 4, 5, 6, 7, 8, 9,
     m11 = 1, m12 = 2, m13 = 3, m21 = 4, m22 = 5, m23 = 6, m31 = 7, m32 = 8, m33 = 9,
