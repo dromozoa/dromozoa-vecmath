@@ -224,9 +224,25 @@ end
 function class.mul_inverse(a, b, c)
   -- TODO inline
   if c then
-    local q = class(c)
-    class.inverse(q)
-    class.mul(a, b, q)
+    local bx = b[1]
+    local by = b[2]
+    local bz = b[3]
+    local bw = b[4]
+
+    local cx = c[1]
+    local cy = c[2]
+    local cz = c[3]
+    local cw = c[4]
+    local d = cx * cx + cy * cy + cz * cz + cw * cw
+    cx = -cx / d
+    cy = -cy / d
+    cz = -cz / d
+    cw = cw / d
+
+    a[1] = bw * cx + bx * cw + by * cz - bz * cy
+    a[2] = bw * cy - bx * cz + by * cw + bz * cx
+    a[3] = bw * cz + bx * cy - by * cx + bz * cw
+    a[4] = bw * cw - bx * cx - by * cy - bz * cz
   else
     local q = class(b)
     class.inverse(q)
@@ -234,7 +250,6 @@ function class.mul_inverse(a, b, c)
   end
   return a
 end
-
 
 -- a:inverse(quat4 b)
 -- a:inverse()
