@@ -54,7 +54,7 @@ assert(s == [[
 0, 0, 1
 ]])
 
-local data = assert(loadfile "test/matrix3d.lua")()
+local data = assert(loadfile "test/matrix3.lua")()
 
 local m = matrix3()
 local v = vector3()

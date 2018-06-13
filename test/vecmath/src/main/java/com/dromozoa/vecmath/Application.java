@@ -51,7 +51,7 @@ public class Application {
         + m.m30 + "," + m.m31 + "," + m.m32 + "," + m.m33 + "}";
   }
 
-  private static void matrix3d() {
+  private static void matrix3() {
     Matrix3d m = new Matrix3d();
     Vector3d v = new Vector3d();
 
@@ -63,74 +63,52 @@ public class Application {
     System.out.println("  " + s(m1) + ";");
     System.out.println("  " + s(m2) + ";");
     System.out.println("  " + s(v1) + ";");
-
     m.set(m1);
     m.setScale(2);
     System.out.println("  set_scale2 = " + s(m) + ";");
-
     System.out.println("  get_scale = " + m1.getScale() + ";");
-
     m.add(2, m1);
     System.out.println("  add2 = " + s(m) + ";");
-
     m.add(m1, m2);
     System.out.println("  add = " + s(m) + ";");
-
     m.sub(m1, m2);
     System.out.println("  sub = " + s(m) + ";");
-
     m.transpose(m1);
     System.out.println("  transpose = " + s(m) + ";");
-
     m.invert(m1);
     System.out.println("  invert = " + s(m) + ";");
-
     System.out.println("  determinant = " + m1.determinant() + ";");
-
     m.rotX(2);
     System.out.println("  rot_x2 = " + s(m) + ";");
-
     m.rotY(2);
     System.out.println("  rot_y2 = " + s(m) + ";");
-
     m.rotZ(2);
     System.out.println("  rot_z2 = " + s(m) + ";");
-
     m.mul(2, m1);
     System.out.println("  mul2 = " + s(m) + ";");
-
     m.mul(m1, m2);
     System.out.println("  mul = " + s(m) + ";");
-
     m.mulNormalize(m1, m2);
     System.out.println("  mul_normalize = " + s(m) + ";");
-
     m.mulTransposeBoth(m1, m2);
     System.out.println("  mul_transpose_both = " + s(m) + ";");
-
     m.mulTransposeRight(m1, m2);
     System.out.println("  mul_transpose_right = " + s(m) + ";");
-
     m.mulTransposeLeft(m1, m2);
     System.out.println("  mul_transpose_left = " + s(m) + ";");
-
     m.normalize(m1);
     System.out.println("  normalize = " + s(m) + ";");
-
     m.normalizeCP(m1);
     System.out.println("  normalize_cp = " + s(m) + ";");
-
     m.negate(m1);
     System.out.println("  negate = " + s(m) + ";");
-
     m.set(m1);
     m.transform(v1, v);
     System.out.println("  transform = " + s(v) + ";");
-
     System.out.println("}");
   }
 
-  private static void point2d() {
+  private static void point2() {
     Point2d p1 = new Point2d(1, 2);
     Point2d p2 = new Point2d(-3, 4);
 
@@ -144,7 +122,7 @@ public class Application {
     System.out.println("  };");
   }
 
-  private static void point3d() {
+  private static void point3() {
     Point3d p1 = new Point3d(1, 2, 3);
     Point3d p2 = new Point3d(-4, 5, -6);
     Point4d p3 = new Point4d(7, -8, 9, -10);
@@ -163,7 +141,7 @@ public class Application {
     System.out.println("  };");
   }
 
-  private static void point4d() {
+  private static void point4() {
     Point4d p1 = new Point4d(1, 2, 3, 4);
     Point4d p2 = new Point4d(-5, 6, -7, 8);
     Point4d p3 = new Point4d();
@@ -182,9 +160,9 @@ public class Application {
 
   private static void point() {
     System.out.println("return {");
-    point2d();
-    point3d();
-    point4d();
+    point2();
+    point3();
+    point4();
     System.out.println("}");
   }
 
@@ -328,8 +306,8 @@ public class Application {
 
   public static void main(String[] args) {
     String name = args[0];
-    if (name.equals("matrix3d")) {
-      matrix3d();
+    if (name.equals("matrix3")) {
+      matrix3();
     } else if (name.equals("point")) {
       point();
     } else if (name.equals("vector")) {

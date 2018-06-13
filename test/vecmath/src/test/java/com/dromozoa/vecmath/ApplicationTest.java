@@ -31,7 +31,7 @@ public class ApplicationTest extends TestCase {
   }
 
   public void testMatrix3d() {
-    String[] args = { "matrix3d" };
+    String[] args = { "matrix3" };
     Application.main(args);
   }
 
