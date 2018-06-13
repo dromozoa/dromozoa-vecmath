@@ -37,7 +37,7 @@ local function set_matrix3(a, b)
     local w = sqrt(t + 1) * 0.5
     local d = w * 4
     a[1] = (b32 - b23) / d
-    a[2] = (b31 - b13) / d
+    a[2] = (b13 - b31) / d
     a[3] = (b21 - b12) / d
     a[4] = w
     return a
@@ -48,7 +48,7 @@ local function set_matrix3(a, b)
         local d = x * 4
         a[1] = x
         a[2] = (b21 + b12) / d
-        a[3] = (b31 + b13) / d
+        a[3] = (b13 + b31) / d
         a[4] = (b32 - b23) / d
         return a
       end
@@ -59,13 +59,13 @@ local function set_matrix3(a, b)
         a[1] = (b21 + b12) / d
         a[2] = y
         a[3] = (b32 + b23) / d
-        a[4] = (b31 - b13) / d
+        a[4] = (b13 - b13) / d
         return a
       end
     end
     local z = sqrt(b33 - b11 - b22 + 1) * 0.5
     local d = z * 4
-    a[1] = (b31 + b13) / d
+    a[1] = (b13 + b31) / d
     a[2] = (b32 + b23) / d
     a[3] = z
     a[4] = (b21 - b12) / d

@@ -606,16 +606,16 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 非対角成分に注目すると
 \[\begin{eqnarray}
   m_{32} - m_{23} &amp;=&amp; 2 x \sin\theta \\
-  m_{31} - m_{13} &amp;=&amp; 2 y \sin\theta \\
+  m_{13} - m_{31} &amp;=&amp; 2 y \sin\theta \\
   m_{21} - m_{12} &amp;=&amp; 2 z \sin\theta
 \end{eqnarray}\]
 なので
 \[\begin{eqnarray}
   x &amp;=&amp; \frac{m_{32} - m_{23}}{2 \sin\theta} \\
-  y &amp;=&amp; \frac{m_{31} - m_{13}}{2 \sin\theta} \\
+  y &amp;=&amp; \frac{m_{13} - m_{31}}{2 \sin\theta} \\
   z &amp;=&amp; \frac{m_{21} - m_{12}}{2 \sin\theta} \\
-  2 \sin\theta &amp;=&amp; (m_{32} - m_{23})^2 + (m_{31} - m_{13})^2 + (m_{21} - m_{12})^2 \\
-  \tan\theta &amp;=&amp; \frac{(m_{32} - m_{23})^2 + (m_{31} - m_{13})^2 + (m_{21} - m_{12})^2}{m_{11} + m_{22} + m_{33} - 1}
+  2 \sin\theta &amp;=&amp; \sqrt{(m_{32} - m_{23})^2 + (m_{13} - m_{31})^2 + (m_{21} - m_{12})^2} \\
+  \tan\theta &amp;=&amp; \frac{\sqrt{(m_{32} - m_{23})^2 + (m_{13} - m_{31})^2 + (m_{21} - m_{12})^2}}{m_{11} + m_{22} + m_{33} - 1}
 \end{eqnarray}\]
 </p>
 
@@ -654,9 +654,9 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 \[\begin{eqnarray}
   m_{21} + m_{12} &amp;=&amp; 4 xy \\
   m_{32} + m_{23} &amp;=&amp; 4 yz \\
-  m_{31} + m_{13} &amp;=&amp; 4 zx \\
+  m_{13} + m_{31} &amp;=&amp; 4 zx \\
   m_{32} - m_{23} &amp;=&amp; 4 wx \\
-  m_{31} - m_{13} &amp;=&amp; 4 wy \\
+  m_{13} - m_{31} &amp;=&amp; 4 wy \\
   m_{21} - m_{12} &amp;=&amp; 4 wz
 \end{eqnarray}\]
 なので、\(x, y, z, w\)のどれかを定めれば残りが定まる。

@@ -22,3 +22,4 @@ jar=target/vecmath-1.0-jar-with-dependencies.jar
 java -jar "$jar" matrix3d >../matrix3d.lua
 java -jar "$jar" point >../point.lua
 java -jar "$jar" vector >../vector.lua
+java -jar "$jar" rotation >../rotation.lua

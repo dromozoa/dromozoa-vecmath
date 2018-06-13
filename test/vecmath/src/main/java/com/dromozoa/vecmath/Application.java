@@ -32,11 +32,23 @@ public class Application {
     return "{" + t.x + "," + t.y + "," + t.z + "," + t.w + "}";
   }
 
+  private static String s(AxisAngle4d a) {
+    return "{" + a.x + "," + a.y + "," + a.z + "," + a.angle + "}";
+  }
+
   private static String s(Matrix3d m) {
     return "{"
         + m.m00 + "," + m.m01 + "," + m.m02 + ","
         + m.m10 + "," + m.m11 + "," + m.m12 + ","
         + m.m20 + "," + m.m21 + "," + m.m22 + "}";
+  }
+
+  private static String s(Matrix4d m) {
+    return "{"
+        + m.m00 + "," + m.m01 + "," + m.m02 + "," + m.m03 + ","
+        + m.m10 + "," + m.m11 + "," + m.m12 + "," + m.m13 + ","
+        + m.m20 + "," + m.m21 + "," + m.m22 + "," + m.m23 + ","
+        + m.m30 + "," + m.m31 + "," + m.m32 + "," + m.m33 + "}";
   }
 
   private static void matrix3d() {
@@ -238,6 +250,29 @@ public class Application {
     System.out.println("}");
   }
 
+  private static void rotation1() {
+    Quat4d q = new Quat4d(1, 2, 3, Math.PI / 3);
+    AxisAngle4d a = new AxisAngle4d();
+    Matrix3d m3 = new Matrix3d();
+    Matrix4d m4 = new Matrix4d();
+    a.set(q);
+    m3.set(q);
+    m4.set(q);
+
+    System.out.println("  {");
+    System.out.println("    quat4 = " + s(q) + ";");
+    System.out.println("    axis_angle4 = " + s(a) + ";");
+    System.out.println("    matrix3 = " + s(m3) + ";");
+    System.out.println("    matrix4 = " + s(m4) + ";");
+    System.out.println("  };");
+  }
+
+  private static void rotation() {
+    System.out.println("return {");
+    rotation1();
+    System.out.println("}");
+  }
+
   public static void main(String[] args) {
     String name = args[0];
     if (name.equals("matrix3d")) {
@@ -246,6 +281,8 @@ public class Application {
       point();
     } else if (name.equals("vector")) {
       vector();
+    } else if (name.equals("rotation")) {
+      rotation();
     }
   }
 }
