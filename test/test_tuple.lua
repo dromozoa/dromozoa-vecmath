@@ -15,8 +15,17 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local color3 = require "dromozoa.vecmath.color3"
+local color4 = require "dromozoa.vecmath.color4"
+local point2 = require "dromozoa.vecmath.point2"
 local point3 = require "dromozoa.vecmath.point3"
+local point4 = require "dromozoa.vecmath.point4"
+local tex_coord2 = require "dromozoa.vecmath.tex_coord2"
+local tex_coord3 = require "dromozoa.vecmath.tex_coord3"
+local tex_coord4 = require "dromozoa.vecmath.tex_coord4"
+local vector2 = require "dromozoa.vecmath.vector2"
 local vector3 = require "dromozoa.vecmath.vector3"
+local vector4 = require "dromozoa.vecmath.vector4"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
@@ -84,6 +93,9 @@ local function test(n, class)
   assert(t:absolute() :equals {2,1,1,1})
 
   local t = class(1,2,3,4)
+  if verbose then
+    print(tostring(t))
+  end
   assert(t.x == 1)
   assert(t.y == 2)
   if n > 2 then
@@ -130,5 +142,16 @@ local function test(n, class)
   assert(not t[n])
 end
 
+test(2, point2)
+test(2, vector2)
+test(2, tex_coord2)
+
 test(3, point3)
 test(3, vector3)
+test(3, color3)
+test(3, tex_coord3)
+
+test(4, point4)
+test(4, vector4)
+test(4, color4)
+test(4, tex_coord4)

@@ -15,56 +15,96 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local tuple3 = require "dromozoa.vecmath.tuple3"
+local tuple4 = require "dromozoa.vecmath.tuple4"
 
 local rawget = rawget
 local rawset = rawset
 local setmetatable = setmetatable
 local sqrt = math.sqrt
 
-local super = tuple3
-local class = { is_point3 = true }
+local super = tuple4
+local class = { is_point4 = true }
 local metatable = { __tostring = super.to_string }
 
--- a:distance_squared(point3 b)
+-- a:set(number b, number c, number d, number e)
+-- a:set(tuple3 b)
+-- a:set(tuple4 b)
+-- a:set()
+function class.set(a, b, c, d, e)
+  if b then
+    if c then
+      a[1] = b
+      a[2] = c
+      a[3] = d
+      a[4] = e
+    else
+      a[1] = b[1]
+      a[2] = b[2]
+      a[3] = b[3]
+      a[4] = b[4] or 1
+    end
+  else
+    a[1] = 0
+    a[2] = 0
+    a[3] = 0
+    a[4] = 0
+  end
+  return a
+end
+
+-- a:distance_squared(point4 b)
 function class.distance_squared(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
   local z = a[3] - b[3]
-  return x * x + y * y + z * z
+  local w = a[4] - b[4]
+  return x * x + y * y + z * z + w * w
 end
 
--- a:distance(point3 b)
+-- a:distance(point4 b)
 function class.distance(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
   local z = a[3] - b[3]
-  return sqrt(x * x + y * y + z * z)
+  local w = a[4] - b[4]
+  return sqrt(x * x + y * y + z * z + w * w)
 end
 
--- a:distance_l1(point3 b)
+-- a:distance_l1(point4 b)
 function class.distance_l1(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
   local z = a[3] - b[3]
+  local w = a[4] - b[4]
   if x < 0 then x = -x end
   if y < 0 then y = -y end
   if z < 0 then z = -z end
-  return x + y + z
+  if w < 0 then w = -w end
+  return x + y + z + w
 end
 
--- a:distance_linf(point3 b)
+-- a:distance_linf(point4 b)
 function class.distance_linf(a, b)
   local x = a[1] - b[1]
   local y = a[2] - b[2]
   local z = a[3] - b[3]
+  local w = a[4] - b[4]
   if x < 0 then x = -x end
   if y < 0 then y = -y end
   if z < 0 then z = -z end
+  if w < 0 then w = -w end
   if x > y then
-    if x > z then return x else return z end
+    if z > w then
+      if x > z then return x else return z end
+    else
+      if x > w then return x else return w end
+    end
   else
-    if y > z then return y else return z end
+    if z > w then
+      if y > z then return y else return z end
+    else
+      if y > w then return y else return w end
+    end
   end
 end
 
@@ -74,6 +114,7 @@ function class.project(a, b)
   a[1] = b[1] / d
   a[2] = b[2] / d
   a[3] = b[3] / d
+  a[4] = 1
   return a
 end
 
@@ -90,8 +131,9 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c, number d)
+-- class(number b, number c, number d, number e)
 -- class(tuple3 b)
+-- class(tuple4 b)
 -- class()
 return setmetatable(class, {
   __index = super;

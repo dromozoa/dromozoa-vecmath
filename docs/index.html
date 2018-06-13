@@ -19,6 +19,9 @@
     padding: 15px;
   }
 }
+table td.subclass {
+  padding-left: 2em;
+}
 </style>
 <body>
 <div class="markdown-body">
@@ -40,7 +43,102 @@
   <li><a href="https://www.irisa.fr/sage/bernard/publis/SVD-Chapter06.pdf">Parallel Algorithms for the Singular Value Decomposition</a></li>
   <li><a href="https://web.stanford.edu/class/cme335/lecture7.pdf">CME 335 - Advanced Topics in Numerical Linear Algebra - Lecture 7</a></li>
   <li><a href="http://nalab.mind.meiji.ac.jp/~mk/labo/text/eigenvalues-add.pdf">固有値問題ノートの補足</a></li>
+  <li><a href="ftp://ftp.cis.upenn.edu/pub/graphics/shoemake/quatut.ps.Z">Quaternions</a></li>
 </ul>
+
+<h2>型階層</h2>
+
+<table>
+  <tr>
+    <th>#</th>
+    <th>class</th>
+    <th>abstract</th>
+  </tr>
+
+  <tr>
+    <td rowspan="4">2</td>
+    <td>tuple2</td>
+    <td>abstract</td>
+  </tr>
+  <tr>
+    <td class="subclass">point2</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">vector2</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord2</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td rowspan="5">3</td>
+    <td>tuple3</td>
+    <td>abstract</td>
+  </tr>
+  <tr>
+    <td class="subclass">point3</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">vector3</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord3</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">color3</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td rowspan="6">4</td>
+    <td>tuple4</td>
+    <td>abstract</td>
+  </tr>
+  <tr>
+    <td class="subclass">point4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">vector4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">quat4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">color4</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>4</td>
+    <td>axis_angle4</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>9</td>
+    <td>matrix3</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>16</td>
+    <td>matrix4</td>
+    <td></td>
+  </tr>
+</table>
 
 <h2>\(3 \times 3\)行列の特異値分解</h2>
 
@@ -76,7 +174,7 @@
 <h3>ヤコビ法による固有値分解</h3>
 
 <p>
-対称行列\(n\)が与えられたとき、適当な\(p,q\)を選んで収束計算を行う。
+対称行列\(n\)が与えられたとき、適当な\(p, q\)を選んで収束計算を行う。
 \[
   \begin{pmatrix}
     \cos\theta &amp; -\sin\theta \\
@@ -101,7 +199,7 @@
 <h3>ヤコビ法による特異値分解</h3>
 
 <p>
-適当な\(p,q\)を選び、収束計算を行う。
+適当な\(p, q\)を選び、収束計算を行う。
 \[
   \begin{pmatrix}
     \cos\theta &amp; -\sin\theta \\
@@ -125,7 +223,7 @@
       0 &amp; s_q
   \end{pmatrix}
 \]
-対称行列でなければならないというヤコビ法の制約を満たすために\(\phi\)で回転する。
+ヤコビ法の制約を満たすために\(\phi\)で回転して対称行列にする。
 \[
   \begin{pmatrix}
     m_{pp} &amp; m_{pq} \\
@@ -146,7 +244,7 @@
 <h4>収束計算</h4>
 
 <p>
-ギブンス変換\(G\)を用いると、\(n\)回めまでの計算は
+ギブンス変換\(G\)を用いると\(n\)回めまでの計算は
 \[
   (G_{\theta_n}^T \dots G_{\theta_1}^T)
   m
@@ -199,7 +297,7 @@
 <h3>計算例</h3>
 
 <p>
-\(p,q,i=1,2,3\)の場合を考える。
+\(p, q, i = 1, 2, 3\)の場合を考える。
 </p>
 
 <h4>\(\phi\)の計算</h4>
@@ -379,29 +477,29 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 \end{eqnarray}\]
 </p>
 
-<h3>\(p,q,i\)に対応するインデックス</h3>
+<h3>\(p, q, i\)に対応するインデックス</h3>
 
 <table>
   <tr>
-    <th>\(p,q,i\)</th>
+    <th>\(p, q, i\)</th>
     <th>pp</th><th>pq</th><th>pi</th>
     <th>qp</th><th>qq</th><th>qi</th>
     <th>ip</th><th>iq</th><th>ii</th>
   </tr>
   <tr>
-    <td>\(1,2,3\)</td>
+    <td>\(1, 2, 3\)</td>
     <td>1</td><td>2</td><td>3</td>
     <td>4</td><td>5</td><td>6</td>
     <td>7</td><td>8</td><td>9</td>
   </tr>
   <tr>
-    <td>\(1,3,2\)</td>
+    <td>\(1, 3, 2\)</td>
     <td>1</td><td>3</td><td>2</td>
     <td>7</td><td>9</td><td>8</td>
     <td>4</td><td>6</td><td>5</td>
   </tr>
   <tr>
-    <td>\(2,3,1\)</td>
+    <td>\(2, 3, 1\)</td>
     <td>5</td><td>6</td><td>4</td>
     <td>8</td><td>9</td><td>7</td>
     <td>2</td><td>3</td><td>1</td>
@@ -439,7 +537,6 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 \end{eqnarray}\]
 </p>
 
-
 <h3>平鍋の実装</h3>
 
 <p>
@@ -447,6 +544,166 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 \[
   B = \sqrt[3]{\mathrm{det}(A)} A
 \]
+</p>
+
+<h2>ベクトルの角度</h2>
+
+<p>
+\[
+  \cos\theta = \frac{a \cdot b}{\|a\|\|b\|}
+\]
+2次元と3次元では外積を用いて
+\[\begin{eqnarray}
+  \sin\theta &amp;=&amp; \frac{\|a \times b\|}{\|a\|\|b\|} \\
+  \tan\theta &amp;=&amp; \frac{\|a \times b\|}{a \cdot b}
+\end{eqnarray}\]
+2次元では
+\[\begin{eqnarray}
+  a &amp;=&amp; (a_x, a_y, 0) \\
+  b &amp;=&amp; (b_x, b_y, 0) \\
+  a \times b &amp;=&amp; (0, 0, a_x b_y - a_y b_x)
+\end{eqnarray}\]
+なので
+\[\begin{eqnarray}
+  \|a \times b\| &amp;=&amp; a_x b_y - a_y b_x \\
+  a \cdot b &amp;=&amp; a_x b_x + a_y b_y
+\end{eqnarray}\]
+</p>
+
+<h2>回転</h2>
+
+<h3>matrix3 / axis_angle4</h3>
+
+<p>
+単位ベクトル\((x, y, z)\)を軸として\(\theta\)回転する行列は
+\[
+  \begin{pmatrix}
+    m_{11} &amp; m_{12} &amp; m_{13} \\
+    m_{21} &amp; m_{22} &amp; m_{23} \\
+    m_{31} &amp; m_{32} &amp; m_{33}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    \cos\theta + x^2 (1 - \cos\theta) &amp;
+    x y (1 - \cos\theta) - z \sin\theta &amp;
+    z x (1 - \cos\theta) + y \sin\theta \\
+    x y (1 - \cos\theta) + z \sin\theta &amp;
+    \cos\theta + y^2 (1 - \cos\theta) &amp;
+    y z (1 - \cos\theta) - x \sin\theta \\
+    z x (1 - \cos\theta) - y \sin\theta &amp;
+    y z (1 - \cos\theta) + x \sin\theta &amp;
+    \cos\theta + z^2 (1 - \cos\theta)
+  \end{pmatrix}
+\]
+対角成分に注目すると
+\[
+  m_{11} + m_{22} + m_{33} = 2 \cos\theta + 1
+\]
+なので
+\[
+  2 \cos\theta = m_{11} + m_{22} + m_{33} - 1
+\]
+非対角成分に注目すると
+\[\begin{eqnarray}
+  m_{32} - m_{23} &amp;=&amp; 2 x \sin\theta \\
+  m_{13} - m_{31} &amp;=&amp; 2 y \sin\theta \\
+  m_{21} - m_{12} &amp;=&amp; 2 z \sin\theta
+\end{eqnarray}\]
+なので
+\[\begin{eqnarray}
+  x &amp;=&amp; \frac{m_{32} - m_{23}}{2 \sin\theta} \\
+  y &amp;=&amp; \frac{m_{13} - m_{31}}{2 \sin\theta} \\
+  z &amp;=&amp; \frac{m_{21} - m_{12}}{2 \sin\theta} \\
+  2 \sin\theta &amp;=&amp; \sqrt{(m_{32} - m_{23})^2 + (m_{13} - m_{31})^2 + (m_{21} - m_{12})^2} \\
+  \tan\theta &amp;=&amp; \frac{\sqrt{(m_{32} - m_{23})^2 + (m_{13} - m_{31})^2 + (m_{21} - m_{12})^2}}{m_{11} + m_{22} + m_{33} - 1}
+\end{eqnarray}\]
+</p>
+
+<h3>matrix3 / quat4</h3>
+
+<p>
+単位四元数\((x, y, z, w)\)が表す回転は
+\[
+  \begin{pmatrix}
+    m_{11} &amp; m_{12} &amp; m_{13} \\
+    m_{21} &amp; m_{22} &amp; m_{23} \\
+    m_{31} &amp; m_{32} &amp; m_{33}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    1 - 2 (y^2 + z^2) &amp; 2 (xy - wz)       &amp; 2 (zx + wy) \\
+    2 (xy + wz)       &amp; 1 - 2 (x^2 + z^2) &amp; 2 (yz - wx) \\
+    2 (zx - wy)       &amp; 2 (yz + wx)       &amp; 1 - 2 (x^2 + y^2)
+  \end{pmatrix}
+\]
+対角成分に注目すると
+\[\begin{eqnarray}
+  m_{11} + m_{22} + m_{33} &amp;=&amp; 4 w^2 - 1 \\
+  m_{11} - m_{22} - m_{33} &amp;=&amp; 4 x^2 - 1 \\
+  m_{22} - m_{33} - m_{11} &amp;=&amp; 4 y^2 - 1 \\
+  m_{33} - m_{11} - m_{22} &amp;=&amp; 4 z^2 - 1
+\end{eqnarray}\]
+なので
+\[\begin{eqnarray}
+  w &amp;=&amp; \frac{\sqrt{m_{11} + m_{22} + m_{33} + 1}}{2} \\
+  x &amp;=&amp; \frac{\sqrt{m_{11} - m_{22} - m_{33} + 1}}{2} \\
+  y &amp;=&amp; \frac{\sqrt{m_{22} - m_{33} - m_{11} + 1}}{2} \\
+  z &amp;=&amp; \frac{\sqrt{m_{33} - m_{11} - m_{22} + 1}}{2}
+\end{eqnarray}\]
+非対角成分に注目すると
+\[\begin{eqnarray}
+  m_{21} + m_{12} &amp;=&amp; 4 xy \\
+  m_{32} + m_{23} &amp;=&amp; 4 yz \\
+  m_{13} + m_{31} &amp;=&amp; 4 zx \\
+  m_{32} - m_{23} &amp;=&amp; 4 wx \\
+  m_{13} - m_{31} &amp;=&amp; 4 wy \\
+  m_{21} - m_{12} &amp;=&amp; 4 wz
+\end{eqnarray}\]
+なので、\(x, y, z, w\)のどれかを定めれば残りが定まる。
+Shoemakeのチュートリアルでは\(m_{11} + m_{22} + m_{33} \ge 0\)ならば\(w\)から決定している。さもなければ、\(m_{11}, m_{22}, m_{33}\)のなかで\(m_{11}\)が最大ならば\(x\)から、\(m_{22}\)が最大ならば\(y\)から、\(m_{33}\)が最大ならば\(z\)から決定する。
+</p>
+
+<h3>axis_angle4 / quat4</h3>
+
+<p>
+単位ベクトル\((x, y, z)\)を軸として\(\theta\)回転すると
+\[
+  \begin{pmatrix}
+    q_x \\
+    q_y \\
+    q_z \\
+    q_w
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    x \sin\frac{\theta}{2} \\
+    y \sin\frac{\theta}{2} \\
+    z \sin\frac{\theta}{2} \\
+    \cos\frac{\theta}{2}
+  \end{pmatrix}
+\]
+なので
+\[\begin{eqnarray}
+  \sin\frac{\theta}{2} &amp;=&amp; \sqrt{q_x^2 + q_y^2 + q_z^2} \\
+  \cos\frac{\theta}{2} &amp;=&amp; q_w \\
+  \tan\frac{\theta}{2} &amp;=&amp; \frac{\sqrt{q_x^2 + q_y^2 + q_z^2}}{q_w}
+\end{eqnarray}\]
+</p>
+
+<h3>Spherical Linear Interpolation</h3>
+
+<p>
+単位四元数\(q_1, q_2\)の球面線形補間は
+\[
+  \mathrm{slerp}(q_1, q_2, t)
+  = q_1 \frac{\sin (1 - t)\Omega}{\sin\Omega}
+  + q_2 \frac{\sin t \Omega}{\sin\Omega}
+\]
+ただし
+\[
+  \cos\Omega = q_1 \cdot q_2
+\]
+\(q_1 \cdot q_2 \lt 0\)ならば\(q_1\)または\(q_2\)の符号を反転して最小距離で補間する（Sunの実装は\(q_1\)の符号を反転する）。
 </p>
 
 </div>

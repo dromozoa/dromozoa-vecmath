@@ -15,67 +15,17 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local tuple3 = require "dromozoa.vecmath.tuple3"
+local tuple4 = require "dromozoa.vecmath.tuple4"
 
 local rawget = rawget
 local rawset = rawset
 local setmetatable = setmetatable
-local sqrt = math.sqrt
 
-local super = tuple3
-local class = { is_point3 = true }
+local super = tuple4
+local class = { is_color4 = true }
 local metatable = { __tostring = super.to_string }
 
--- a:distance_squared(point3 b)
-function class.distance_squared(a, b)
-  local x = a[1] - b[1]
-  local y = a[2] - b[2]
-  local z = a[3] - b[3]
-  return x * x + y * y + z * z
-end
-
--- a:distance(point3 b)
-function class.distance(a, b)
-  local x = a[1] - b[1]
-  local y = a[2] - b[2]
-  local z = a[3] - b[3]
-  return sqrt(x * x + y * y + z * z)
-end
-
--- a:distance_l1(point3 b)
-function class.distance_l1(a, b)
-  local x = a[1] - b[1]
-  local y = a[2] - b[2]
-  local z = a[3] - b[3]
-  if x < 0 then x = -x end
-  if y < 0 then y = -y end
-  if z < 0 then z = -z end
-  return x + y + z
-end
-
--- a:distance_linf(point3 b)
-function class.distance_linf(a, b)
-  local x = a[1] - b[1]
-  local y = a[2] - b[2]
-  local z = a[3] - b[3]
-  if x < 0 then x = -x end
-  if y < 0 then y = -y end
-  if z < 0 then z = -z end
-  if x > y then
-    if x > z then return x else return z end
-  else
-    if y > z then return y else return z end
-  end
-end
-
--- a:project(point4 b)
-function class.project(a, b)
-  local d = b[4]
-  a[1] = b[1] / d
-  a[2] = b[2] / d
-  a[3] = b[3] / d
-  return a
-end
+-- TODO impl get()
 
 function metatable.__index(a, key)
   local value = class[key]
@@ -90,8 +40,8 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c, number d)
--- class(tuple3 b)
+-- class(number b, number c, number d, number e)
+-- class(tuple4 b)
 -- class()
 return setmetatable(class, {
   __index = super;
