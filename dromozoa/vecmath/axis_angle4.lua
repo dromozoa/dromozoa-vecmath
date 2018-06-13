@@ -27,7 +27,6 @@ local function set_quat4(a, b)
   local x = b[1]
   local y = b[2]
   local z = b[3]
-  local w = b[4]
   local d = sqrt(x * x + y * y + z * z)
   if d == 0 then
     a[1] = 0
@@ -38,24 +37,15 @@ local function set_quat4(a, b)
     a[1] = x / d
     a[2] = y / d
     a[3] = z / d
-    a[4] = 2 * atan2(d, w)
+    a[4] = 2 * atan2(d, b[4])
   end
   return a
 end
 
 local function set_matrix3(a, b)
-  local b11 = b[1]
-  local b12 = b[2]
-  local b13 = b[3]
-  local b21 = b[4]
-  local b22 = b[5]
-  local b23 = b[6]
-  local b31 = b[7]
-  local b32 = b[8]
-  local b33 = b[9]
-  local x = b32 - b23
-  local y = b13 - b31
-  local z = b21 - b12
+  local x = b[8] - b[6]
+  local y = b[3] - b[7]
+  local z = b[4] - b[2]
   local d = sqrt(x * x + y * y + z * z)
   if d == 0 then
     a[1] = 0
@@ -66,7 +56,7 @@ local function set_matrix3(a, b)
     a[1] = x / d
     a[2] = y / d
     a[3] = z / d
-    a[4] = atan2(d, b11 + b22 + b33 - 1)
+    a[4] = atan2(d, b[1] + b[5] + b[9] - 1)
   end
   return a
 end
