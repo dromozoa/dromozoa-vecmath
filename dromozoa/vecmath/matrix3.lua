@@ -28,7 +28,10 @@ local format = string.format
 
 -- a:to_string()
 local function to_string(a)
-  return format("%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n", a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9])
+  return format("%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n%.17g, %.17g, %.17g\n",
+      a[1], a[2], a[3],
+      a[4], a[5], a[6],
+      a[7], a[8], a[9])
 end
 
 -- a:mul(number b, matrix3 c)
@@ -270,7 +273,9 @@ local class = {
   is_matrix3 = true;
   index = {
     1, 2, 3, 4, 5, 6, 7, 8, 9,
-    m11 = 1, m12 = 2, m13 = 3, m21 = 4, m22 = 5, m23 = 6, m31 = 7, m32 = 8, m33 = 9,
+    m11 = 1, m12 = 2, m13 = 3,
+    m21 = 4, m22 = 5, m23 = 6,
+    m31 = 7, m32 = 8, m33 = 9,
   };
   to_string = to_string;
   mul = mul;
@@ -688,31 +693,38 @@ end
 
 -- a:equals(matrix3 b)
 function class.equals(a, b)
-  return a and b and a[1] == b[1] and a[2] == b[2] and a[3] == b[3] and a[4] == b[4] and a[5] == b[5] and a[6] == b[6] and a[7] == b[7] and a[8] == b[8] and a[9] == b[9]
+  return a and b
+      and a[1] == b[1] and a[2] == b[2] and a[3] == b[3]
+      and a[4] == b[4] and a[5] == b[5] and a[6] == b[6]
+      and a[7] == b[7] and a[8] == b[8] and a[9] == b[9]
 end
 
 -- a:epsilon_equals(matrix3 b, number epsilon)
 function class.epsilon_equals(a, b, epsilon)
   if a and b then
-    local v11 = a[1] - b[1]
-    local v12 = a[2] - b[2]
-    local v13 = a[3] - b[3]
-    local v21 = a[4] - b[4]
-    local v22 = a[5] - b[5]
-    local v23 = a[6] - b[6]
-    local v31 = a[7] - b[7]
-    local v32 = a[8] - b[8]
-    local v33 = a[9] - b[9]
-    if v11 < 0 then v11 = -v11 end
-    if v12 < 0 then v12 = -v12 end
-    if v13 < 0 then v13 = -v13 end
-    if v21 < 0 then v21 = -v21 end
-    if v22 < 0 then v22 = -v22 end
-    if v23 < 0 then v23 = -v23 end
-    if v31 < 0 then v31 = -v31 end
-    if v32 < 0 then v32 = -v32 end
-    if v33 < 0 then v33 = -v33 end
-    return v11 <= epsilon and v12 <= epsilon and v13 <= epsilon and v21 <= epsilon and v22 <= epsilon and v23 <= epsilon and v31 <= epsilon and v32 <= epsilon and v33 <= epsilon
+    local m11 = a[1] - b[1]
+    local m12 = a[2] - b[2]
+    local m13 = a[3] - b[3]
+    local m21 = a[4] - b[4]
+    local m22 = a[5] - b[5]
+    local m23 = a[6] - b[6]
+    local m31 = a[7] - b[7]
+    local m32 = a[8] - b[8]
+    local m33 = a[9] - b[9]
+
+    if m11 < 0 then m11 = -m11 end
+    if m12 < 0 then m12 = -m12 end
+    if m13 < 0 then m13 = -m13 end
+    if m21 < 0 then m21 = -m21 end
+    if m22 < 0 then m22 = -m22 end
+    if m23 < 0 then m23 = -m23 end
+    if m31 < 0 then m31 = -m31 end
+    if m32 < 0 then m32 = -m32 end
+    if m33 < 0 then m33 = -m33 end
+
+    return m11 <= epsilon and m12 <= epsilon and m13 <= epsilon
+        and m21 <= epsilon and m22 <= epsilon and m23 <= epsilon
+        and m31 <= epsilon and m32 <= epsilon and m33 <= epsilon
   else
     return false
   end
