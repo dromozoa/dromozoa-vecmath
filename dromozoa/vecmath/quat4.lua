@@ -128,7 +128,11 @@ local function interpolate(a, b, c, alpha)
 end
 
 local super = tuple4
-local class = { is_quat4 = true }
+local class = {
+  is_quat4 = true;
+  set_axis_angle4 = set_axis_angle4;
+  set_matrix3 = set_matrix3;
+}
 local metatable = { __tostring = super.to_string }
 
 -- a:set(number b, number c, number d, number e)

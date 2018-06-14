@@ -80,7 +80,7 @@ if verbose then
 end
 assert(m:set(m1):set_scale(2):epsilon_equals(d, epsilon))
 
-assert(math.abs(m1:get_scale() - data.get_scale) < epsilon)
+assert(math.abs(m1:get_scale() - data.get_scale) <= epsilon)
 
 assert(m:add(2, m1):equals(data.add2))
 assert(m:add(2, m:set(m1)):equals(data.add2))

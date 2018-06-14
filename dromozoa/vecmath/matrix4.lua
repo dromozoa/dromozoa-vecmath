@@ -23,6 +23,8 @@ local rawget = rawget
 local rawset = rawset
 local setmetatable = setmetatable
 local type = type
+local cos = math.cos
+local sin = math.sin
 local format = string.format
 
 -- a:to_string()
@@ -163,15 +165,15 @@ end
 function class.set_scale(a, b)
   local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
   matrix3.set_scale(m, b)
-  a[1] = b[1]
-  a[2] = b[2]
-  a[3] = b[3]
-  a[5] = b[4]
-  a[6] = b[5]
-  a[7] = b[6]
-  a[9] = b[7]
-  a[10] = b[8]
-  a[11] = b[9]
+  a[ 1] = m[1]
+  a[ 2] = m[2]
+  a[ 3] = m[3]
+  a[ 5] = m[4]
+  a[ 6] = m[5]
+  a[ 7] = m[6]
+  a[ 9] = m[7]
+  a[10] = m[8]
+  a[11] = m[9]
   return a
 end
 
@@ -294,6 +296,7 @@ function class.sub(a, b, c)
     a[15] = a[15] - b[15]
     a[16] = a[16] - b[16]
   end
+  return a
 end
 
 -- a:transpose(matrix4 b)
@@ -328,6 +331,7 @@ end
 -- a:set(vector3 b, number c)
 -- a:set(number b)
 -- a:set(vector3 b)
+-- a:set(axis_angle4 b)
 -- a:set(quat4 b)
 -- a:set(matrix3 b)
 -- a:set(matrix4 b)
@@ -450,17 +454,17 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
       else
         local n = #b
         if n == 3 then
-          a[1] = 0
+          a[1] = 1
           a[2] = 0
           a[3] = 0
           a[4] = b[1]
           a[5] = 0
-          a[6] = 0
+          a[6] = 1
           a[7] = 0
           a[8] = b[2]
           a[9] = 0
           a[10] = 0
-          a[11] = 0
+          a[11] = 1
           a[12] = b[3]
           a[13] = 0
           a[14] = 0
@@ -468,16 +472,22 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[16] = 1
         elseif n == 4 then
           local m = {}
-          matrix3.set_quat4(m, b)
-          a[1] = m[1]
-          a[2] = m[2]
-          a[3] = m[3]
-          a[4] = 0
-          a[5] = m[4]
-          a[6] = m[5]
-          a[7] = m[6]
-          a[8] = 0
-          a[9] = m[7]
+
+          if b.is_axis_angle4 then
+            matrix3.set_axis_angle4(m, b)
+          else
+            matrix3.set_quat4(m, b)
+          end
+
+          a[ 1] = m[1]
+          a[ 2] = m[2]
+          a[ 3] = m[3]
+          a[ 4] = 0
+          a[ 5] = m[4]
+          a[ 6] = m[5]
+          a[ 7] = m[6]
+          a[ 8] = 0
+          a[ 9] = m[7]
           a[10] = m[8]
           a[11] = m[9]
           a[12] = 0
@@ -485,16 +495,17 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[14] = 0
           a[15] = 0
           a[16] = 1
+
         elseif n == 9 then
-          a[1] = b[1]
-          a[2] = b[2]
-          a[3] = b[3]
-          a[4] = 0
-          a[5] = b[4]
-          a[6] = b[5]
-          a[7] = b[6]
-          a[8] = 0
-          a[9] = b[7]
+          a[ 1] = b[1]
+          a[ 2] = b[2]
+          a[ 3] = b[3]
+          a[ 4] = 0
+          a[ 5] = b[4]
+          a[ 6] = b[5]
+          a[ 7] = b[6]
+          a[ 8] = 0
+          a[ 9] = b[7]
           a[10] = b[8]
           a[11] = b[9]
           a[12] = 0
@@ -502,6 +513,23 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[14] = 0
           a[15] = 0
           a[16] = 1
+        else
+          a[ 1] = b[ 1]
+          a[ 2] = b[ 2]
+          a[ 3] = b[ 3]
+          a[ 4] = b[ 4]
+          a[ 5] = b[ 5]
+          a[ 6] = b[ 6]
+          a[ 7] = b[ 7]
+          a[ 8] = b[ 8]
+          a[ 9] = b[ 9]
+          a[10] = b[10]
+          a[11] = b[11]
+          a[12] = b[12]
+          a[13] = b[13]
+          a[14] = b[14]
+          a[15] = b[15]
+          a[16] = b[16]
         end
       end
     end
@@ -554,7 +582,7 @@ function class.invert(a, b)
   local n12 = m32 * (m13 * m44 - m14 * m43) + m33 * (m14 * m42 - m12 * m44) + m34 * (m12 * m43 - m13 * m42)
   local n13 = m42 * (m13 * m24 - m14 * m23) + m43 * (m14 * m22 - m12 * m24) + m44 * (m12 * m23 - m13 * m22)
   local n14 = m12 * (m24 * m33 - m23 * m34) + m13 * (m22 * m34 - m24 * m32) + m14 * (m23 * m32 - m22 * m33)
-  local d = m11 * n11 + m21 * n21 + m31 * n13 + m41 * n14;
+  local d = m11 * n11 + m21 * n12 + m31 * n13 + m41 * n14;
 
   a[ 1] = n11 / d
   a[ 2] = n12 / d
@@ -643,13 +671,14 @@ function class.rot_y(a, angle)
   a[3] = s
   a[4] = 0
   a[5] = 0
-  a[6] = 0
-  a[7] = 1
+  a[6] = 1
+  a[7] = 0
   a[8] = 0
   a[9] = -s
   a[10] = 0
   a[11] = c
   a[12] = 0
+
   a[13] = 0
   a[14] = 0
   a[15] = 0
@@ -991,7 +1020,7 @@ end
 -- a:transform(vector3 b)
 -- a:transform(point3 b)
 -- a:transform(tuple4 b)
-function class.transform(a, b)
+function class.transform(a, b, c)
   local n = #b
   if #b == 3 then
     if b.is_vector3 then
@@ -1024,7 +1053,7 @@ function class.set_rotation(a, b)
   if #b == 4 then
     local n = {}
     matrix3.set(n, b)
-    matrix3.mul(m, n, b)
+    matrix3.mul(m, n, m)
     a[ 1] = m[1]
     a[ 2] = m[2]
     a[ 3] = m[3]
@@ -1035,6 +1064,8 @@ function class.set_rotation(a, b)
     a[10] = m[8]
     a[11] = m[9]
   else
+    print("[1]", matrix3(b))
+    print("[2]", matrix3(m))
     matrix3.mul(m, b, m)
     a[ 1] = m[1]
     a[ 2] = m[2]
