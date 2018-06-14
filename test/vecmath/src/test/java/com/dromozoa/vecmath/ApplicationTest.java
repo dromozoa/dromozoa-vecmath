@@ -30,8 +30,13 @@ public class ApplicationTest extends TestCase {
     System.out.println("Color4b\n" + new Color4b((byte)255, (byte)255, (byte)0, (byte)127));
   }
 
-  public void testMatrix3d() {
+  public void testMatrix3() {
     String[] args = { "matrix3" };
+    Application.main(args);
+  }
+
+  public void testMatrix4() {
+    String[] args = { "matrix4" };
     Application.main(args);
   }
 
@@ -53,5 +58,17 @@ public class ApplicationTest extends TestCase {
   public void testRotation() {
     String[] args = { "rotation" };
     Application.main(args);
+  }
+
+  public void testNormalize() {
+    // [u,s,v]=svd([2, 1, 4; 1, 2, 3; 3, -1, 1])
+    Matrix3d m1 = new Matrix3d(2, 1, 4, 1, 2, 3, 3, -1, 1);
+    m1.normalize();
+    System.out.println(m1);
+
+    // [u,s,v]=svd([1, 2, 1; 2, 1, 0; 1, 1, 2])
+    Matrix3d m2 = new Matrix3d(1, 2, 1, 2, 1, 0, 1, 1, 2);
+    m2.normalize();
+    System.out.println(m2);
   }
 }

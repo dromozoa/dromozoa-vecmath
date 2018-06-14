@@ -108,6 +108,126 @@ public class Application {
     System.out.println("}");
   }
 
+  private static void matrix4() {
+    Matrix4d m = new Matrix4d();
+    Point3d p = new Point3d();
+    Vector3d v = new Vector3d();
+    Quat4d q = new Quat4d();
+    Matrix3d n = new Matrix3d();
+    Tuple4d t = new Vector4d();
+
+    Matrix4d m1 = new Matrix4d(2, 1, 4, 10, 1, 2, 3, 20, 3, -1, 1, 30, 0, 0, 0, 1);
+    Matrix4d m2 = new Matrix4d(1, 2, 1, -30, 2, 1, 0, -20, 1, 1, 2, -10, 0, 0, 0, 1);
+    Point3d p1 = new Point3d(1, 2, 3);
+    Vector3d v1 = new Vector3d(2, 3, 4);
+    Vector4d v2 = new Vector4d(3, 4, 5, 6);
+
+    Quat4d q1 = new Quat4d(1, 2, 3, Math.PI / 6);
+    AxisAngle4d a1 = new AxisAngle4d();
+    Matrix3d n1 = new Matrix3d();
+    a1.set(q1);
+    n1.set(q1);
+
+    System.out.println("return {");
+    System.out.println("  " + s(m1) + ";");
+    System.out.println("  " + s(m2) + ";");
+    System.out.println("  p1 = " + s(p1) + ";");
+    System.out.println("  v1 = " + s(v1) + ";");
+    System.out.println("  v2 = " + s(v2) + ";");
+    System.out.println("  q1 = " + s(q1) + ";");
+    System.out.println("  a1 = " + s(a1) + ";");
+    System.out.println("  n1 = " + s(n1) + ";");
+    m1.get(n);
+    System.out.println("  get_matrix3 = " + s(n) + ";");
+    m1.get(n, v);
+    System.out.println("  get_matrix3_vector3 = {");
+    System.out.println("    " + s(n) + ";");
+    System.out.println("    " + s(v) + ";");
+    System.out.println("  };");
+    m1.get(q);
+    System.out.println("  get_quat4 = " + s(q) + ";");
+    m1.get(v);
+    System.out.println("  get_vector3 = " + s(v) + ";");
+    m1.getRotationScale(n);
+    System.out.println("  get_rotation_scale = " + s(n) + ";");
+    System.out.println("  get_scale = " + m1.getScale() + ";");
+    m.set(m1);
+    m.setRotationScale(n1);
+    System.out.println("  set_rotation_scale = " + s(m) + ";");
+    m.set(m1);
+    m.setScale(2);
+    System.out.println("  set_scale2 = " + s(m) + ";");
+    m.add(2, m1);
+    System.out.println("  add2 = " + s(m) + ";");
+    m.add(m1, m2);
+    System.out.println("  add = " + s(m) + ";");
+    m.sub(m1, m2);
+    System.out.println("  sub = " + s(m) + ";");
+    m.transpose(m1);
+    System.out.println("  transpose = " + s(m) + ";");
+    m.set(n1);
+    System.out.println("  set_matrix3 = " + s(m) + ";");
+    m.set(q1);
+    System.out.println("  set_quat4 = " + s(m) + ";");
+    m.set(a1);
+    System.out.println("  set_axis_angle4 = " + s(m) + ";");
+    m.set(q1, v1, 2);
+    System.out.println("  set_quat4_vector3_2 = " + s(m) + ";");
+    m.set(m1);
+    System.out.println("  set_matrix4 = " + s(m) + ";");
+    m.invert(m1);
+    System.out.println("  invert = " + s(m) + ";");
+    System.out.println("  determinant = " + m1.determinant() + ";");
+    m.set(v1);
+    System.out.println("  set_vector3 = " + s(m) + ";");
+    m.set(2, v1);
+    System.out.println("  set_2_vector3 = " + s(m) + ";");
+    m.set(v1, 2);
+    System.out.println("  set_vector3_2 = " + s(m) + ";");
+    m.set(n1, v1, 2);
+    System.out.println("  set_matrix3_vector3_2 = " + s(m) + ";");
+    m.set(m1);
+    m.setTranslation(v1);
+    System.out.println("  set_translation = " + s(m) + ";");
+    m.rotX(2);
+    System.out.println("  rot_x2 = " + s(m) + ";");
+    m.rotY(2);
+    System.out.println("  rot_y2 = " + s(m) + ";");
+    m.rotZ(2);
+    System.out.println("  rot_z2 = " + s(m) + ";");
+    m.mul(2, m1);
+    System.out.println("  mul2 = " + s(m) + ";");
+    m.mul(m1, m2);
+    System.out.println("  mul = " + s(m) + ";");
+    m.mulTransposeBoth(m1, m2);
+    System.out.println("  mul_transpose_both = " + s(m) + ";");
+    m.mulTransposeRight(m1, m2);
+    System.out.println("  mul_transpose_right = " + s(m) + ";");
+    m.mulTransposeLeft(m1, m2);
+    System.out.println("  mul_transpose_left = " + s(m) + ";");
+    m.set(m1);
+    m.transform(v2, t);
+    System.out.println("  transform_tuple4 = " + s(t) + ";");
+    m.transform(p1, p);
+    System.out.println("  transform_point3 = " + s(p) + ";");
+    m.transform(v1, v);
+    System.out.println("  transform_vector3 = " + s(v) + ";");
+    m.set(m1);
+    m.setRotation(n1);
+    System.out.println("  set_rotation_matrix3 = " + s(m) + ";");
+    m.set(m1);
+    m.setRotation(q1);
+    System.out.println("  set_rotation_quat4 = " + s(m) + ";");
+    m.set(m1);
+    m.setRotation(a1);
+    System.out.println("  set_rotation_axis_angle4 = " + s(m) + ";");
+    m.setZero();
+    System.out.println("  set_zero = " + s(m) + ";");
+    m.negate(m1);
+    System.out.println("  negate = " + s(m) + ";");
+    System.out.println("}");
+  }
+
   private static void point2() {
     Point2d p1 = new Point2d(1, 2);
     Point2d p2 = new Point2d(-3, 4);
@@ -331,6 +451,8 @@ public class Application {
     String name = args[0];
     if (name.equals("matrix3")) {
       matrix3();
+    } else if (name.equals("matrix4")) {
+      matrix4();
     } else if (name.equals("point")) {
       point();
     } else if (name.equals("vector")) {
