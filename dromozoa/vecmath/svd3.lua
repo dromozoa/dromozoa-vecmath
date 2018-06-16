@@ -113,33 +113,32 @@ end
 return function (a, b, c)
   while true do
     -- p,q,i = 1,2,3
-    local u = a[2]
-    local v = a[4]
-    local s = u * u + v * v
-    local w = s
+    local s = a[2]
+    local t = a[4]
+    local u = s * s + t * t
+    local v = u
     local pq = 2
 
     -- p,q,i = 1,3,2
-    local u = a[3]
-    local v = a[7]
-    u = u * u + v * v
-    s = s + u
-    if w < u then
-      w = u
+    s = a[3]
+    t = a[7]
+    s = s * s + t * t
+    u = u + s
+    if v < s then
+      v = s
       pq = 3
     end
 
     -- p,q,i = 2,3,1
-    local u = a[6]
-    local v = a[8]
-    u = u * u + v * v
-    s = s + u
-    if w < u then
-      w = u
+    s = a[6]
+    t = a[8]
+    s = s * s + t * t
+    u = u + s
+    if v < s then
       pq = 6
     end
 
-    if s < epsilon then
+    if u < epsilon then
       break
     end
 
@@ -280,5 +279,4 @@ return function (a, b, c)
       return sz, sy, sx
     end
   end
-  return sz
 end
