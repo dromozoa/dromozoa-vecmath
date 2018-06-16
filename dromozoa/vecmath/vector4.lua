@@ -27,17 +27,17 @@ local super = tuple4
 local class = { is_vector4 = true }
 local metatable = { __tostring = super.to_string }
 
--- a:set(number b, number c, number d, number e)
+-- a:set(number b, number y, number z, number w)
 -- a:set(tuple3 b)
 -- a:set(tuple4 b)
 -- a:set()
-function class.set(a, b, c, d, e)
+function class.set(a, b, y, z, w)
   if b then
-    if c then
+    if y then
       a[1] = b
-      a[2] = c
-      a[3] = d
-      a[4] = e
+      a[2] = y
+      a[3] = z
+      a[4] = w
     else
       a[1] = b[1]
       a[2] = b[2]
@@ -79,27 +79,18 @@ end
 -- a:normalize(vector4 b)
 -- a:normalize()
 function class.normalize(a, b)
-  if b then
-    local x = b[1]
-    local y = b[2]
-    local z = b[3]
-    local w = b[4]
-    local d = sqrt(x * x + y * y + z * z + w * w)
-    a[1] = x / d
-    a[2] = y / d
-    a[3] = z / d
-    a[4] = w / d
-  else
-    local x = a[1]
-    local y = a[2]
-    local z = a[3]
-    local w = a[4]
-    local d = sqrt(x * x + y * y + z * z + w * w)
-    a[1] = x / d
-    a[2] = y / d
-    a[3] = z / d
-    a[4] = w / d
+  if not b then
+    b = a
   end
+  local x = b[1]
+  local y = b[2]
+  local z = b[3]
+  local w = b[4]
+  local d = sqrt(x * x + y * y + z * z + w * w)
+  a[1] = x / d
+  a[2] = y / d
+  a[3] = z / d
+  a[4] = w / d
   return a
 end
 
@@ -113,10 +104,10 @@ function class.angle(a, b)
   local by = b[2]
   local bz = b[3]
   local bw = b[4]
-  local u = ax * bx + ay * by + az * bz + aw * bw
-  local v = sqrt(ax * ax + ay * ay + az * az + aw * aw)
-  local w = sqrt(bx * bx + by * by + bz * bz + bw * bw)
-  return acos(u / v / w)
+  local t = ax * bx + ay * by + az * bz + aw * bw
+  local u = sqrt(ax * ax + ay * ay + az * az + aw * aw)
+  local v = sqrt(bx * bx + by * by + bz * bz + bw * bw)
+  return acos(t / u / v)
 end
 
 function metatable.__index(a, key)
@@ -132,7 +123,7 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c, number d, number e)
+-- class(number b, number y, number z, number w)
 -- class(tuple3 b)
 -- class(tuple4 b)
 -- class()

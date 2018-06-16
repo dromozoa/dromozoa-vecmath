@@ -25,8 +25,6 @@ local super = tuple4
 local class = { is_color4 = true }
 local metatable = { __tostring = super.to_string }
 
--- TODO impl get()
-
 function metatable.__index(a, key)
   local value = class[key]
   if value then
@@ -40,7 +38,7 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c, number d, number e)
+-- class(number b, number y, number z, number w)
 -- class(tuple4 b)
 -- class()
 return setmetatable(class, {
