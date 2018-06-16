@@ -106,34 +106,32 @@ local function transform_vector3(a, b, c)
 end
 
 local function set_rotation_axis_angle4(a, b)
-  local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
-  svd3(m)
-  matrix3.mul(m, matrix3.set_axis_angle4({}, b), m)
-  a[ 1] = m[1]
-  a[ 2] = m[2]
-  a[ 3] = m[3]
-  a[ 5] = m[4]
-  a[ 6] = m[5]
-  a[ 7] = m[6]
-  a[ 9] = m[7]
-  a[10] = m[8]
-  a[11] = m[9]
+  local sx, sy, sz = svd3{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
+  local m = matrix3.set_axis_angle4({}, b)
+  a[ 1] = m[1] * sx
+  a[ 2] = m[2] * sy
+  a[ 3] = m[3] * sz
+  a[ 5] = m[4] * sx
+  a[ 6] = m[5] * sy
+  a[ 7] = m[6] * sz
+  a[ 9] = m[7] * sx
+  a[10] = m[8] * sy
+  a[11] = m[9] * sz
   return a
 end
 
 local function set_rotation_quat4(a, b)
-  local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
-  svd3(m)
-  matrix3.mul(m, matrix3.set_quat4({}, b), m)
-  a[ 1] = m[1]
-  a[ 2] = m[2]
-  a[ 3] = m[3]
-  a[ 5] = m[4]
-  a[ 6] = m[5]
-  a[ 7] = m[6]
-  a[ 9] = m[7]
-  a[10] = m[8]
-  a[11] = m[9]
+  local sx, sy, sz = svd3{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
+  local m = matrix3.set_quat4({}, b)
+  a[ 1] = m[1] * sx
+  a[ 2] = m[2] * sy
+  a[ 3] = m[3] * sz
+  a[ 5] = m[4] * sx
+  a[ 6] = m[5] * sy
+  a[ 7] = m[6] * sz
+  a[ 9] = m[7] * sx
+  a[10] = m[8] * sy
+  a[11] = m[9] * sz
   return a
 end
 
@@ -183,27 +181,26 @@ end
 -- a:get(matrix3 b)
 function class.get(a, b, c)
   if c then
-    matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11])
-    matrix3.normalize(b)
+    matrix3.normalize(matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11]))
     c[1] = a[4]
     c[2] = a[8]
     c[3] = a[12]
+    return a
   else
     local n = #b
     if n == 3 then
       b[1] = a[4]
       b[2] = a[8]
       b[3] = a[12]
+      return a
     elseif n == 4 then
-      local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
-      matrix3.normalize(m)
-      quat4.set(b, m)
+      quat4.set(b, matrix3.normalize{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] })
+      return a
     else
-      matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11])
-      matrix3.normalize(b)
+      matrix3.normalize(matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11]))
+      return a
     end
   end
-  return a
 end
 
 -- a:get_rotation_scale(matrix3 b)
@@ -222,8 +219,7 @@ end
 
 -- a:get_scale()
 function class.get_scale(a)
-  local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
-  return matrix3.get_scale(m)
+  return svd3{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
 end
 
 -- a:set_rotation_scale(matrix3 b)
@@ -242,8 +238,7 @@ end
 
 -- a:set_scale(number b)
 function class.set_scale(a, b)
-  local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
-  matrix3.set_scale(m, b)
+  local m = matrix3.set_scale({ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }, b)
   a[ 1] = m[1]
   a[ 2] = m[2]
   a[ 3] = m[3]
@@ -1065,18 +1060,16 @@ function class.set_rotation(a, b)
       error "bad argument #2 (axis_angle4 or quat4 expected)"
     end
   else
-    local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
-    svd3(m)
-    matrix3.mul(m, b, m)
-    a[ 1] = m[1]
-    a[ 2] = m[2]
-    a[ 3] = m[3]
-    a[ 5] = m[4]
-    a[ 6] = m[5]
-    a[ 7] = m[6]
-    a[ 9] = m[7]
-    a[10] = m[8]
-    a[11] = m[9]
+    local sx, sy, sz = svd3{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
+    a[ 1] = b[1] * sx
+    a[ 2] = b[2] * sy
+    a[ 3] = b[3] * sz
+    a[ 5] = b[4] * sx
+    a[ 6] = b[5] * sy
+    a[ 7] = b[6] * sz
+    a[ 9] = b[7] * sx
+    a[10] = b[8] * sy
+    a[11] = b[9] * sz
     return a
   end
 end

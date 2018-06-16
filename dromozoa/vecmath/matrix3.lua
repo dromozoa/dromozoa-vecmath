@@ -126,12 +126,16 @@ local function mul_transpose_right(a, b, c)
   return a
 end
 
+-- a:normalize(matrix3 b)
+-- a:normalize()
 local function normalize(a, b)
-  local m = { a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9] }
+  if not b then
+    b = a
+  end
   local u = { 1, 0, 0, 0, 1, 0, 0, 0, 1 }
   local v = { 1, 0, 0, 0, 1, 0, 0, 0, 1 }
-  svd3(m, u, v)
-  mul_transpose_right(b, u, v)
+  svd3({ b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9] }, u, v)
+  return mul_transpose_right(a, u, v)
 end
 
 local function set_axis_angle4(a, b)
@@ -211,6 +215,7 @@ local class = {
   to_string = to_string;
   mul = mul;
   mul_transpose_right = mul_transpose_right;
+  normalize = normalize;
   set_axis_angle4 = set_axis_angle4;
   set_quat4 = set_quat4;
 }
@@ -232,7 +237,7 @@ end
 
 -- a:set_scale(number scale)
 function class.set_scale(a, scale)
-  normalize(a, a)
+  normalize(a)
   a[1] = a[1] * scale
   a[2] = a[2] * scale
   a[3] = a[3] * scale
@@ -247,7 +252,7 @@ end
 
 -- a:get_scale()
 function class.get_scale(a)
-  return svd3({ a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9] })
+  return svd3{ a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9] }
 end
 
 -- a:add(number b, matrix3 c)
@@ -488,9 +493,7 @@ end
 -- a:mul_normalize(matrix3 b, matrix3 c)
 -- a:mul_normalize(matrix3 b)
 function class.mul_normalize(a, b, c)
-  mul(a, b, c)
-  normalize(a, a)
-  return a
+  return normalize(mul(a, b, c))
 end
 
 -- a:mul_transpose_both(matrix3 b, matrix3 c)
@@ -559,18 +562,6 @@ function class.mul_transpose_left(a, b, c)
   a[8] = b31 * c12 + b32 * c22 + b33 * c32
   a[9] = b31 * c13 + b32 * c23 + b33 * c33
   return a
-end
-
--- a:normalize(matrix3 b)
--- a:normalize()
-function class.normalize(a, b)
-  if b then
-    normalize(b, a)
-    return a
-  else
-    normalize(a, a)
-    return a
-  end
 end
 
 -- a:normalize_cp(matrix3 b)
