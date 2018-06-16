@@ -131,23 +131,23 @@ local super = tuple4
 local class = {
   is_quat4 = true;
   set_axis_angle4 = set_axis_angle4;
-  set_matrix3 = set_matrix3;
 }
 local metatable = { __tostring = super.to_string }
 
--- a:set(number b, number c, number d, number e)
+-- a:set(number b, number c, number z, number w)
 -- a:set(axis_angle4 b)
 -- a:set(tuple4 b)
 -- a:set(matrix3 b)
 -- a:set(matrix4 b)
 -- a:set()
-function class.set(a, b, c, d, e)
+function class.set(a, b, c, z, w)
   if b then
     if c then
       a[1] = b
       a[2] = c
-      a[3] = d
-      a[4] = e
+      a[3] = z
+      a[4] = w
+      return a
     else
       local n = #b
       if n == 4 then
@@ -158,6 +158,7 @@ function class.set(a, b, c, d, e)
           a[2] = b[2]
           a[3] = b[3]
           a[4] = b[4]
+          return a
         end
       elseif n == 9 then
         return set_matrix3(a, b)
@@ -171,8 +172,8 @@ function class.set(a, b, c, d, e)
     a[2] = 0
     a[3] = 0
     a[4] = 0
+    return a
   end
-  return a
 end
 
 -- a:conjugate(quat4 b)
