@@ -26,17 +26,17 @@ local super = tuple4
 local class = { is_point4 = true }
 local metatable = { __tostring = super.to_string }
 
--- a:set(number b, number c, number d, number e)
+-- a:set(number b, number y, number z, number w)
 -- a:set(tuple3 b)
 -- a:set(tuple4 b)
 -- a:set()
-function class.set(a, b, c, d, e)
+function class.set(a, b, y, z, w)
   if b then
-    if c then
+    if y then
       a[1] = b
-      a[2] = c
-      a[3] = d
-      a[4] = e
+      a[2] = y
+      a[3] = z
+      a[4] = w
     else
       a[1] = b[1]
       a[2] = b[2]
@@ -95,15 +95,31 @@ function class.distance_linf(a, b)
   if w < 0 then w = -w end
   if x > y then
     if z > w then
-      if x > z then return x else return z end
+      if x > z then
+        return x
+      else
+        return z
+      end
     else
-      if x > w then return x else return w end
+      if x > w then
+        return x
+      else
+        return w
+      end
     end
   else
     if z > w then
-      if y > z then return y else return z end
+      if y > z then
+        return y
+      else
+        return z
+      end
     else
-      if y > w then return y else return w end
+      if y > w then
+        return y
+      else
+        return w
+      end
     end
   end
 end
@@ -131,7 +147,7 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c, number d, number e)
+-- class(number b, number y, number z, number w)
 -- class(tuple3 b)
 -- class(tuple4 b)
 -- class()

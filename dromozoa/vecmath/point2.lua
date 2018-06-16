@@ -55,7 +55,10 @@ function class.distance_linf(a, b)
   local y = a[2] - b[2]
   if x < 0 then x = -x end
   if y < 0 then y = -y end
-  if x > y then return x else return y
+  if x > y then
+    return x
+  else
+    return y
   end
 end
 
@@ -72,7 +75,7 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c)
+-- class(number b, number y)
 -- class(tuple2 b)
 -- class()
 return setmetatable(class, {

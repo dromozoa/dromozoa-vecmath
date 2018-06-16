@@ -44,23 +44,16 @@ end
 -- a:normalize(vector3 b)
 -- a:normalize()
 function class.normalize(a, b)
-  if b then
-    local x = b[1]
-    local y = b[2]
-    local z = b[3]
-    local d = sqrt(x * x + y * y + z * z)
-    a[1] = x / d
-    a[2] = y / d
-    a[3] = z / d
-  else
-    local x = a[1]
-    local y = a[2]
-    local z = a[3]
-    local d = sqrt(x * x + y * y + z * z)
-    a[1] = x / d
-    a[2] = y / d
-    a[3] = z / d
+  if not b then
+    b = a
   end
+  local x = b[1]
+  local y = b[2]
+  local z = b[3]
+  local d = sqrt(x * x + y * y + z * z)
+  a[1] = x / d
+  a[2] = y / d
+  a[3] = z / d
   return a
 end
 
@@ -117,7 +110,7 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c, number d)
+-- class(number b, number y, number z)
 -- class(tuple3 b)
 -- class()
 return setmetatable(class, {
