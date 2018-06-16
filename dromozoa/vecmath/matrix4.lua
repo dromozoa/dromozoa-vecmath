@@ -37,18 +37,19 @@ local function to_string(a)
       a[13], a[14], a[15], a[16])
 end
 
-local function set_matrix3(a, b)
-  a[ 1] = b[1]
-  a[ 2] = b[2]
-  a[ 3] = b[3]
+local function set_axis_angle4(a, b)
+  local m = matrix3.set_axis_angle4({}, b)
+  a[ 1] = m[1]
+  a[ 2] = m[2]
+  a[ 3] = m[3]
   a[ 4] = 0
-  a[ 5] = b[4]
-  a[ 6] = b[5]
-  a[ 7] = b[6]
+  a[ 5] = m[4]
+  a[ 6] = m[5]
+  a[ 7] = m[6]
   a[ 8] = 0
-  a[ 9] = b[7]
-  a[10] = b[8]
-  a[11] = b[9]
+  a[ 9] = m[7]
+  a[10] = m[8]
+  a[11] = m[9]
   a[12] = 0
   a[13] = 0
   a[14] = 0
@@ -57,24 +58,24 @@ local function set_matrix3(a, b)
   return a
 end
 
-local function set_axis_angle4(a, b)
-  return set_matrix3(a, matrix3.set_axis_angle4({}, b))
-end
-
 local function set_quat4(a, b)
-  return set_matrix3(a, matrix3.set_quat4({}, b))
-end
-
-local function transform_vector3(a, b, c)
-  if not c then
-    c = b
-  end
-  local x = b[1]
-  local y = b[2]
-  local z = b[3]
-  c[1] = a[1] * x + a[ 2] * y + a[ 3] * z
-  c[2] = a[5] * x + a[ 6] * y + a[ 7] * z
-  c[3] = a[9] * x + a[10] * y + a[11] * z
+  local m = matrix3.set_quat4({}, b)
+  a[ 1] = m[1]
+  a[ 2] = m[2]
+  a[ 3] = m[3]
+  a[ 4] = 0
+  a[ 5] = m[4]
+  a[ 6] = m[5]
+  a[ 7] = m[6]
+  a[ 8] = 0
+  a[ 9] = m[7]
+  a[10] = m[8]
+  a[11] = m[9]
+  a[12] = 0
+  a[13] = 0
+  a[14] = 0
+  a[15] = 0
+  a[16] = 1
   return a
 end
 
@@ -88,6 +89,19 @@ local function transform_point3(a, b, c)
   c[1] = a[1] * x + a[ 2] * y + a[ 3] * z + a[ 4]
   c[2] = a[5] * x + a[ 6] * y + a[ 7] * z + a[ 8]
   c[3] = a[9] * x + a[10] * y + a[11] * z + a[12]
+  return a
+end
+
+local function transform_vector3(a, b, c)
+  if not c then
+    c = b
+  end
+  local x = b[1]
+  local y = b[2]
+  local z = b[3]
+  c[1] = a[1] * x + a[ 2] * y + a[ 3] * z
+  c[2] = a[5] * x + a[ 6] * y + a[ 7] * z
+  c[3] = a[9] * x + a[10] * y + a[11] * z
   return a
 end
 
@@ -133,8 +147,12 @@ local class = {
     m41 = 13, m42 = 14, m43 = 15, m44 = 16,
   };
   to_string = to_string;
-  transform_vector3 = transform_vector3;
+  set_axis_angle4 = set_axis_angle4;
+  set_quat4 = set_quat4;
   transform_point3 = transform_point3;
+  transform_vector3 = transform_vector3;
+  set_rotation_axis_angle4 = set_rotation_axis_angle4;
+  set_rotation_quat4 = set_rotation_quat4;
 }
 local metatable = { __tostring = to_string }
 
@@ -502,7 +520,23 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
               error "bad argument #2 (axis_angle4 or quat4 expected)"
             end
           else
-            return set_matrix3(a, b)
+            a[ 1] = b[1]
+            a[ 2] = b[2]
+            a[ 3] = b[3]
+            a[ 4] = 0
+            a[ 5] = b[4]
+            a[ 6] = b[5]
+            a[ 7] = b[6]
+            a[ 8] = 0
+            a[ 9] = b[7]
+            a[10] = b[8]
+            a[11] = b[9]
+            a[12] = 0
+            a[13] = 0
+            a[14] = 0
+            a[15] = 0
+            a[16] = 1
+            return a
           end
         end
       end
