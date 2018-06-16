@@ -26,17 +26,13 @@ local function test_svd(m, expect)
   local a = matrix3(m)
   local u = matrix3():set_identity()
   local v = matrix3():set_identity()
-  local s = svd3(a, u, v)
-  local result = {
-    a.m11;
-    a.m22;
-    a.m33;
-  }
-  table.sort(result, function (a, b) return b < a end)
-  assert(s == result[1])
-  local e1 = math.abs(result[1] - expect[1])
-  local e2 = math.abs(result[2] - expect[2])
-  local e3 = math.abs(result[3] - expect[3])
+  local sx, sy, sz = svd3(a, u, v)
+  assert(sx == a.m11)
+  assert(sy == a.m22)
+  assert(sz == a.m33)
+  local e1 = math.abs(sx - expect[1])
+  local e2 = math.abs(sy - expect[2])
+  local e3 = math.abs(sz - expect[3])
   if verbose then
     print(("="):rep(80))
     print(tostring(m))
