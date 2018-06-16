@@ -162,7 +162,8 @@ function class.set(a, b, c, d, e)
       elseif n == 9 then
         return set_matrix3(a, b)
       else
-        -- TODO impl set matrix4
+        local m = { b[1], b[2], b[3], b[5], b[6], b[7], b[9], b[10], b[11] }
+        return set_matrix3(a, m)
       end
     end
   else
