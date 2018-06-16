@@ -678,7 +678,6 @@ function class.rot_y(a, angle)
   a[10] = 0
   a[11] = c
   a[12] = 0
-
   a[13] = 0
   a[14] = 0
   a[15] = 0
@@ -971,15 +970,15 @@ end
 -- a:epsilon_equals(matrix4 b, number epsilon)
 function class.epsilon_equals(a, b, epsilon)
   if a and b then
-    local m11 = a[1] - b[1]
-    local m12 = a[2] - b[2]
-    local m13 = a[3] - b[3]
-    local m14 = a[4] - b[4]
-    local m21 = a[5] - b[5]
-    local m22 = a[6] - b[6]
-    local m23 = a[7] - b[7]
-    local m24 = a[8] - b[8]
-    local m31 = a[9] - b[9]
+    local m11 = a[ 1] - b[ 1]
+    local m12 = a[ 2] - b[ 2]
+    local m13 = a[ 3] - b[ 3]
+    local m14 = a[ 4] - b[ 4]
+    local m21 = a[ 5] - b[ 5]
+    local m22 = a[ 6] - b[ 6]
+    local m23 = a[ 7] - b[ 7]
+    local m24 = a[ 8] - b[ 8]
+    local m31 = a[ 9] - b[ 9]
     local m32 = a[10] - b[10]
     local m33 = a[11] - b[11]
     local m34 = a[12] - b[12]
