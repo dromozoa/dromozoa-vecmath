@@ -163,5 +163,13 @@ if verbose then
 end
 assert(m:epsilon_equals(data.set_rotation_matrix3, epsilon))
 
+m:set(m1):set_rotation(q1)
+assert(m:epsilon_equals(data.set_rotation_quat4, epsilon))
 
+m:set(m1):set_rotation(a1)
+assert(m:epsilon_equals(data.set_rotation_axis_angle4, epsilon))
 
+assert(m:set_zero():equals(data.set_zero))
+
+assert(m:negate(m1):equals(data.negate))
+assert(m:set(m1):negate():equals(data.negate))

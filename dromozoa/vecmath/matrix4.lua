@@ -1064,8 +1064,6 @@ function class.set_rotation(a, b)
     a[10] = m[8]
     a[11] = m[9]
   else
-    print("[1]", matrix3(b))
-    print("[2]", matrix3(m))
     matrix3.mul(m, b, m)
     a[ 1] = m[1]
     a[ 2] = m[2]
@@ -1098,6 +1096,7 @@ function class.set_zero(a)
   a[14] = 0
   a[15] = 0
   a[16] = 0
+  return a
 end
 
 -- a:negate(matrix4 b)
