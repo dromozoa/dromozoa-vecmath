@@ -29,64 +29,19 @@ local function set_axis_angle4(a, b)
   local x = b[1]
   local y = b[2]
   local z = b[3]
-  local t = b[4] * 0.5
-  local u = sin(t) / sqrt(x * x + y * y + z * z)
-  a[1] = x * u
-  a[2] = y * u
-  a[3] = z * u
-  a[4] = cos(t)
+  local u = b[4] * 0.5
+  local v = sin(u) / sqrt(x * x + y * y + z * z)
+  a[1] = x * v
+  a[2] = y * v
+  a[3] = z * v
+  a[4] = cos(u)
   return a
 end
 
-local function set_matrix3(a, b)
-  local b11 = b[1]
-  local b22 = b[5]
-  local b33 = b[9]
-  local t = b11 + b22 + b33
-  if t >= 0 then
-    local w = sqrt(t + 1) * 0.5
-    local d = w * 4
-    a[1] = (b[8] - b[6]) / d
-    a[2] = (b[3] - b[7]) / d
-    a[3] = (b[4] - b[2]) / d
-    a[4] = w
-    return a
-  else
-    if b11 > b22 then
-      if b11 > b33 then
-        local x = sqrt(b11 - b22 - b33 + 1) * 0.5
-        local d = x * 4
-        a[1] = x
-        a[2] = (b[4] + b[2]) / d
-        a[3] = (b[3] + b[7]) / d
-        a[4] = (b[8] - b[6]) / d
-        return a
-      end
-    else
-      if b22 > b33 then
-        local y = sqrt(b22 - b33 - b11 + 1) * 0.5
-        local d = y * 4
-        a[1] = (b[4] + b[2]) / d
-        a[2] = y
-        a[3] = (b[8] + b[6]) / d
-        a[4] = (b[3] - b[7]) / d
-        return a
-      end
-    end
-    local z = sqrt(b33 - b11 - b22 + 1) * 0.5
-    local d = z * 4
-    a[1] = (b[3] + b[7]) / d
-    a[2] = (b[8] + b[6]) / d
-    a[3] = z
-    a[4] = (b[4] - b[2]) / d
-    return a
-  end
-end
-
 local function set_matrix3(a, b11, b12, b13, b21, b22, b23, b31, b32, b33)
-  local t = b11 + b22 + b33
-  if t >= 0 then
-    local w = sqrt(t + 1) * 0.5
+  local v = b11 + b22 + b33
+  if v >= 0 then
+    local w = sqrt(v + 1) * 0.5
     local d = w * 4
     a[1] = (b32 - b23) / d
     a[2] = (b13 - b31) / d
