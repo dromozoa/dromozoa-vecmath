@@ -15,10 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local axis_angle4 = require "dromozoa.vecmath.axis_angle4"
-local matrix3 = require "dromozoa.vecmath.matrix3"
-local matrix4 = require "dromozoa.vecmath.matrix4"
-local quat4 = require "dromozoa.vecmath.quat4"
+local vecmath = require "dromozoa.vecmath"
+local axis_angle4 = vecmath.axis_angle4
+local matrix3 = vecmath.matrix3
+local matrix4 = vecmath.matrix4
+local quat4 = vecmath.quat4
 
 local verbose = os.getenv "VERBOSE" == "1"
 local epsilon = 1e-9
