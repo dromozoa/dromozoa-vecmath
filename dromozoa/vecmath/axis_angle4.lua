@@ -74,7 +74,7 @@ local class = {
 }
 local metatable = { __tostring = tuple4.to_string }
 
--- a:set(number b, number c, number d, number e)
+-- a:set(number b, number c, number z, number w)
 -- a:set(vector3 b, number c)
 -- a:set(quat4 b)
 -- a:set(tuple4 b)
@@ -86,7 +86,7 @@ function class.set(a, b, c, d, e)
       if d then
         a[1] = b
         a[2] = c
-        z[3] = d
+        a[3] = d
         a[4] = e
       else
         a[1] = b[1]
