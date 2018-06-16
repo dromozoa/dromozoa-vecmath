@@ -83,6 +83,48 @@ local function set_matrix3(a, b)
   end
 end
 
+local function set_matrix3(a, b11, b12, b13, b21, b22, b23, b31, b32, b33)
+  local t = b11 + b22 + b33
+  if t >= 0 then
+    local w = sqrt(t + 1) * 0.5
+    local d = w * 4
+    a[1] = (b32 - b23) / d
+    a[2] = (b13 - b31) / d
+    a[3] = (b21 - b12) / d
+    a[4] = w
+    return a
+  else
+    if b11 > b22 then
+      if b11 > b33 then
+        local x = sqrt(b11 - b22 - b33 + 1) * 0.5
+        local d = x * 4
+        a[1] = x
+        a[2] = (b21 + b12) / d
+        a[3] = (b13 + b31) / d
+        a[4] = (b32 - b23) / d
+        return a
+      end
+    else
+      if b22 > b33 then
+        local y = sqrt(b22 - b33 - b11 + 1) * 0.5
+        local d = y * 4
+        a[1] = (b21 + b12) / d
+        a[2] = y
+        a[3] = (b32 + b23) / d
+        a[4] = (b13 - b31) / d
+        return a
+      end
+    end
+    local z = sqrt(b33 - b11 - b22 + 1) * 0.5
+    local d = z * 4
+    a[1] = (b13 + b31) / d
+    a[2] = (b32 + b23) / d
+    a[3] = z
+    a[4] = (b21 - b12) / d
+    return a
+  end
+end
+
 local function interpolate(a, b, c, alpha)
   local bx = b[1]
   local by = b[2]
@@ -161,10 +203,9 @@ function class.set(a, b, c, z, w)
           return a
         end
       elseif n == 9 then
-        return set_matrix3(a, b)
+        return set_matrix3(a, b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9])
       else
-        local m = { b[1], b[2], b[3], b[5], b[6], b[7], b[9], b[10], b[11] }
-        return set_matrix3(a, m)
+        return set_matrix3(a, b[1], b[2], b[3], b[5], b[6], b[7], b[9], b[10], b[11])
       end
     end
   else
