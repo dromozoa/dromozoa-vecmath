@@ -70,24 +70,23 @@ local class = {
   equals = tuple4.equals;
   epsilon_equals = tuple4.epsilon_equals;
   set_quat4 = set_quat4;
-  set_matrix3 = set_matrix3;
 }
 local metatable = { __tostring = tuple4.to_string }
 
--- a:set(number b, number c, number z, number w)
+-- a:set(number b, number c, number z, number angle)
 -- a:set(vector3 b, number c)
 -- a:set(quat4 b)
 -- a:set(tuple4 b)
 -- a:set(matrix3 b)
 -- a:set(matrix4 b)
-function class.set(a, b, c, z, w)
+function class.set(a, b, c, z, angle)
   if b then
     if c then
       if z then
         a[1] = b
         a[2] = c
         a[3] = z
-        a[4] = w
+        a[4] = angle
         return a
       else
         a[1] = b[1]

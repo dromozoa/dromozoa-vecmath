@@ -118,7 +118,7 @@ function class.get(a, b, c)
     elseif n == 4 then
       local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
       matrix3.normalize(m)
-      quat4.set_matrix3(b, m)
+      quat4.set(b, m)
     else
       matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11])
       matrix3.normalize(b)
