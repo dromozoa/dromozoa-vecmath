@@ -44,6 +44,7 @@ table td.subclass {
   <li><a href="https://web.stanford.edu/class/cme335/lecture7.pdf">CME 335 - Advanced Topics in Numerical Linear Algebra - Lecture 7</a></li>
   <li><a href="http://nalab.mind.meiji.ac.jp/~mk/labo/text/eigenvalues-add.pdf">固有値問題ノートの補足</a></li>
   <li><a href="ftp://ftp.cis.upenn.edu/pub/graphics/shoemake/quatut.ps.Z">Quaternions</a></li>
+  <li><a href="https://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix">inverting a 4x4 matrix</a></li>
 </ul>
 
 <h2>型階層</h2>
@@ -167,7 +168,7 @@ table td.subclass {
   u v^* = U s^{-1} U^* m
 \]
 で表される。
-ランクが1または2である場合、0除算が発生するので別の計算式を使う必要がある。
+ランクが1または2である場合、ゼロ除算が発生するので別の計算式を使う必要がある。
 </p>
 
 <h3>ヤコビ法による固有値分解</h3>
@@ -251,47 +252,159 @@ table td.subclass {
   = s_n
 \]
 \(s_n\)の非対角成分の2乗和が閾値を下まわったら収束したと見なす。
-特異値が負に収束した場合を考慮して
-\begin{align}
-  m &amp;=
-  (G_{\theta_1} \dots G_{\theta_n})
-  s
-  (J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T) \\
-  s_n &amp;= \begin{pmatrix}
+\[
+  s_n = \begin{pmatrix}
     s_x &amp; 0   &amp; 0 \\
     0   &amp; s_y &amp; 0 \\
     0   &amp; 0   &amp; s_z
-  \end{pmatrix} \\
-  s &amp;= \begin{pmatrix}
+  \end{pmatrix}
+\]
+特異値が負に収束した場合を考慮して\(J\)を導入する。
+\begin{align}
+  s_n J &amp;= \begin{pmatrix}
     |s_x| &amp; 0     &amp; 0 \\
     0     &amp; |s_y| &amp; 0 \\
     0     &amp; 0     &amp; |s_z|
   \end{pmatrix} \\
   J &amp;= \begin{pmatrix}
-    \mathrm{sign}(s_x) &amp; 0                  &amp; 0 \\
-    0                  &amp; \mathrm{sign}(s_y) &amp; 0 \\
-    0                  &amp; 0                  &amp; \mathrm{sign}(s_z)
+    \mathrm{sign}(s_x) &amp;
+    0 &amp;
+    0 \\
+    0 &amp;
+    \mathrm{sign}(s_y) &amp;
+    0 \\
+    0 &amp;
+    0 &amp; \mathrm{sign}(s_z)
   \end{pmatrix} \\
   \mathrm{sign}(x) &amp;= \begin{cases}
      1 &amp; (x \ge 0) \\
     -1 &amp; (x \lt 0)
   \end{cases}
 \end{align}
+特異値を降順に並べるために\(K\)を導入する。
+これはヤコビ法で180度回転を0,1,2回適用する処理に等しい。
+\begin{align}
+  s &amp;= K^T s_n J K \\
+  K &amp;= \begin{cases}
+    I             &amp; (|s_z| \ge |s_y| \ge |s_x|) \\
+    G_{23}        &amp; (|s_z| \ge |s_x| \ge |s_y|) \\
+    G_{12}        &amp; (|s_y| \ge |s_z| \ge |s_x|) \\
+    G_{23} G_{13} &amp; (|s_y| \ge |s_x| \ge |s_z|) \\
+    G_{23} G_{12} &amp; (|s_x| \ge |s_z| \ge |s_y|) \\
+    G_{13}        &amp; (|s_x| \ge |s_y| \ge |s_z|)
+  \end{cases} \\
+  G_{12} &amp;= \begin{pmatrix}
+     0 &amp; 1 &amp; 0 \\
+    -1 &amp; 0 &amp; 0 \\
+     0 &amp; 0 &amp; 1
+  \end{pmatrix} \\
+  G_{13} &amp;= \begin{pmatrix}
+     0 &amp; 0 &amp; 1 \\
+     0 &amp; 1 &amp; 0 \\
+    -1 &amp; 0 &amp; 0
+  \end{pmatrix} \\
+  G_{23} &amp;= \begin{pmatrix}
+    1 &amp;  0 &amp; 0 \\
+    0 &amp;  0 &amp; 1 \\
+    0 &amp; -1 &amp; 0
+  \end{pmatrix}
+\end{align}
+\(K, J\)を用いて
+\begin{align}
+  s &amp;=
+  K^T (G_{\theta_n}^T \dots G_{\theta_1}^T)
+  m
+  (G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n}) J K
+  \\
+  m &amp;=
+  (G_{\theta_n} \dots G_{\theta_1}) K
+  s
+  K^T J (G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T)
+\end{align}
 \(u_n\)は
 \begin{align}
-  u_n     &amp;= G_{\theta_1} \dots G_{\theta_n} \\
-  u_0     &amp;= I \\
-  u_{i+1} &amp;= u_i G_{\theta_i} \\
+  u &amp;= (G_{\theta_n} \dots G_{\theta_1}) K \\
+    &amp;= u_n' K \\
+  u_0' &amp;= I \\
+  u_{i+1}' &amp;= u_i G_{\theta_i} \\
 \end{align}
 \(v_n\)は
 \begin{align}
-  v_n^*    &amp;= J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T \\
-  v_n      &amp;= G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n} J \\
-           &amp;= v_n' J \\
-  v_0'     &amp;= I \\
+  v_n^* &amp;= K^T J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T \\
+  v_n &amp;= G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n} J K \\
+      &amp;= v_n' J K \\
+  v_0' &amp;= I \\
   v_{i+1}' &amp;= v_i' G_{\phi_i} G_{\theta_i}
 \end{align}
+\(u v^{*}\)だけが必要なのであれば\(K\)を考える必要はない。
 </p>
+
+<table>
+  <tr>
+    <th>大小関係</th>
+    <th>\(K\)</th>
+  </tr>
+  <tr>
+    <td>\(|s_z| \ge |s_y| \ge |s_x|\)</td>
+    <td>\[
+      \begin{pmatrix}
+        1 &amp; 0 &amp; 0 \\
+        0 &amp; 1 &amp; 0 \\
+        0 &amp; 0 &amp; 1
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_z| \ge |s_x| \ge |s_y|\)</td>
+    <td>\[
+      \begin{pmatrix}
+        1 &amp;  0 &amp;  0 \\
+        0 &amp;  0 &amp; -1 \\
+        0 &amp;  1 &amp;  0
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_y| \ge |s_z| \ge |s_x|\)</td>
+    <td>\[
+      \begin{pmatrix}
+         0 &amp; 1 &amp; 0 \\
+        -1 &amp; 0 &amp; 0 \\
+         0 &amp; 0 &amp; 1
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_y| \ge |s_x| \ge |s_z|\)</td>
+    <td>\[
+      \begin{pmatrix}
+         0 &amp; 1 &amp;  0 \\
+         0 &amp; 0 &amp; -1 \\
+        -1 &amp; 0 &amp;  0
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_x| \ge |s_z| \ge |s_y|\)</td>
+    <td>\[
+      \begin{pmatrix}
+         0 &amp; 0 &amp; -1 \\
+        -1 &amp; 0 &amp;  0 \\
+         0 &amp; 1 &amp;  0
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_x| \ge |s_y| \ge |s_z|\)</td>
+    <td>\[
+      \begin{pmatrix}
+         0 &amp; 0 &amp; 1 \\
+         0 &amp; 1 &amp; 0 \\
+        -1 &amp; 0 &amp; 0
+      \end{pmatrix}
+    \]</td>
+  </tr>
+</table>
 
 <h3>計算例</h3>
 
