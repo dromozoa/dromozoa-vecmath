@@ -25,26 +25,28 @@ local class = {
   };
 }
 
--- a:set(number b, number c, number d)
+-- a:set(number b, number y, number z)
 -- a:set(tuple3 b)
 -- a:set()
-function class.set(a, b, c, d)
+function class.set(a, b, y, z)
   if b then
-    if c then
+    if y then
       a[1] = b
-      a[2] = c
-      a[3] = d
+      a[2] = y
+      a[3] = z
+      return a
     else
       a[1] = b[1]
       a[2] = b[2]
       a[3] = b[3]
+      return a
     end
   else
     a[1] = 0
     a[2] = 0
     a[3] = 0
+    return a
   end
-  return a
 end
 
 -- a:get(tuple3 b)
@@ -58,75 +60,63 @@ end
 -- a:add(tuple3 b, tuple3 c)
 -- a:add(tuple3 b)
 function class.add(a, b, c)
-  if c then
-    a[1] = b[1] + c[1]
-    a[2] = b[2] + c[2]
-    a[3] = b[3] + c[3]
-  else
-    a[1] = a[1] + b[1]
-    a[2] = a[2] + b[2]
-    a[3] = a[3] + b[3]
+  if not c then
+    c = b
+    b = a
   end
+  a[1] = b[1] + c[1]
+  a[2] = b[2] + c[2]
+  a[3] = b[3] + c[3]
   return a
 end
 
 -- a:sub(tuple3 b, tuple3 c)
 -- a:sub(tuple3 b)
 function class.sub(a, b, c)
-  if c then
-    a[1] = b[1] - c[1]
-    a[2] = b[2] - c[2]
-    a[3] = b[3] - c[3]
-  else
-    a[1] = a[1] - b[1]
-    a[2] = a[2] - b[2]
-    a[3] = a[3] - b[3]
+  if not c then
+    c = b
+    b = a
   end
+  a[1] = b[1] - c[1]
+  a[2] = b[2] - c[2]
+  a[3] = b[3] - c[3]
   return a
 end
 
 -- a:negate(tuple3 b)
 -- a:negate()
 function class.negate(a, b)
-  if b then
-    a[1] = -b[1]
-    a[2] = -b[2]
-    a[3] = -b[3]
-  else
-    a[1] = -a[1]
-    a[2] = -a[2]
-    a[3] = -a[3]
+  if not b then
+    b = a
   end
+  a[1] = -b[1]
+  a[2] = -b[2]
+  a[3] = -b[3]
   return a
 end
 
 -- a:scale(number b, tuple3 c)
 -- a:scale(number b)
 function class.scale(a, b, c)
-  if c then
-    a[1] = b * c[1]
-    a[2] = b * c[2]
-    a[3] = b * c[3]
-  else
-    a[1] = b * a[1]
-    a[2] = b * a[2]
-    a[3] = b * a[3]
+  if not c then
+    c = a
   end
+  a[1] = b * c[1]
+  a[2] = b * c[2]
+  a[3] = b * c[3]
   return a
 end
 
 -- a:scale_add(number b, tuple3 c, tuple3 d)
 -- a:scale_add(number b, tuple3 c)
 function class.scale_add(a, b, c, d)
-  if d then
-    a[1] = b * c[1] + d[1]
-    a[2] = b * c[2] + d[2]
-    a[3] = b * c[3] + d[3]
-  else
-    a[1] = b * a[1] + c[1]
-    a[2] = b * a[2] + c[2]
-    a[3] = b * a[3] + c[3]
+  if not d then
+    d = c
+    c = a
   end
+  a[1] = b * c[1] + d[1]
+  a[2] = b * c[2] + d[2]
+  a[3] = b * c[3] + d[3]
   return a
 end
 
@@ -236,17 +226,15 @@ end
 -- a:interpolate(tuple3 b, tuple3 c, number d)
 -- a:interpolate(tuple3 b, number d)
 function class.interpolate(a, b, c, d)
-  if d then
-    local beta = 1 - d
-    a[1] = beta * b[1] + d * c[1]
-    a[2] = beta * b[2] + d * c[2]
-    a[3] = beta * b[3] + d * c[3]
-  else
-    local beta = 1 - c
-    a[1] = beta * a[1] + c * b[1]
-    a[2] = beta * a[2] + c * b[2]
-    a[3] = beta * a[3] + c * b[3]
+  if not d then
+    d = c
+    c = b
+    b = a
   end
+  local beta = 1 - d
+  a[1] = beta * b[1] + d * c[1]
+  a[2] = beta * b[2] + d * c[2]
+  a[3] = beta * b[3] + d * c[3]
   return a
 end
 
