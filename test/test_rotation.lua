@@ -17,6 +17,7 @@
 
 local axis_angle4 = require "dromozoa.vecmath.axis_angle4"
 local matrix3 = require "dromozoa.vecmath.matrix3"
+local matrix4 = require "dromozoa.vecmath.matrix4"
 local quat4 = require "dromozoa.vecmath.quat4"
 
 local verbose = os.getenv "VERBOSE" == "1"
@@ -26,18 +27,22 @@ local function check1(data)
   local q = quat4(data.quat4)
   local a = axis_angle4(data.axis_angle4)
   local m3 = matrix3(data.matrix3)
+  local m4 = matrix4(data.matrix4)
 
   if verbose then
     print "=="
     print("q", tostring(q))
     print("a", tostring(a))
     print("m3", tostring(m3))
+    print("m4", tostring(m4))
     print "--"
     print(tostring(axis_angle4(q)))
     print(tostring(axis_angle4(m3)))
+    print(tostring(axis_angle4(m4)))
   end
   assert(axis_angle4(q):equals(a))
   assert(axis_angle4(m3):epsilon_equals(a, epsilon))
+  assert(axis_angle4(m4):epsilon_equals(a, epsilon))
 
   local q = quat4(data.quat4)
   local a = axis_angle4(data.axis_angle4)
@@ -50,12 +55,15 @@ local function check1(data)
     print("q", tostring(q))
     print("a", tostring(a))
     print("m3", tostring(m3))
+    print("m4", tostring(m4))
     print "--"
     print(tostring(quat4(a)))
     print(tostring(quat4(m3)))
+    print(tostring(quat4(m4)))
   end
   assert(quat4(a):epsilon_equals(q, epsilon))
   assert(quat4(m3):equals(q))
+  assert(quat4(m4):equals(q))
 
   local q = quat4(data.quat4)
   local a = axis_angle4(data.axis_angle4)
@@ -90,6 +98,19 @@ local function check2(data)
   end
 end
 
+local function check3(data)
+  for i = 1, #data.m do
+    local m = matrix3(data.m[i])
+    local q = quat4(data.q[i])
+    if verbose then
+      print(tostring(q))
+      print(tostring(quat4(m)))
+    end
+    assert(quat4(m):epsilon_equals(data.q[i], epsilon))
+  end
+end
+
 local data = assert(loadfile "test/rotation.lua")()
 check1(data[1])
 check2(data[2])
+check3(data[3])

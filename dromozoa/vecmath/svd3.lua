@@ -152,13 +152,13 @@ return function (a, b, c)
     end
   end
 
-  local s1 = a[1]
-  local s2 = a[5]
-  local s3 = a[9]
+  local sx = a[1]
+  local sy = a[5]
+  local sz = a[9]
 
-  if s1 < 0 then
-    s1 = -s1
-    a[1] = s1
+  if sx < 0 then
+    sx = -sx
+    a[1] = sx
     a[4] = -a[4]
     a[7] = -a[7]
     if c then
@@ -168,10 +168,10 @@ return function (a, b, c)
     end
   end
 
-  if s2 < 0 then
-    s2 = -s2
+  if sy < 0 then
+    sy = -sy
     a[2] = -a[2]
-    a[5] = s2
+    a[5] = sy
     a[8] = -a[8]
     if c then
       c[2] = -c[2]
@@ -180,11 +180,11 @@ return function (a, b, c)
     end
   end
 
-  if s3 < 0 then
-    s3 = -s3
+  if sz < 0 then
+    sz = -sz
     a[3] = -a[3]
     a[6] = -a[6]
-    a[9] = s3
+    a[9] = sz
     if c then
       c[3] = -c[3]
       c[6] = -c[6]
@@ -192,17 +192,93 @@ return function (a, b, c)
     end
   end
 
-  if s1 > s2 then
-    if s1 > s3 then
-      return s1
+  if sx > sy then
+    if sx > sz then
+      if sy > sz then
+        return sx, sy, sz
+      else
+        a[5] = sz
+        a[9] = sy
+        a[2], a[3], a[4], a[6], a[7], a[8] = -a[3], a[2], -a[7], -a[8], a[4], -a[6]
+        if b then
+          b[2], b[3] = -b[3], b[2]
+          b[5], b[6] = -b[6], b[5]
+          b[8], b[9] = -b[9], b[8]
+        end
+        if c then
+          c[2], c[3] = -c[3], c[2]
+          c[5], c[6] = -c[6], c[5]
+          c[8], c[9] = -c[9], c[8]
+        end
+        return sx, sz, sy
+      end
     else
-      return s3
+      a[1] = sz
+      a[5] = sx
+      a[9] = sy
+      a[2], a[3], a[4], a[6], a[7], a[8] = a[7], -a[8], a[3], -a[2], -a[6], -a[4]
+      if b then
+        b[1], b[2], b[3] = -b[3], -b[1], b[2]
+        b[4], b[5], b[6] = -b[6], -b[4], b[5]
+        b[7], b[8], b[9] = -b[9], -b[7], b[8]
+      end
+      if c then
+        c[1], c[2], c[3] = -c[3], -c[1], c[2]
+        c[4], c[5], c[6] = -c[6], -c[4], c[5]
+        c[7], c[8], c[9] = -c[9], -c[7], c[8]
+      end
+      return sz, sx, sy
     end
   else
-    if s2 > s3 then
-      return s2
+    if sy > sz then
+      if sx > sz then
+        a[1] = sy
+        a[5] = sx
+        a[2], a[3], a[4], a[6], a[7], a[8] = -a[4], -a[6], -a[2], a[3], -a[8], a[7]
+        if b then
+          b[1], b[2] = -b[2], b[1]
+          b[4], b[5] = -b[5], b[4]
+          b[7], b[8] = -b[8], b[7]
+        end
+        if c then
+          c[1], c[2] = -c[2], c[1]
+          c[4], c[5] = -c[5], c[4]
+          c[7], c[8] = -c[8], c[7]
+        end
+        return sy, sx, sz
+      else
+        a[1] = sy
+        a[5] = sz
+        a[9] = sx
+        a[2], a[3], a[4], a[6], a[7], a[8] = a[6], -a[4], a[8], -a[7], -a[2], -a[3]
+        if b then
+          b[1], b[2], b[3] = -b[2], -b[3], b[1]
+          b[4], b[5], b[6] = -b[5], -b[6], b[4]
+          b[7], b[8], b[9] = -b[8], -b[9], b[7]
+        end
+        if c then
+          c[1], c[2], c[3] = -c[2], -c[3], c[1]
+          c[4], c[5], c[6] = -c[5], -c[6], c[4]
+          c[7], c[8], c[9] = -c[8], -c[9], c[7]
+        end
+        return sy, sz, sx
+      end
     else
-      return s3
+      a[1] = sz
+      a[9] = sx
+      a[2], a[3], a[4], a[6], a[7], a[8] = -a[8], -a[7], -a[6], a[4], -a[3], a[2]
+      if b then
+        b[1], b[3] = -b[3], b[1]
+        b[4], b[6] = -b[6], b[4]
+        b[7], b[9] = -b[9], b[7]
+      end
+      if c then
+        c[1], c[3] = -c[3], c[1]
+        c[4], c[6] = -c[6], c[4]
+        c[7], c[9] = -c[9], c[7]
+      end
+      return sz, sy, sx
     end
   end
+  return sz
 end

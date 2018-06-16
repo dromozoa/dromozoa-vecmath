@@ -44,6 +44,7 @@ table td.subclass {
   <li><a href="https://web.stanford.edu/class/cme335/lecture7.pdf">CME 335 - Advanced Topics in Numerical Linear Algebra - Lecture 7</a></li>
   <li><a href="http://nalab.mind.meiji.ac.jp/~mk/labo/text/eigenvalues-add.pdf">固有値問題ノートの補足</a></li>
   <li><a href="ftp://ftp.cis.upenn.edu/pub/graphics/shoemake/quatut.ps.Z">Quaternions</a></li>
+  <li><a href="https://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix">inverting a 4x4 matrix</a></li>
 </ul>
 
 <h2>型階層</h2>
@@ -150,25 +151,24 @@ table td.subclass {
 <h3>固有値と特異値の関係</h3>
 
 <p>
-行列\(m\)が与えられたとき、\(M = m m^*\)を固有値分解してユニタリ行列\(U\)と固有値行列\(S\)を得る。
+行列\(m\)が与えられたとき、\(M = m m^*\)を固有値分解するとユニタリ行列\(U\)と固有値行列\(S\)が得られる。
 \[
   (U, S) = \mathrm{eig}(M)
 \]
 \(m\)を特異値分解する。
-\[\begin{eqnarray}
-  m   &amp;=&amp; u s v^* \\
-  u   &amp;=&amp; U \\
-  s   &amp;=&amp; \sqrt{S} \\
-  v^* &amp;=&amp; s^{-1} U^* m
-\end{eqnarray}\]
-\(3 \times 3\)行列の正規化を実装するために、回転成分\(u v^*\)を計算したい。
+\begin{align}
+  m   &amp;= u s v^* \\
+  u   &amp;= U \\
+  s   &amp;= \sqrt{S} \\
+  v^* &amp;= s^{-1} U^* m
+\end{align}
+\(3 \times 3\)行列の正規化を実装するために回転成分\(u v^*\)を計算したい。
 回転成分\(u v^*\)は
 \[
   u v^* = U s^{-1} U^* m
 \]
 で表される。
-ランクが1または2である場合、0除算が発生するので別の計算式を使う必要がある。
-そこでTwo-Sieded Jacovi SVDと呼ばれる手法を用いる。
+ランクが1または2である場合、ゼロ除算が発生するので別の計算式を使う必要がある。
 </p>
 
 <h3>ヤコビ法による固有値分解</h3>
@@ -199,7 +199,23 @@ table td.subclass {
 <h3>ヤコビ法による特異値分解</h3>
 
 <p>
-適当な\(p, q\)を選び、収束計算を行う。
+適当な\(p, q\)を選び、\(\phi\)回転して対称行列にする。
+\[
+  \begin{pmatrix}
+    n_{pp} &amp; n_{pq} \\
+    n_{pq} &amp; n_{qq}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    m_{pp} &amp; m_{pq} \\
+    m_{qp} &amp; m_{qp}
+  \end{pmatrix}
+  \begin{pmatrix}
+     \cos\phi &amp; \sin\phi \\
+    -\sin\phi &amp; \cos\phi
+  \end{pmatrix}
+\]
+固有値分解と同様に収束計算を行う。
 \[
   \begin{pmatrix}
     \cos\theta &amp; -\sin\theta \\
@@ -223,28 +239,12 @@ table td.subclass {
       0 &amp; s_q
   \end{pmatrix}
 \]
-ヤコビ法の制約を満たすために\(\phi\)で回転して対称行列にする。
-\[
-  \begin{pmatrix}
-    m_{pp} &amp; m_{pq} \\
-    m_{qp} &amp; m_{qp}
-  \end{pmatrix}
-  \begin{pmatrix}
-     \cos\phi &amp; \sin\phi \\
-    -\sin\phi &amp; \cos\phi
-  \end{pmatrix}
-  =
-  \begin{pmatrix}
-    n_{pp} &amp; n_{pq} \\
-    n_{pq} &amp; n_{qq}
-  \end{pmatrix}
-\]
 </p>
 
 <h4>収束計算</h4>
 
 <p>
-ギブンス変換\(G\)を用いると\(n\)回めまでの計算は
+<a href="https://en.wikipedia.org/wiki/Givens_rotation">ギブンス変換</a>\(G\)を用いて\(n\)回めまでの計算を記述すると
 \[
   (G_{\theta_n}^T \dots G_{\theta_1}^T)
   m
@@ -252,47 +252,159 @@ table td.subclass {
   = s_n
 \]
 \(s_n\)の非対角成分の2乗和が閾値を下まわったら収束したと見なす。
-特異値が負に収束した場合を考慮して
-\[\begin{eqnarray}
-  m &amp;=&amp;
-  (G_{\theta_1} \dots G_{\theta_n})
-  s
-  (J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T) \\
-  s_n &amp;=&amp; \begin{pmatrix}
+\[
+  s_n = \begin{pmatrix}
     s_x &amp; 0   &amp; 0 \\
     0   &amp; s_y &amp; 0 \\
     0   &amp; 0   &amp; s_z
-  \end{pmatrix} \\
-  s &amp;=&amp; \begin{pmatrix}
+  \end{pmatrix}
+\]
+特異値が負に収束した場合を考慮して\(J\)を導入する。
+\begin{align}
+  s_n J &amp;= \begin{pmatrix}
     |s_x| &amp; 0     &amp; 0 \\
     0     &amp; |s_y| &amp; 0 \\
     0     &amp; 0     &amp; |s_z|
   \end{pmatrix} \\
-  J &amp;=&amp; \begin{pmatrix}
-    \mathrm{sign}(s_x) &amp; 0                  &amp; 0 \\
-    0                  &amp; \mathrm{sign}(s_y) &amp; 0 \\
-    0                  &amp; 0                  &amp; \mathrm{sign}(s_z)
+  J &amp;= \begin{pmatrix}
+    \mathrm{sign}(s_x) &amp;
+    0 &amp;
+    0 \\
+    0 &amp;
+    \mathrm{sign}(s_y) &amp;
+    0 \\
+    0 &amp;
+    0 &amp; \mathrm{sign}(s_z)
   \end{pmatrix} \\
-  \mathrm{sign}(x) &amp;=&amp; \begin{cases}
-    1 &amp; (x \ge 0) \\
+  \mathrm{sign}(x) &amp;= \begin{cases}
+     1 &amp; (x \ge 0) \\
     -1 &amp; (x \lt 0)
   \end{cases}
-\end{eqnarray}\]
+\end{align}
+特異値を降順に並べるために\(K\)を導入する。
+これはヤコビ法で90度回転を0〜2回適用する処理に等しい。
+\begin{align}
+  s &amp;= K^T s_n J K \\
+  K &amp;= \begin{cases}
+    I             &amp; (|s_x| \ge |s_y| \ge |s_z|) \\
+    G_{23}        &amp; (|s_x| \ge |s_z| \ge |s_y|) \\
+    G_{13} G_{23} &amp; (|s_z| \ge |s_x| \ge |s_y|) \\
+    G_{12}        &amp; (|s_y| \ge |s_x| \ge |s_z|) \\
+    G_{12} G_{23} &amp; (|s_y| \ge |s_z| \ge |s_x|) \\
+    G_{13}        &amp; (|s_z| \ge |s_y| \ge |s_x|)
+  \end{cases} \\
+  G_{12} &amp;= \begin{pmatrix}
+     0 &amp; 1 &amp; 0 \\
+    -1 &amp; 0 &amp; 0 \\
+     0 &amp; 0 &amp; 1
+  \end{pmatrix} \\
+  G_{13} &amp;= \begin{pmatrix}
+     0 &amp; 0 &amp; 1 \\
+     0 &amp; 1 &amp; 0 \\
+    -1 &amp; 0 &amp; 0
+  \end{pmatrix} \\
+  G_{23} &amp;= \begin{pmatrix}
+    1 &amp;  0 &amp; 0 \\
+    0 &amp;  0 &amp; 1 \\
+    0 &amp; -1 &amp; 0
+  \end{pmatrix}
+\end{align}
+\(K, J\)を用いて
+\begin{align}
+  s &amp;=
+  K^T (G_{\theta_n}^T \dots G_{\theta_1}^T)
+  m
+  (G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n}) J K
+  \\
+  m &amp;=
+  (G_{\theta_n} \dots G_{\theta_1}) K
+  s
+  K^T J (G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T)
+\end{align}
 \(u_n\)は
-\[\begin{eqnarray}
-  u_n     &amp;=&amp; G_{\theta_1} \dots G_{\theta_n} \\
-  u_0     &amp;=&amp; I \\
-  u_{i+1} &amp;=&amp; u_i G_{\theta_i} \\
-\end{eqnarray}\]
+\begin{align}
+  u &amp;= (G_{\theta_n} \dots G_{\theta_1}) K \\
+    &amp;= u_n' K \\
+  u_0' &amp;= I \\
+  u_{i+1}' &amp;= u_i G_{\theta_i} \\
+\end{align}
 \(v_n\)は
-\[\begin{eqnarray}
-  v_n^*    &amp;=&amp; J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T \\
-  v_n      &amp;=&amp; G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n} J \\
-           &amp;=&amp; v_n' J \\
-  v_0'     &amp;=&amp; I \\
-  v_{i+1}' &amp;=&amp; v_i' G_{\phi_i} G_{\theta_i}
-\end{eqnarray}\]
+\begin{align}
+  v_n^* &amp;= K^T J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T \\
+  v_n &amp;= G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n} J K \\
+      &amp;= v_n' J K \\
+  v_0' &amp;= I \\
+  v_{i+1}' &amp;= v_i' G_{\phi_i} G_{\theta_i}
+\end{align}
+回転成分\(u v^{*}\)だけが必要なのであれば\(K\)を考える必要はない。
 </p>
+
+<table>
+  <tr>
+    <th>大小関係</th>
+    <th>\(K\)</th>
+  </tr>
+  <tr>
+    <td>\(|s_x| \ge |s_y| \ge |s_z|\)</td>
+    <td>\[
+      \begin{pmatrix}
+        1 &amp; 0 &amp; 0 \\
+        0 &amp; 1 &amp; 0 \\
+        0 &amp; 0 &amp; 1
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_x| \ge |s_z| \ge |s_y|\)</td>
+    <td>\[
+      \begin{pmatrix}
+        1 &amp;  0 &amp; 0 \\
+        0 &amp;  0 &amp; 1 \\
+        0 &amp; -1 &amp; 0
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_z| \ge |s_x| \ge |s_y|\)</td>
+    <td>\[
+      \begin{pmatrix}
+         0 &amp; -1 &amp; 0 \\
+         0 &amp;  0 &amp; 1 \\
+        -1 &amp;  0 &amp; 0
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_y| \ge |s_x| \ge |s_z|\)</td>
+    <td>\[
+      \begin{pmatrix}
+         0 &amp; 1 &amp; 0 \\
+        -1 &amp; 0 &amp; 0 \\
+         0 &amp; 0 &amp; 1
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_y| \ge |s_z| \ge |s_x|\)</td>
+    <td>\[
+      \begin{pmatrix}
+         0 &amp;  0 &amp; 1 \\
+        -1 &amp;  0 &amp; 0 \\
+         0 &amp; -1 &amp; 0
+      \end{pmatrix}
+    \]</td>
+  </tr>
+  <tr>
+    <td>\(|s_z| \ge |s_y| \ge |s_x|\)</td>
+    <td>\[
+      \begin{pmatrix}
+         0 &amp; 0 &amp; 1 \\
+         0 &amp; 1 &amp; 0 \\
+        -1 &amp; 0 &amp; 0
+      \end{pmatrix}
+    \]</td>
+  </tr>
+</table>
 
 <h3>計算例</h3>
 
@@ -303,13 +415,13 @@ table td.subclass {
 <h4>\(\phi\)の計算</h4>
 
 <p>
-\[\begin{eqnarray}
+\begin{align}
   \begin{pmatrix}
     n_{pp} &amp; n_{pq} &amp; n_{pi} \\
     n_{pq} &amp; n_{qq} &amp; n_{qi} \\
     n_{ip} &amp; n_{iq} &amp; n_{ii}
   \end{pmatrix}
-  &amp;=&amp;
+  &amp;=
   \begin{pmatrix}
     m_{pp} &amp; m_{pq} &amp; m_{pi} \\
     m_{qp} &amp; m_{qq} &amp; m_{qi} \\
@@ -320,46 +432,50 @@ table td.subclass {
     -\sin\phi &amp; \cos\phi &amp; 0 \\
      0        &amp; 0        &amp; 1
   \end{pmatrix} \\
-  &amp;=&amp;
+  &amp;=
   \begin{pmatrix}
-    m_{pp} \cos\phi - m_{pq} \sin\phi &amp; m_{pq} \cos\phi + m_{pp} \sin\phi &amp; m_{pi} \\
-    m_{qp} \cos\phi - m_{qq} \sin\phi &amp; m_{qq} \cos\phi + m_{qp} \sin\phi &amp; m_{qi} \\
-    m_{ip} \cos\phi - m_{iq} \sin\phi &amp; m_{iq} \cos\phi + m_{ip} \sin\phi &amp; m_{ii}
+    m_{pp} \cos\phi - m_{pq} \sin\phi &amp;
+    m_{pq} \cos\phi + m_{pp} \sin\phi &amp;
+    m_{pi} \\
+    m_{qp} \cos\phi - m_{qq} \sin\phi &amp;
+    m_{qq} \cos\phi + m_{qp} \sin\phi &amp;
+    m_{qi} \\
+    m_{ip} \cos\phi - m_{iq} \sin\phi &amp;
+    m_{iq} \cos\phi + m_{ip} \sin\phi &amp;
+    m_{ii}
   \end{pmatrix}
-\end{eqnarray}\]
+\end{align}
 \(\phi\)は
 \[
   m_{pq} \cos\phi + m_{pp} \sin\phi = m_{qp} \cos\phi - m_{qq} \sin\phi
 \]
 を満たすので
-\[\begin{eqnarray}
-  (m_{qp} - m_{pq}) \cos\phi &amp;=&amp; (m_{pp} + m_{qq}) \sin\phi \\
-  \cot\phi &amp;=&amp; \frac{m_{pp} + m_{qq}}{m_{qp} - m_{pq}}
-\end{eqnarray}\]
-\(m_{qp} = m_{pq}\)の場合は回転する必要がない（\(\phi = 0\)）。
-また、
-\[\begin{eqnarray}
+\begin{align}
+  (m_{qp} - m_{pq}) \cos\phi &amp;= (m_{pp} + m_{qq}) \sin\phi \\
+  \cot\phi &amp;= \frac{m_{pp} + m_{qq}}{m_{qp} - m_{pq}}
+\end{align}
+\(m_{qp} = m_{pq}\)の場合は回転が不要である（\(\phi = 0\)）。
+\begin{align}
   \sin\phi
-  &amp;=&amp; \frac{1}{\sqrt{1 + \cot^2\phi}} \\
-  &amp;=&amp; \frac{m_{qp} - m_{pq}}{\sqrt{(m_{qp} - m_{pq})^2 + (m_{pp} + m_{qq})^2}} \\
+  &amp;= \frac{1}{\sqrt{1 + \cot^2\phi}} \\
+  &amp;= \frac{m_{qp} - m_{pq}}{\sqrt{(m_{qp} - m_{pq})^2 + (m_{pp} + m_{qq})^2}} \\
   \cos\phi
-  &amp;=&amp; \sin\phi \cot\phi \\
-  &amp;=&amp; \frac{m_{pp} + m_{qq}}{\sqrt{(m_{qp} - m_{pq})^2 + (m_{pp} + m_{qq})^2}}
-\end{eqnarray}\]
-実装では、後述のように三角関数の公式を用いる。
+  &amp;= \sin\phi \cot\phi \\
+  &amp;= \frac{m_{pp} + m_{qq}}{\sqrt{(m_{qp} - m_{pq})^2 + (m_{pp} + m_{qq})^2}}
+\end{align}
+後述のように三角関数の公式を用いて実装する。
 </p>
 
 <h4>\(\theta\)の計算</h4>
 
 <p>
-次に
-\[\begin{eqnarray}
+\[
   \begin{pmatrix}
     m_{pp}' &amp; 0       &amp; m_{pi}' \\
     0       &amp; m_{qq}' &amp; m_{qi}' \\
     m_{ip}' &amp; m_{iq}' &amp; m_{ii}
   \end{pmatrix}
-  &amp;=&amp;
+  =
   \begin{pmatrix}
     \cos\theta &amp; -\sin\theta &amp; 0 \\
     \sin\theta &amp;  \cos\theta &amp; 0 \\
@@ -374,61 +490,48 @@ table td.subclass {
      \cos\theta &amp; \sin\theta &amp; 0 \\
     -\sin\theta &amp; \cos\theta &amp; 0 \\
      0          &amp; 0          &amp; 1
-  \end{pmatrix} \\
-  &amp;=&amp;
-  \begin{pmatrix}
-    \cos\theta &amp; -\sin\theta &amp; 0 \\
-    \sin\theta &amp;  \cos\theta &amp; 0 \\
-    0          &amp;  0          &amp; 1
   \end{pmatrix}
-  \begin{pmatrix}
-    n_{pp} \cos\theta - n_{pq} \sin\theta &amp; n_{pq} \cos\theta + n_{pp} \sin\theta &amp; n_{pi} \\
-    n_{pq} \cos\theta - n_{qq} \sin\theta &amp; n_{qq} \cos\theta + n_{pq} \sin\theta &amp; n_{qi} \\
-    n_{ip} \cos\theta - n_{iq} \sin\theta &amp; n_{iq} \cos\theta + n_{ip} \sin\theta &amp; n_{ii}
-  \end{pmatrix} \\
-  &amp;=&amp;
-  \begin{pmatrix}
-    n_{pp} \cos^2\theta - 2 n_{pq} \cos\theta \sin\theta + n_{qq} \sin^2\theta &amp;
-    (n_{pp} - n_{qq}) \cos\theta \sin\theta + n_{pq} (\cos^2\theta - \sin^2\theta) &amp;
-    n_{pi} \cos\theta - n_{qi} \sin\theta \\
-    (n_{pp} - n_{qq}) \cos\theta \sin\theta + n_{pq} (\cos^2\theta - \sin^2\theta) &amp;
-    n_{pp} \sin^2\theta + 2 n_{pq} \cos\theta \sin\theta + n_{qq} \cos^2\theta &amp;
-    n_{qi} \cos\theta + n_{pi} \sin\theta \\
-    n_{ip} \cos\theta - n_{iq} \sin\theta &amp;
-    n_{iq} \cos\theta + n_{ip} \sin\theta &amp;
-    n_{ii}
-  \end{pmatrix}
-\end{eqnarray}\]
+\]
+を展開して
+\begin{align}
+  m_{pp}' &amp;= n_{pp} \cos^2\theta - 2 n_{pq} \cos\theta \sin\theta + n_{qq} \sin^2\theta \\
+  m_{qq}' &amp;= n_{pp} \sin^2\theta + 2 n_{pq} \cos\theta \sin\theta + n_{qq} \cos^2\theta \\
+  m_{pi}' &amp;= n_{pi} \cos\theta - n_{qi} \sin\theta \\
+  m_{qi}' &amp;= n_{qi} \cos\theta + n_{pi} \sin\theta \\
+  m_{ip}' &amp;= n_{ip} \cos\theta - n_{iq} \sin\theta \\
+  m_{iq}' &amp;= n_{iq} \cos\theta + n_{ip} \sin\theta \\
+  m_{ii}' &amp;= n_{ii}
+\end{align}
 \(\theta\)は
 \[
   (n_{pp} - n_{qq}) \cos\theta \sin\theta + n_{pq} (\cos^2\theta - \sin^2\theta) = 0
 \]
 を満たすので、倍角の公式を用いて
-\[\begin{eqnarray}
-  n_{pq} \cos 2\theta &amp;=&amp; \frac{n_{qq} - n_{pp}}{2} \sin 2\theta \\
-  \cot 2\theta &amp;=&amp; \frac{n_{qq} - n_{pp}}{2 n_{pq}}
-\end{eqnarray}\]
+\begin{align}
+  n_{pq} \cos 2\theta &amp;= \frac{n_{qq} - n_{pp}}{2} \sin 2\theta \\
+         \cot 2\theta &amp;= \frac{n_{qq} - n_{pp}}{2 n_{pq}}
+\end{align}
 </p>
 
 <h4>三角関数の公式</h4>
 
 <p>
 RutishauserはThe Jacobi Method for Real Symmetric Matricesで
-\[\begin{eqnarray}
-  \tan\theta &amp;=&amp; \frac{\mathrm{sign}(\cot 2\theta)}{|\cot 2\theta| + \sqrt{1 + \cot^2 2\theta}} \\
-  \cos\theta &amp;=&amp; \frac{1}{\sqrt{1 + tan^2 \theta}} \\
-  \sin\theta &amp;=&amp; \cos\theta \tan\theta \\
-  \tan\frac{\theta}{2} &amp;=&amp; \frac{\sin\theta}{1 + \cos\theta} \\
-  a \cos\theta - b \sin\theta &amp;=&amp; a - (b + a \tan\frac{\theta}{2}) \sin\theta \\
-  a \cos\theta + b \sin\theta &amp;=&amp; a + (b - a \tan\frac{\theta}{2}) \sin\theta
-\end{eqnarray}\]
+\begin{align}
+  \tan\theta &amp;= \frac{\mathrm{sign}(\cot 2\theta)}{|\cot 2\theta| + \sqrt{1 + \cot^2 2\theta}} \\
+  \cos\theta &amp;= \frac{1}{\sqrt{1 + tan^2 \theta}} \\
+  \sin\theta &amp;= \cos\theta \tan\theta \\
+  \tan\frac{\theta}{2} &amp;= \frac{\sin\theta}{1 + \cos\theta} \\
+  a \cos\theta - b \sin\theta &amp;= a - (b + a \tan\frac{\theta}{2}) \sin\theta \\
+  a \cos\theta + b \sin\theta &amp;= a + (b - a \tan\frac{\theta}{2}) \sin\theta
+\end{align}
 を用いて
-\[\begin{eqnarray}
-  m_{pp}' &amp;=&amp; n_{pp} - n_{pq} \tan\theta \\
-  m_{qq}' &amp;=&amp; n_{qq} + n_{pq} \tan\theta \\
-  m_{pi}' &amp;=&amp; n_{pi} - (n_{qi} +  n_{pi} \tan\frac{\theta}{2}) \sin\theta \\
-  m_{qi}' &amp;=&amp; n_{qi} + (n_{pi} -  n_{qi} \tan\frac{\theta}{2}) \sin\theta
-\end{eqnarray}\]
+\begin{align}
+  m_{pp}' &amp;= n_{pp} - n_{pq} \tan\theta \\
+  m_{qq}' &amp;= n_{qq} + n_{pq} \tan\theta \\
+  m_{pi}' &amp;= n_{pi} - (n_{qi} +  n_{pi} \tan\frac{\theta}{2}) \sin\theta \\
+  m_{qi}' &amp;= n_{qi} + (n_{pi} -  n_{qi} \tan\frac{\theta}{2}) \sin\theta
+\end{align}
 を与えている。
 固有値分解では\(m_{pi}' = m_{ip}', m_{qi}' = m_{iq}'\)なので計算を省略できるが、特異値分解では計算する必要がある。
 </p>
@@ -436,13 +539,13 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 <h4>回転成分</h4>
 
 <p>
-\[\begin{eqnarray}
+\begin{align}
   \begin{pmatrix}
     u_{11}' &amp; u_{12}' &amp; u_{13}' \\
     u_{21}' &amp; u_{22}' &amp; u_{23}' \\
     u_{31}' &amp; u_{32}' &amp; u_{33}'
   \end{pmatrix}
-  &amp;=&amp;
+  &amp;=
   \begin{pmatrix}
     u_{11} &amp; u_{12} &amp; u_{13} \\
     u_{21} &amp; u_{22} &amp; u_{23} \\
@@ -458,7 +561,7 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
     v_{21}' &amp; v_{22}' &amp; v_{23}' \\
     v_{31}' &amp; v_{32}' &amp; v_{33}'
   \end{pmatrix}
-  &amp;=&amp;
+  &amp;=
   \begin{pmatrix}
     v_{11} &amp; v_{12} &amp; v_{13} \\
     v_{21} &amp; v_{22} &amp; v_{23} \\
@@ -474,7 +577,8 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
     -\sin\theta &amp; \cos\theta &amp; 0 \\
      0          &amp; 0          &amp; 1
   \end{pmatrix} \\
-\end{eqnarray}\]
+\end{align}
+ここでも三角関数の公式を用いて実装する。
 </p>
 
 <h3>\(p, q, i\)に対応するインデックス</h3>
@@ -512,29 +616,27 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 
 <p>
 第1列と第2列を正規化したうえで、外積を計算する。
-\[\begin{eqnarray}
-  A &amp;=&amp; \begin{pmatrix}
+\begin{align}
+  A &amp;= \begin{pmatrix}
     a_{11} &amp; a_{12} &amp; a_{13} \\
     a_{21} &amp; a_{22} &amp; a_{23} \\
     a_{31} &amp; a_{32} &amp; a_{33}
   \end{pmatrix} \\
-  A_1,
-  A_2
-  &amp;=&amp;
+  A_1, A_2 &amp;=
   \begin{pmatrix} a_{11} \\  a_{21} \\ a_{31} \end{pmatrix},
   \begin{pmatrix} a_{12} \\  a_{22} \\ a_{32} \end{pmatrix} \\
   B
-  &amp;=&amp; \begin{pmatrix}
+  &amp;= \begin{pmatrix}
     \frac{A_1}{\|A_1\|} &amp;
     \frac{A_2}{\|A_2\|} &amp;
     \frac{A_1}{\|A_1\|} \times \frac{A_2}{\|A_2\|}
   \end{pmatrix} \\
-  &amp;=&amp; \begin{pmatrix}
+  &amp;= \begin{pmatrix}
     \frac{a_{11}}{\|A_1\|} &amp; \frac{a_{12}}{\|A_2\|} &amp; \frac{a_{21} a_{32} - a_{22} a_{31}}{\|A_1\| \|A_2\|} \\
     \frac{a_{21}}{\|A_1\|} &amp; \frac{a_{22}}{\|A_2\|} &amp; \frac{a_{31} a_{12} - a_{32} a_{11}}{\|A_1\| \|A_2\|} \\
     \frac{a_{31}}{\|A_1\|} &amp; \frac{a_{32}}{\|A_2\|} &amp; \frac{a_{11} a_{22} - a_{12} a_{21}}{\|A_1\| \|A_2\|}
   \end{pmatrix}
-\end{eqnarray}\]
+\end{align}
 </p>
 
 <h3>平鍋の実装</h3>
@@ -553,21 +655,21 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
   \cos\theta = \frac{a \cdot b}{\|a\|\|b\|}
 \]
 2次元と3次元では外積を用いて
-\[\begin{eqnarray}
-  \sin\theta &amp;=&amp; \frac{\|a \times b\|}{\|a\|\|b\|} \\
-  \tan\theta &amp;=&amp; \frac{\|a \times b\|}{a \cdot b}
-\end{eqnarray}\]
+\begin{align}
+  \sin\theta &amp;= \frac{\|a \times b\|}{\|a\|\|b\|} \\
+  \tan\theta &amp;= \frac{\|a \times b\|}{a \cdot b}
+\end{align}
 2次元では
-\[\begin{eqnarray}
-  a &amp;=&amp; (a_x, a_y, 0) \\
-  b &amp;=&amp; (b_x, b_y, 0) \\
-  a \times b &amp;=&amp; (0, 0, a_x b_y - a_y b_x)
-\end{eqnarray}\]
+\begin{align}
+  a &amp;= (a_x, a_y, 0) \\
+  b &amp;= (b_x, b_y, 0) \\
+  a \times b &amp;= (0, 0, a_x b_y - a_y b_x)
+\end{align}
 なので
-\[\begin{eqnarray}
-  \|a \times b\| &amp;=&amp; a_x b_y - a_y b_x \\
-  a \cdot b &amp;=&amp; a_x b_x + a_y b_y
-\end{eqnarray}\]
+\begin{align}
+  \|a \times b\| &amp;= a_x b_y - a_y b_x \\
+  a \cdot b &amp;= a_x b_x + a_y b_y
+\end{align}
 </p>
 
 <h2>回転</h2>
@@ -604,19 +706,19 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
   2 \cos\theta = m_{11} + m_{22} + m_{33} - 1
 \]
 非対角成分に注目すると
-\[\begin{eqnarray}
-  m_{32} - m_{23} &amp;=&amp; 2 x \sin\theta \\
-  m_{13} - m_{31} &amp;=&amp; 2 y \sin\theta \\
-  m_{21} - m_{12} &amp;=&amp; 2 z \sin\theta
-\end{eqnarray}\]
+\begin{align}
+  m_{32} - m_{23} &amp;= 2 x \sin\theta \\
+  m_{13} - m_{31} &amp;= 2 y \sin\theta \\
+  m_{21} - m_{12} &amp;= 2 z \sin\theta
+\end{align}
 なので
-\[\begin{eqnarray}
-  x &amp;=&amp; \frac{m_{32} - m_{23}}{2 \sin\theta} \\
-  y &amp;=&amp; \frac{m_{13} - m_{31}}{2 \sin\theta} \\
-  z &amp;=&amp; \frac{m_{21} - m_{12}}{2 \sin\theta} \\
-  2 \sin\theta &amp;=&amp; \sqrt{(m_{32} - m_{23})^2 + (m_{13} - m_{31})^2 + (m_{21} - m_{12})^2} \\
-  \tan\theta &amp;=&amp; \frac{\sqrt{(m_{32} - m_{23})^2 + (m_{13} - m_{31})^2 + (m_{21} - m_{12})^2}}{m_{11} + m_{22} + m_{33} - 1}
-\end{eqnarray}\]
+\begin{align}
+  x &amp;= \frac{m_{32} - m_{23}}{2 \sin\theta} \\
+  y &amp;= \frac{m_{13} - m_{31}}{2 \sin\theta} \\
+  z &amp;= \frac{m_{21} - m_{12}}{2 \sin\theta} \\
+  2 \sin\theta &amp;= \sqrt{(m_{32} - m_{23})^2 + (m_{13} - m_{31})^2 + (m_{21} - m_{12})^2} \\
+  \tan\theta &amp;= \frac{\sqrt{(m_{32} - m_{23})^2 + (m_{13} - m_{31})^2 + (m_{21} - m_{12})^2}}{m_{11} + m_{22} + m_{33} - 1}
+\end{align}
 </p>
 
 <h3>matrix3 / quat4</h3>
@@ -637,28 +739,28 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
   \end{pmatrix}
 \]
 対角成分に注目すると
-\[\begin{eqnarray}
-  m_{11} + m_{22} + m_{33} &amp;=&amp; 4 w^2 - 1 \\
-  m_{11} - m_{22} - m_{33} &amp;=&amp; 4 x^2 - 1 \\
-  m_{22} - m_{33} - m_{11} &amp;=&amp; 4 y^2 - 1 \\
-  m_{33} - m_{11} - m_{22} &amp;=&amp; 4 z^2 - 1
-\end{eqnarray}\]
+\begin{align}
+  m_{11} + m_{22} + m_{33} &amp;= 4 w^2 - 1 \\
+  m_{11} - m_{22} - m_{33} &amp;= 4 x^2 - 1 \\
+  m_{22} - m_{33} - m_{11} &amp;= 4 y^2 - 1 \\
+  m_{33} - m_{11} - m_{22} &amp;= 4 z^2 - 1
+\end{align}
 なので
-\[\begin{eqnarray}
-  w &amp;=&amp; \frac{\sqrt{m_{11} + m_{22} + m_{33} + 1}}{2} \\
-  x &amp;=&amp; \frac{\sqrt{m_{11} - m_{22} - m_{33} + 1}}{2} \\
-  y &amp;=&amp; \frac{\sqrt{m_{22} - m_{33} - m_{11} + 1}}{2} \\
-  z &amp;=&amp; \frac{\sqrt{m_{33} - m_{11} - m_{22} + 1}}{2}
-\end{eqnarray}\]
+\begin{align}
+  w &amp;= \frac{\sqrt{m_{11} + m_{22} + m_{33} + 1}}{2} \\
+  x &amp;= \frac{\sqrt{m_{11} - m_{22} - m_{33} + 1}}{2} \\
+  y &amp;= \frac{\sqrt{m_{22} - m_{33} - m_{11} + 1}}{2} \\
+  z &amp;= \frac{\sqrt{m_{33} - m_{11} - m_{22} + 1}}{2}
+\end{align}
 非対角成分に注目すると
-\[\begin{eqnarray}
-  m_{21} + m_{12} &amp;=&amp; 4 xy \\
-  m_{32} + m_{23} &amp;=&amp; 4 yz \\
-  m_{13} + m_{31} &amp;=&amp; 4 zx \\
-  m_{32} - m_{23} &amp;=&amp; 4 wx \\
-  m_{13} - m_{31} &amp;=&amp; 4 wy \\
-  m_{21} - m_{12} &amp;=&amp; 4 wz
-\end{eqnarray}\]
+\begin{align}
+  m_{21} + m_{12} &amp;= 4 xy \\
+  m_{32} + m_{23} &amp;= 4 yz \\
+  m_{13} + m_{31} &amp;= 4 zx \\
+  m_{32} - m_{23} &amp;= 4 wx \\
+  m_{13} - m_{31} &amp;= 4 wy \\
+  m_{21} - m_{12} &amp;= 4 wz
+\end{align}
 なので、\(x, y, z, w\)のどれかを定めれば残りが定まる。
 Shoemakeのチュートリアルでは\(m_{11} + m_{22} + m_{33} \ge 0\)ならば\(w\)から決定している。さもなければ、\(m_{11}, m_{22}, m_{33}\)のなかで\(m_{11}\)が最大ならば\(x\)から、\(m_{22}\)が最大ならば\(y\)から、\(m_{33}\)が最大ならば\(z\)から決定する。
 </p>
@@ -683,11 +785,11 @@ Shoemakeのチュートリアルでは\(m_{11} + m_{22} + m_{33} \ge 0\)なら�
   \end{pmatrix}
 \]
 なので
-\[\begin{eqnarray}
-  \sin\frac{\theta}{2} &amp;=&amp; \sqrt{q_x^2 + q_y^2 + q_z^2} \\
-  \cos\frac{\theta}{2} &amp;=&amp; q_w \\
-  \tan\frac{\theta}{2} &amp;=&amp; \frac{\sqrt{q_x^2 + q_y^2 + q_z^2}}{q_w}
-\end{eqnarray}\]
+\begin{align}
+  \sin\frac{\theta}{2} &amp;= \sqrt{q_x^2 + q_y^2 + q_z^2} \\
+  \cos\frac{\theta}{2} &amp;= q_w \\
+  \tan\frac{\theta}{2} &amp;= \frac{\sqrt{q_x^2 + q_y^2 + q_z^2}}{q_w}
+\end{align}
 </p>
 
 <h3>Spherical Linear Interpolation</h3>
@@ -706,6 +808,72 @@ Shoemakeのチュートリアルでは\(m_{11} + m_{22} + m_{33} \ge 0\)なら�
 \(q_1 \cdot q_2 \lt 0\)ならば\(q_1\)または\(q_2\)の符号を反転して最小距離で補間する（Sunの実装は\(q_1\)の符号を反転する）。
 </p>
 
+<h2>\(4 \times 4\)行列</h2>
+
+<p>
+\[
+  m = \begin{pmatrix}
+    m_{11} &amp; m_{12} &amp; m_{13} &amp; m_{14} \\
+    m_{21} &amp; m_{22} &amp; m_{23} &amp; m_{24} \\
+    m_{31} &amp; m_{32} &amp; m_{33} &amp; m_{34} \\
+    m_{41} &amp; m_{42} &amp; m_{43} &amp; m_{44}
+  \end{pmatrix}
+\]
+</p>
+
+<h3>逆行列</h3>
+
+<p>
+\[
+  m^{-1}
+  =
+  \frac{1}{\mathrm{det}(m)}
+  \begin{pmatrix}
+    n_{11} &amp; n_{12} &amp; n_{13} &amp; n_{14} \\
+    n_{21} &amp; n_{22} &amp; n_{23} &amp; n_{24} \\
+    n_{31} &amp; n_{32} &amp; n_{33} &amp; n_{34} \\
+    n_{41} &amp; n_{42} &amp; n_{43} &amp; n_{44}
+  \end{pmatrix}
+\]
+\begin{align}
+  n_{11} &amp;= m_{22} (m_{33} m_{44} - m_{34} m_{43}) + m_{23} (m_{34} m_{42} - m_{32} m_{44}) + m_{24} (m_{32} m_{43} - m_{33} m_{42}) \\
+  n_{12} &amp;= m_{32} (m_{13} m_{44} - m_{14} m_{43}) + m_{33} (m_{14} m_{42} - m_{12} m_{44}) + m_{34} (m_{12} m_{43} - m_{13} m_{42}) \\
+  n_{13} &amp;= m_{42} (m_{13} m_{24} - m_{14} m_{23}) + m_{43} (m_{14} m_{22} - m_{12} m_{24}) + m_{44} (m_{12} m_{23} - m_{13} m_{22}) \\
+  n_{14} &amp;= m_{12} (m_{24} m_{33} - m_{23} m_{34}) + m_{13} (m_{22} m_{34} - m_{24} m_{32}) + m_{14} (m_{23} m_{32} - m_{22} m_{33}) \\
+  n_{21} &amp;= m_{23} (m_{31} m_{44} - m_{34} m_{41}) + m_{24} (m_{33} m_{41} - m_{31} m_{43}) + m_{21} (m_{34} m_{43} - m_{33} m_{44}) \\
+  n_{22} &amp;= m_{33} (m_{11} m_{44} - m_{14} m_{41}) + m_{34} (m_{13} m_{41} - m_{11} m_{43}) + m_{31} (m_{14} m_{43} - m_{13} m_{44}) \\
+  n_{23} &amp;= m_{43} (m_{11} m_{24} - m_{14} m_{21}) + m_{44} (m_{13} m_{21} - m_{11} m_{23}) + m_{41} (m_{14} m_{23} - m_{13} m_{24}) \\
+  n_{24} &amp;= m_{13} (m_{24} m_{31} - m_{21} m_{34}) + m_{14} (m_{21} m_{33} - m_{23} m_{31}) + m_{11} (m_{23} m_{34} - m_{24} m_{33}) \\
+  n_{31} &amp;= m_{24} (m_{31} m_{42} - m_{32} m_{41}) + m_{21} (m_{32} m_{44} - m_{34} m_{42}) + m_{22} (m_{34} m_{41} - m_{31} m_{44}) \\
+  n_{32} &amp;= m_{34} (m_{11} m_{42} - m_{12} m_{41}) + m_{31} (m_{12} m_{44} - m_{14} m_{42}) + m_{32} (m_{14} m_{41} - m_{11} m_{44}) \\
+  n_{33} &amp;= m_{44} (m_{11} m_{22} - m_{12} m_{21}) + m_{41} (m_{12} m_{24} - m_{14} m_{22}) + m_{42} (m_{14} m_{21} - m_{11} m_{24}) \\
+  n_{34} &amp;= m_{14} (m_{22} m_{31} - m_{21} m_{32}) + m_{11} (m_{24} m_{32} - m_{22} m_{34}) + m_{12} (m_{21} m_{34} - m_{24} m_{31}) \\
+  n_{41} &amp;= m_{21} (m_{33} m_{42} - m_{32} m_{43}) + m_{22} (m_{31} m_{43} - m_{33} m_{41}) + m_{23} (m_{32} m_{41} - m_{31} m_{42}) \\
+  n_{42} &amp;= m_{31} (m_{13} m_{42} - m_{12} m_{43}) + m_{32} (m_{11} m_{43} - m_{13} m_{41}) + m_{33} (m_{12} m_{41} - m_{11} m_{42}) \\
+  n_{43} &amp;= m_{41} (m_{13} m_{22} - m_{12} m_{23}) + m_{42} (m_{11} m_{23} - m_{13} m_{21}) + m_{43} (m_{12} m_{21} - m_{11} m_{22}) \\
+  n_{44} &amp;= m_{11} (m_{22} m_{33} - m_{23} m_{32}) + m_{12} (m_{23} m_{31} - m_{21} m_{33}) + m_{13} (m_{21} m_{32} - m_{22} m_{31})
+\end{align}
+</p>
+
+<h3>行列式</h3>
+
+<p>
+\begin{align}
+  \mathrm{det}(m)
+  &amp;=
+  m_{11} n_{11} + m_{21} n_{12} + m_{31} n_{13} + m_{41} n_{14} \\
+  &amp;=
+  \begin{split}
+      &amp; (m_{11} m_{22} - m_{12} m_{21}) (m_{33} m_{44} - m_{34} m_{43}) \\
+    - &amp; (m_{11} m_{23} - m_{13} m_{21}) (m_{32} m_{44} - m_{34} m_{42}) \\
+    + &amp; (m_{11} m_{24} - m_{14} m_{21}) (m_{32} m_{43} - m_{33} m_{42}) \\
+    + &amp; (m_{12} m_{23} - m_{13} m_{22}) (m_{31} m_{44} - m_{34} m_{41}) \\
+    - &amp; (m_{12} m_{24} - m_{14} m_{22}) (m_{31} m_{43} - m_{33} m_{41}) \\
+    + &amp; (m_{13} m_{24} - m_{14} m_{23}) (m_{31} m_{42} - m_{32} m_{41})
+  \end{split}
+\end{align}
+</p>
+
 </div>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -714,6 +882,6 @@ MathJax.Hub.Config({
   }
 });
 </script>
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML"></script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML"></script>
 </body>
 </html>

@@ -54,7 +54,7 @@ assert(s == [[
 0, 0, 1
 ]])
 
-local data = assert(loadfile "test/matrix3d.lua")()
+local data = assert(loadfile "test/matrix3.lua")()
 
 local m = matrix3()
 local v = vector3()
@@ -69,18 +69,13 @@ if verbose then
   print(tostring(v1))
 end
 
--- javax.vecmath bug
-local d = data.set_scale2
-d[1], d[2] = d[2], d[1]
-d[4], d[5] = d[5], d[4]
-d[7], d[8] = d[8], d[7]
 if verbose then
   print(tostring(m:set(m1):set_scale(2)))
-  print(tostring(matrix3(d)))
+  print(tostring(matrix3(data.set_scale2)))
 end
-assert(m:set(m1):set_scale(2):epsilon_equals(d, epsilon))
+assert(m:set(m1):set_scale(2):epsilon_equals(data.set_scale2, epsilon))
 
-assert(math.abs(m1:get_scale() - data.get_scale) < epsilon)
+assert(math.abs(m1:get_scale() - data.get_scale) <= epsilon)
 
 assert(m:add(2, m1):equals(data.add2))
 assert(m:add(2, m:set(m1)):equals(data.add2))
@@ -125,17 +120,12 @@ assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
 assert(m:mul_transpose_right(m1, m2):equals(data.mul_transpose_right))
 assert(m:mul_transpose_left(m1, m2):equals(data.mul_transpose_left))
 
--- javax.vecmath bug
-local d = data.normalize
-d[1], d[2] = d[2], d[1]
-d[4], d[5] = d[5], d[4]
-d[7], d[8] = d[8], d[7]
 if verbose then
   print(tostring(m:normalize(m1)))
-  print(tostring(matrix3(d)))
+  print(tostring(matrix3(data.normalize)))
 end
-assert(m:normalize(m1):epsilon_equals(d, epsilon))
-assert(m:set(m1):normalize():epsilon_equals(d, epsilon))
+assert(m:normalize(m1):epsilon_equals(data.normalize, epsilon))
+assert(m:set(m1):normalize():epsilon_equals(data.normalize, epsilon))
 
 if verbose then
   print(tostring(m:normalize_cp(m1)))

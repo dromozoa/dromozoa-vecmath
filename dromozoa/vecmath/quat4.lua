@@ -40,52 +40,45 @@ end
 
 local function set_matrix3(a, b)
   local b11 = b[1]
-  local b12 = b[2]
-  local b13 = b[3]
-  local b21 = b[4]
   local b22 = b[5]
-  local b23 = b[6]
-  local b31 = b[7]
-  local b32 = b[8]
   local b33 = b[9]
-
   local t = b11 + b22 + b33
   if t >= 0 then
     local w = sqrt(t + 1) * 0.5
     local d = w * 4
-    a[1] = (b32 - b23) / d
-    a[2] = (b13 - b31) / d
-    a[3] = (b21 - b12) / d
+    a[1] = (b[8] - b[6]) / d
+    a[2] = (b[3] - b[7]) / d
+    a[3] = (b[4] - b[2]) / d
     a[4] = w
     return a
   else
     if b11 > b22 then
       if b11 > b33 then
-        local x = sqrt(b11 - b22 - v33 + 1) * 0.5
+        local x = sqrt(b11 - b22 - b33 + 1) * 0.5
         local d = x * 4
         a[1] = x
-        a[2] = (b21 + b12) / d
-        a[3] = (b13 + b31) / d
-        a[4] = (b32 - b23) / d
+        a[2] = (b[4] + b[2]) / d
+        a[3] = (b[3] + b[7]) / d
+        a[4] = (b[8] - b[6]) / d
         return a
       end
     else
       if b22 > b33 then
         local y = sqrt(b22 - b33 - b11 + 1) * 0.5
         local d = y * 4
-        a[1] = (b21 + b12) / d
+        a[1] = (b[4] + b[2]) / d
         a[2] = y
-        a[3] = (b32 + b23) / d
-        a[4] = (b13 - b13) / d
+        a[3] = (b[8] + b[6]) / d
+        a[4] = (b[3] - b[7]) / d
         return a
       end
     end
     local z = sqrt(b33 - b11 - b22 + 1) * 0.5
     local d = z * 4
-    a[1] = (b13 + b31) / d
-    a[2] = (b32 + b23) / d
+    a[1] = (b[3] + b[7]) / d
+    a[2] = (b[8] + b[6]) / d
     a[3] = z
-    a[4] = (b21 - b12) / d
+    a[4] = (b[4] - b[2]) / d
     return a
   end
 end
@@ -135,7 +128,11 @@ local function interpolate(a, b, c, alpha)
 end
 
 local super = tuple4
-local class = { is_quat4 = true }
+local class = {
+  is_quat4 = true;
+  set_axis_angle4 = set_axis_angle4;
+  set_matrix3 = set_matrix3;
+}
 local metatable = { __tostring = super.to_string }
 
 -- a:set(number b, number c, number d, number e)
@@ -165,7 +162,8 @@ function class.set(a, b, c, d, e)
       elseif n == 9 then
         return set_matrix3(a, b)
       else
-        -- TODO impl set matrix4
+        local m = { b[1], b[2], b[3], b[5], b[6], b[7], b[9], b[10], b[11] }
+        return set_matrix3(a, m)
       end
     end
   else
@@ -205,9 +203,9 @@ function class.mul(a, b, c)
     local cy = c[2]
     local cz = c[3]
     local cw = c[4]
-    a[1] = bw * cx + bx * cw + by * cz - bz * cy
-    a[2] = bw * cy - bx * cz + by * cw + bz * cx
-    a[3] = bw * cz + bx * cy - by * cx + bz * cw
+    a[1] = bx * cw + bw * cx - bz * cy + by * cz
+    a[2] = by * cw + bz * cx + bw * cy - bx * cz
+    a[3] = bz * cw - by * cx + bx * cy + bw * cz
     a[4] = bw * cw - bx * cx - by * cy - bz * cz
   else
     local ax = a[1]
@@ -218,9 +216,9 @@ function class.mul(a, b, c)
     local by = b[2]
     local bz = b[3]
     local bw = b[4]
-    a[1] = aw * bx + ax * bw + ay * bz - az * by
-    a[2] = aw * by - ax * bz + ay * bw + az * bx
-    a[3] = aw * bz + ax * by - ay * bx + az * bw
+    a[1] = ax * bw + aw * bx - az * by + ay * bz
+    a[2] = ay * bw + az * bx + aw * by - ax * bz
+    a[3] = az * bw - ay * bx + ax * by + aw * bz
     a[4] = aw * bw - ax * bx - ay * by - az * bz
   end
   return a
@@ -229,19 +227,37 @@ end
 -- a:mul_inverse(quat4 b, quat4 c)
 -- a:mul_inverse(quat4 b)
 function class.mul_inverse(a, b, c)
-  -- TODO inline
   if c then
-    local q = class(c)
-    class.inverse(q)
-    class.mul(a, b, q)
+    local bx = b[1]
+    local by = b[2]
+    local bz = b[3]
+    local bw = b[4]
+    local cx = c[1]
+    local cy = c[2]
+    local cz = c[3]
+    local cw = c[4]
+    local d = cx * cx + cy * cy + cz * cz + cw * cw
+    a[1] = (bx * cw - bw * cx + bz * cy - by * cz) / d
+    a[2] = (by * cw - bz * cx - bw * cy + bx * cz) / d
+    a[3] = (bz * cw + by * cx - bx * cy - bw * cz) / d
+    a[4] = (bw * cw + bx * cx + by * cy + bz * cz) / d
   else
-    local q = class(b)
-    class.inverse(q)
-    class.mul(a, q)
+    local ax = a[1]
+    local ay = a[2]
+    local az = a[3]
+    local aw = a[4]
+    local bx = b[1]
+    local by = b[2]
+    local bz = b[3]
+    local bw = b[4]
+    local d = bx * bx + by * by + bz * bz + bw * bw
+    a[1] = (ax * bw - aw * bx + az * by - ay * bz) / d
+    a[2] = (ay * bw - az * bx - aw * by + ax * bz) / d
+    a[3] = (az * bw + ay * bx - ax * by - aw * bz) / d
+    a[4] = (aw * bw + ax * bx + ay * by + az * bz) / d
   end
   return a
 end
-
 
 -- a:inverse(quat4 b)
 -- a:inverse()

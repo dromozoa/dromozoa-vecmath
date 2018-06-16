@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-jar=target/vecmath-1.0-jar-with-dependencies.jar
+CLASSPATH=lib/vecmath.jar:target/classes
+export CLASSPATH
 
-java -jar "$jar" matrix3d >../matrix3d.lua
-java -jar "$jar" point >../point.lua
-java -jar "$jar" vector >../vector.lua
-java -jar "$jar" rotation >../rotation.lua
+java com.dromozoa.vecmath.Application matrix3 >../matrix3.lua
+java com.dromozoa.vecmath.Application matrix4 >../matrix4.lua
+java com.dromozoa.vecmath.Application point >../point.lua
+java com.dromozoa.vecmath.Application vector >../vector.lua
+java com.dromozoa.vecmath.Application quat >../quat.lua
+java com.dromozoa.vecmath.Application rotation >../rotation.lua
