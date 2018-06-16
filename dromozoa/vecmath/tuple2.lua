@@ -25,14 +25,14 @@ local class = {
   };
 }
 
--- a:set(number b, number c)
+-- a:set(number b, number y)
 -- a:set(tuple2 b)
 -- a:set()
-function class.set(a, b, c)
+function class.set(a, b, y)
   if b then
-    if c then
+    if y then
       a[1] = b
-      a[2] = c
+      a[2] = y
     else
       a[1] = b[1]
       a[2] = b[2]
@@ -54,65 +54,58 @@ end
 -- a:add(tuple2 b, tuple2 c)
 -- a:add(tuple2 b)
 function class.add(a, b, c)
-  if c then
-    a[1] = b[1] + c[1]
-    a[2] = b[2] + c[2]
-  else
-    a[1] = a[1] + b[1]
-    a[2] = a[2] + b[2]
+  if not c then
+    c = b
+    b = a
   end
+  a[1] = b[1] + c[1]
+  a[2] = b[2] + c[2]
   return a
 end
 
 -- a:sub(tuple2 b, tuple2 c)
 -- a:sub(tuple2 b)
 function class.sub(a, b, c)
-  if c then
-    a[1] = b[1] - c[1]
-    a[2] = b[2] - c[2]
-  else
-    a[1] = a[1] - b[1]
-    a[2] = a[2] - b[2]
+  if not c then
+    c = b
+    b = a
   end
+  a[1] = b[1] - c[1]
+  a[2] = b[2] - c[2]
   return a
 end
 
 -- a:negate(tuple2 b)
 -- a:negate()
 function class.negate(a, b)
-  if b then
-    a[1] = -b[1]
-    a[2] = -b[2]
-  else
-    a[1] = -a[1]
-    a[2] = -a[2]
+  if not b then
+    b = a
   end
+  a[1] = -b[1]
+  a[2] = -b[2]
   return a
 end
 
 -- a:scale(number b, tuple2 c)
 -- a:scale(number b)
 function class.scale(a, b, c)
-  if c then
-    a[1] = b * c[1]
-    a[2] = b * c[2]
-  else
-    a[1] = b * a[1]
-    a[2] = b * a[2]
+  if not c then
+    c = a
   end
+  a[1] = b * c[1]
+  a[2] = b * c[2]
   return a
 end
 
 -- a:scale_add(number b, tuple2 c, tuple2 d)
 -- a:scale_add(number b, tuple2 c)
 function class.scale_add(a, b, c, d)
-  if d then
-    a[1] = b * c[1] + d[1]
-    a[2] = b * c[2] + d[2]
-  else
-    a[1] = b * a[1] + c[1]
-    a[2] = b * a[2] + c[2]
+  if not d then
+    d = c
+    c = a
   end
+  a[1] = b * c[1] + d[1]
+  a[2] = b * c[2] + d[2]
   return a
 end
 
@@ -192,7 +185,6 @@ function class.absolute(a, b)
   if b then
     local x = b[1]
     local y = b[2]
-    local z = b[3]
     if x < 0 then a[1] = -x else a[1] = x end
     if y < 0 then a[2] = -y else a[2] = y end
   else
@@ -207,15 +199,14 @@ end
 -- a:interpolate(tuple2 b, tuple2 c, number d)
 -- a:interpolate(tuple2 b, number d)
 function class.interpolate(a, b, c, d)
-  if d then
-    local beta = 1 - d
-    a[1] = beta * b[1] + d * c[1]
-    a[2] = beta * b[2] + d * c[2]
-  else
-    local beta = 1 - c
-    a[1] = beta * a[1] + c * b[1]
-    a[2] = beta * a[2] + c * b[2]
+  if not d then
+    d = c
+    c = b
+    b = a
   end
+  local beta = 1 - d
+  a[1] = beta * b[1] + d * c[1]
+  a[2] = beta * b[2] + d * c[2]
   return a
 end
 
