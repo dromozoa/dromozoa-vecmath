@@ -19,6 +19,7 @@ local matrix3 = require "dromozoa.vecmath.matrix3"
 local quat4 = require "dromozoa.vecmath.quat4"
 local svd3 = require "dromozoa.vecmath.svd3"
 
+local error = error
 local rawget = rawget
 local rawset = rawset
 local setmetatable = setmetatable
@@ -34,6 +35,34 @@ local function to_string(a)
       a[ 5], a[ 6], a[ 7], a[ 8],
       a[ 9], a[10], a[11], a[12],
       a[13], a[14], a[15], a[16])
+end
+
+local function set_matrix3(a, b)
+  a[ 1] = b[1]
+  a[ 2] = b[2]
+  a[ 3] = b[3]
+  a[ 4] = 0
+  a[ 5] = b[4]
+  a[ 6] = b[5]
+  a[ 7] = b[6]
+  a[ 8] = 0
+  a[ 9] = b[7]
+  a[10] = b[8]
+  a[11] = b[9]
+  a[12] = 0
+  a[13] = 0
+  a[14] = 0
+  a[15] = 0
+  a[16] = 1
+  return a
+end
+
+local function set_axis_angle4(a, b)
+  return set_matrix3(a, matrix3.set_axis_angle4({}, b))
+end
+
+local function set_quat4(a, b)
+  return set_matrix3(a, matrix3.set_quat4({}, b))
 end
 
 local function transform_vector3(a, b, c)
@@ -62,6 +91,38 @@ local function transform_point3(a, b, c)
   return a
 end
 
+local function set_rotation_axis_angle4(a, b)
+  local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
+  svd3(m)
+  matrix3.mul(m, matrix3.set_axis_angle4({}, b), m)
+  a[ 1] = m[1]
+  a[ 2] = m[2]
+  a[ 3] = m[3]
+  a[ 5] = m[4]
+  a[ 6] = m[5]
+  a[ 7] = m[6]
+  a[ 9] = m[7]
+  a[10] = m[8]
+  a[11] = m[9]
+  return a
+end
+
+local function set_rotation_quat4(a, b)
+  local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
+  svd3(m)
+  matrix3.mul(m, matrix3.set_quat4({}, b), m)
+  a[ 1] = m[1]
+  a[ 2] = m[2]
+  a[ 3] = m[3]
+  a[ 5] = m[4]
+  a[ 6] = m[5]
+  a[ 7] = m[6]
+  a[ 9] = m[7]
+  a[10] = m[8]
+  a[11] = m[9]
+  return a
+end
+
 local class = {
   is_matrix4 = true;
   index = {
@@ -79,15 +140,15 @@ local metatable = { __tostring = to_string }
 
 -- a:set_identity()
 function class.set_identity(a)
-  a[1] = 1
-  a[2] = 0
-  a[3] = 0
-  a[4] = 0
-  a[5] = 0
-  a[6] = 1
-  a[7] = 0
-  a[8] = 0
-  a[9] = 0
+  a[ 1] = 1
+  a[ 2] = 0
+  a[ 3] = 0
+  a[ 4] = 0
+  a[ 5] = 0
+  a[ 6] = 1
+  a[ 7] = 0
+  a[ 8] = 0
+  a[ 9] = 0
   a[10] = 0
   a[11] = 1
   a[12] = 0
@@ -129,13 +190,13 @@ end
 
 -- a:get_rotation_scale(matrix3 b)
 function class.get_rotation_scale(a, b)
-  b[1] = a[1]
-  b[2] = a[2]
-  b[3] = a[3]
-  b[4] = a[5]
-  b[5] = a[6]
-  b[6] = a[7]
-  b[7] = a[9]
+  b[1] = a[ 1]
+  b[2] = a[ 2]
+  b[3] = a[ 3]
+  b[4] = a[ 5]
+  b[5] = a[ 6]
+  b[6] = a[ 7]
+  b[7] = a[ 9]
   b[8] = a[10]
   b[9] = a[11]
   return a
@@ -149,13 +210,13 @@ end
 
 -- a:set_rotation_scale(matrix3 b)
 function class.set_rotation_scale(a, b)
-  a[1] = b[1]
-  a[2] = b[2]
-  a[3] = b[3]
-  a[5] = b[4]
-  a[6] = b[5]
-  a[7] = b[6]
-  a[9] = b[7]
+  a[ 1] = b[1]
+  a[ 2] = b[2]
+  a[ 3] = b[3]
+  a[ 5] = b[4]
+  a[ 6] = b[5]
+  a[ 7] = b[6]
+  a[ 9] = b[7]
   a[10] = b[8]
   a[11] = b[9]
   return a
@@ -182,120 +243,75 @@ end
 -- a:add(number b)
 -- a:add(matrix4 b)
 function class.add(a, b, c)
-  if c then
-    if type(b) == "number" then
-      a[1] = c[1] + b
-      a[2] = c[2] + b
-      a[3] = c[3] + b
-      a[4] = c[4] + b
-      a[5] = c[5] + b
-      a[6] = c[6] + b
-      a[7] = c[7] + b
-      a[8] = c[8] + b
-      a[9] = c[9] + b
-      a[10] = c[10] + b
-      a[11] = c[11] + b
-      a[12] = c[12] + b
-      a[13] = c[13] + b
-      a[14] = c[14] + b
-      a[15] = c[15] + b
-      a[16] = c[16] + b
-    else
-      a[1] = b[1] + c[1]
-      a[2] = b[2] + c[2]
-      a[3] = b[3] + c[3]
-      a[4] = b[4] + c[4]
-      a[5] = b[5] + c[5]
-      a[6] = b[6] + c[6]
-      a[7] = b[7] + c[7]
-      a[8] = b[8] + c[8]
-      a[9] = b[9] + c[9]
-      a[10] = b[10] + c[10]
-      a[11] = b[11] + c[11]
-      a[12] = b[12] + c[12]
-      a[13] = b[13] + c[13]
-      a[14] = b[14] + c[14]
-      a[15] = b[15] + c[15]
-      a[16] = b[16] + c[16]
+  if type(b) == "number" then
+    if not c then
+      c = a
     end
+    a[ 1] = b + c[ 1]
+    a[ 2] = b + c[ 2]
+    a[ 3] = b + c[ 3]
+    a[ 4] = b + c[ 4]
+    a[ 5] = b + c[ 5]
+    a[ 6] = b + c[ 6]
+    a[ 7] = b + c[ 7]
+    a[ 8] = b + c[ 8]
+    a[ 9] = b + c[ 9]
+    a[10] = b + c[10]
+    a[11] = b + c[11]
+    a[12] = b + c[12]
+    a[13] = b + c[13]
+    a[14] = b + c[14]
+    a[15] = b + c[15]
+    a[16] = b + c[16]
+    return a
   else
-    if type(b) == "number" then
-      a[1] = a[1] + b
-      a[2] = a[2] + b
-      a[3] = a[3] + b
-      a[4] = a[4] + b
-      a[5] = a[5] + b
-      a[6] = a[6] + b
-      a[7] = a[7] + b
-      a[8] = a[8] + b
-      a[9] = a[9] + b
-      a[10] = a[10] + b
-      a[11] = a[11] + b
-      a[12] = a[12] + b
-      a[13] = a[13] + b
-      a[14] = a[14] + b
-      a[15] = a[15] + b
-      a[16] = a[16] + b
-    else
-      a[1] = a[1] + b[1]
-      a[2] = a[2] + b[2]
-      a[3] = a[3] + b[3]
-      a[4] = a[4] + b[4]
-      a[5] = a[5] + b[5]
-      a[6] = a[6] + b[6]
-      a[7] = a[7] + b[7]
-      a[8] = a[8] + b[8]
-      a[9] = a[9] + b[9]
-      a[10] = a[10] + b[10]
-      a[11] = a[11] + b[11]
-      a[12] = a[12] + b[12]
-      a[13] = a[13] + b[13]
-      a[14] = a[14] + b[14]
-      a[15] = a[15] + b[15]
-      a[16] = a[16] + b[16]
+    if not c then
+      c = b
+      b = a
     end
+    a[ 1] = b[ 1] + c[ 1]
+    a[ 2] = b[ 2] + c[ 2]
+    a[ 3] = b[ 3] + c[ 3]
+    a[ 4] = b[ 4] + c[ 4]
+    a[ 5] = b[ 5] + c[ 5]
+    a[ 6] = b[ 6] + c[ 6]
+    a[ 7] = b[ 7] + c[ 7]
+    a[ 8] = b[ 8] + c[ 8]
+    a[ 9] = b[ 9] + c[ 9]
+    a[10] = b[10] + c[10]
+    a[11] = b[11] + c[11]
+    a[12] = b[12] + c[12]
+    a[13] = b[13] + c[13]
+    a[14] = b[14] + c[14]
+    a[15] = b[15] + c[15]
+    a[16] = b[16] + c[16]
+    return a
   end
-  return a
 end
 
 -- a:sub(matrix4 b, matrix4 c)
 -- a:sub(matrix4 b)
 function class.sub(a, b, c)
-  if c then
-    a[1] = b[1] - c[1]
-    a[2] = b[2] - c[2]
-    a[3] = b[3] - c[3]
-    a[4] = b[4] - c[4]
-    a[5] = b[5] - c[5]
-    a[6] = b[6] - c[6]
-    a[7] = b[7] - c[7]
-    a[8] = b[8] - c[8]
-    a[9] = b[9] - c[9]
-    a[10] = b[10] - c[10]
-    a[11] = b[11] - c[11]
-    a[12] = b[12] - c[12]
-    a[13] = b[13] - c[13]
-    a[14] = b[14] - c[14]
-    a[15] = b[15] - c[15]
-    a[16] = b[16] - c[16]
-  else
-    a[1] = a[1] - b[1]
-    a[2] = a[2] - b[2]
-    a[3] = a[3] - b[3]
-    a[4] = a[4] - b[4]
-    a[5] = a[5] - b[5]
-    a[6] = a[6] - b[6]
-    a[7] = a[7] - b[7]
-    a[8] = a[8] - b[8]
-    a[9] = a[9] - b[9]
-    a[10] = a[10] - b[10]
-    a[11] = a[11] - b[11]
-    a[12] = a[12] - b[12]
-    a[13] = a[13] - b[13]
-    a[14] = a[14] - b[14]
-    a[15] = a[15] - b[15]
-    a[16] = a[16] - b[16]
+  if not c then
+    c = b
+    b = a
   end
+  a[ 1] = b[ 1] - c[ 1]
+  a[ 2] = b[ 2] - c[ 2]
+  a[ 3] = b[ 3] - c[ 3]
+  a[ 4] = b[ 4] - c[ 4]
+  a[ 5] = b[ 5] - c[ 5]
+  a[ 6] = b[ 6] - c[ 6]
+  a[ 7] = b[ 7] - c[ 7]
+  a[ 8] = b[ 8] - c[ 8]
+  a[ 9] = b[ 9] - c[ 9]
+  a[10] = b[10] - c[10]
+  a[11] = b[11] - c[11]
+  a[12] = b[12] - c[12]
+  a[13] = b[13] - c[13]
+  a[14] = b[14] - c[14]
+  a[15] = b[15] - c[15]
+  a[16] = b[16] - c[16]
   return a
 end
 
@@ -331,25 +347,25 @@ end
 -- a:set(vector3 b, number c)
 -- a:set(number b)
 -- a:set(vector3 b)
+-- a:set(matrix4 b)
 -- a:set(axis_angle4 b)
 -- a:set(quat4 b)
 -- a:set(matrix3 b)
--- a:set(matrix4 b)
 -- a:set()
 function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44)
   if b then
     if c then
       if d then
         if m14 then
-          a[1] = b
-          a[2] = c
-          a[3] = d
-          a[4] = m14
-          a[5] = m21
-          a[6] = m22
-          a[7] = m23
-          a[8] = m24
-          a[9] = m31
+          a[ 1] = b
+          a[ 2] = c
+          a[ 3] = d
+          a[ 4] = m14
+          a[ 5] = m21
+          a[ 6] = m22
+          a[ 7] = m23
+          a[ 8] = m24
+          a[ 9] = m31
           a[10] = m32
           a[11] = m33
           a[12] = m34
@@ -357,56 +373,40 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[14] = m42
           a[15] = m43
           a[16] = m44
+          return a
         else
           if #b == 4 then
-            local m = {}
-            matrix3.set_quat4(m, b)
-            a[1] = m[1] * d
-            a[2] = m[2] * d
-            a[3] = m[3] * d
-            a[4] = c[1]
-            a[5] = m[4] * d
-            a[6] = m[5] * d
-            a[7] = m[6] * d
-            a[8] = c[2]
-            a[9] = m[7] * d
-            a[10] = m[8] * d
-            a[11] = m[9] * d
-            a[12] = c[3]
-            a[13] = 0
-            a[14] = 0
-            a[15] = 0
-            a[16] = 1
-          else
-            a[1] = b[1] * d
-            a[2] = b[2] * d
-            a[3] = b[3] * d
-            a[4] = c[1]
-            a[5] = b[4] * d
-            a[6] = b[5] * d
-            a[7] = b[6] * d
-            a[8] = c[2]
-            a[9] = b[7] * d
-            a[10] = b[8] * d
-            a[11] = b[9] * d
-            a[12] = c[3]
-            a[13] = 0
-            a[14] = 0
-            a[15] = 0
-            a[16] = 1
+            b = matrix3.set_quat4({}, b)
           end
+          a[ 1] = b[1] * d
+          a[ 2] = b[2] * d
+          a[ 3] = b[3] * d
+          a[ 4] = c[1]
+          a[ 5] = b[4] * d
+          a[ 6] = b[5] * d
+          a[ 7] = b[6] * d
+          a[ 8] = c[2]
+          a[ 9] = b[7] * d
+          a[10] = b[8] * d
+          a[11] = b[9] * d
+          a[12] = c[3]
+          a[13] = 0
+          a[14] = 0
+          a[15] = 0
+          a[16] = 1
+          return a
         end
       else
         if type(b) == "number" then
-          a[1] = b
-          a[2] = 0
-          a[3] = 0
-          a[4] = c[1]
-          a[5] = 0
-          a[6] = b
-          a[7] = 0
-          a[8] = c[2]
-          a[9] = 0
+          a[ 1] = b
+          a[ 2] = 0
+          a[ 3] = 0
+          a[ 4] = c[1]
+          a[ 5] = 0
+          a[ 6] = b
+          a[ 7] = 0
+          a[ 8] = c[2]
+          a[ 9] = 0
           a[10] = 0
           a[11] = b
           a[12] = c[3]
@@ -414,16 +414,17 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[14] = 0
           a[15] = 0
           a[16] = 1
+          return a
         else
-          a[1] = c
-          a[2] = 0
-          a[3] = 0
-          a[4] = b[1] * c
-          a[5] = 0
-          a[6] = c
-          a[7] = 0
-          a[8] = b[2] * c
-          a[9] = 0
+          a[ 1] = c
+          a[ 2] = 0
+          a[ 3] = 0
+          a[ 4] = b[1] * c
+          a[ 5] = 0
+          a[ 6] = c
+          a[ 7] = 0
+          a[ 8] = b[2] * c
+          a[ 9] = 0
           a[10] = 0
           a[11] = c
           a[12] = b[3] * c
@@ -431,19 +432,20 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[14] = 0
           a[15] = 0
           a[16] = 1
+          return a
         end
       end
     else
       if type(b) == "number" then
-        a[1] = b
-        a[2] = 0
-        a[3] = 0
-        a[4] = 0
-        a[5] = 0
-        a[6] = b
-        a[7] = 0
-        a[8] = 0
-        a[9] = 0
+        a[ 1] = b
+        a[ 2] = 0
+        a[ 3] = 0
+        a[ 4] = 0
+        a[ 5] = 0
+        a[ 6] = b
+        a[ 7] = 0
+        a[ 8] = 0
+        a[ 9] = 0
         a[10] = 0
         a[11] = b
         a[12] = 0
@@ -451,18 +453,19 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
         a[14] = 0
         a[15] = 0
         a[16] = 1
+        return a
       else
         local n = #b
         if n == 3 then
-          a[1] = 1
-          a[2] = 0
-          a[3] = 0
-          a[4] = b[1]
-          a[5] = 0
-          a[6] = 1
-          a[7] = 0
-          a[8] = b[2]
-          a[9] = 0
+          a[ 1] = 1
+          a[ 2] = 0
+          a[ 3] = 0
+          a[ 4] = b[1]
+          a[ 5] = 0
+          a[ 6] = 1
+          a[ 7] = 0
+          a[ 8] = b[2]
+          a[ 9] = 0
           a[10] = 0
           a[11] = 1
           a[12] = b[3]
@@ -470,50 +473,8 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[14] = 0
           a[15] = 0
           a[16] = 1
-        elseif n == 4 then
-          local m = {}
-
-          if b.is_axis_angle4 then
-            matrix3.set_axis_angle4(m, b)
-          else
-            matrix3.set_quat4(m, b)
-          end
-
-          a[ 1] = m[1]
-          a[ 2] = m[2]
-          a[ 3] = m[3]
-          a[ 4] = 0
-          a[ 5] = m[4]
-          a[ 6] = m[5]
-          a[ 7] = m[6]
-          a[ 8] = 0
-          a[ 9] = m[7]
-          a[10] = m[8]
-          a[11] = m[9]
-          a[12] = 0
-          a[13] = 0
-          a[14] = 0
-          a[15] = 0
-          a[16] = 1
-
-        elseif n == 9 then
-          a[ 1] = b[1]
-          a[ 2] = b[2]
-          a[ 3] = b[3]
-          a[ 4] = 0
-          a[ 5] = b[4]
-          a[ 6] = b[5]
-          a[ 7] = b[6]
-          a[ 8] = 0
-          a[ 9] = b[7]
-          a[10] = b[8]
-          a[11] = b[9]
-          a[12] = 0
-          a[13] = 0
-          a[14] = 0
-          a[15] = 0
-          a[16] = 1
-        else
+          return a
+        elseif n == 16 then
           a[ 1] = b[ 1]
           a[ 2] = b[ 2]
           a[ 3] = b[ 3]
@@ -530,19 +491,32 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[14] = b[14]
           a[15] = b[15]
           a[16] = b[16]
+          return a
+        else
+          if n == 4 then
+            if b.is_axis_angle4 then
+              return set_axis_angle4(a, b)
+            elseif b.is_quat4 then
+              return set_quat4(a, b)
+            else
+              error "bad argument #2 (axis_angle4 or quat4 expected)"
+            end
+          else
+            return set_matrix3(a, b)
+          end
         end
       end
     end
   else
-    a[1] = 0
-    a[2] = 0
-    a[3] = 0
-    a[4] = 0
-    a[5] = 0
-    a[6] = 0
-    a[7] = 0
-    a[8] = 0
-    a[9] = 0
+    a[ 1] = 0
+    a[ 2] = 0
+    a[ 3] = 0
+    a[ 4] = 0
+    a[ 5] = 0
+    a[ 6] = 0
+    a[ 7] = 0
+    a[ 8] = 0
+    a[ 9] = 0
     a[10] = 0
     a[11] = 0
     a[12] = 0
@@ -550,8 +524,8 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
     a[14] = 0
     a[15] = 0
     a[16] = 0
+    return a
   end
-  return a
 end
 
 -- a:invert(matrix4 b)
@@ -600,7 +574,6 @@ function class.invert(a, b)
   a[14] = (m31 * (m13 * m42 - m12 * m43) + m32 * (m11 * m43 - m13 * m41) + m33 * (m12 * m41 - m11 * m42)) / d
   a[15] = (m41 * (m13 * m22 - m12 * m23) + m42 * (m11 * m23 - m13 * m21) + m43 * (m12 * m21 - m11 * m22)) / d
   a[16] = (m11 * (m22 * m33 - m23 * m32) + m12 * (m23 * m31 - m21 * m33) + m13 * (m21 * m32 - m22 * m31)) / d
-
   return a
 end
 
@@ -633,8 +606,8 @@ end
 
 -- a:set_translation(vector3 b)
 function class.set_translation(a, b)
-  a[4] = b[1]
-  a[8] = b[2]
+  a[ 4] = b[1]
+  a[ 8] = b[2]
   a[12] = b[3]
   return a
 end
@@ -643,15 +616,15 @@ end
 function class.rot_x(a, angle)
   local c = cos(angle)
   local s = sin(angle)
-  a[1] = 1
-  a[2] = 0
-  a[3] = 0
-  a[4] = 0
-  a[5] = 0
-  a[6] = c
-  a[7] = -s
-  a[8] = 0
-  a[9] = 0
+  a[ 1] = 1
+  a[ 2] = 0
+  a[ 3] = 0
+  a[ 4] = 0
+  a[ 5] = 0
+  a[ 6] = c
+  a[ 7] = -s
+  a[ 8] = 0
+  a[ 9] = 0
   a[10] = s
   a[11] = c
   a[12] = 0
@@ -666,15 +639,15 @@ end
 function class.rot_y(a, angle)
   local c = cos(angle)
   local s = sin(angle)
-  a[1] = c
-  a[2] = 0
-  a[3] = s
-  a[4] = 0
-  a[5] = 0
-  a[6] = 1
-  a[7] = 0
-  a[8] = 0
-  a[9] = -s
+  a[ 1] = c
+  a[ 2] = 0
+  a[ 3] = s
+  a[ 4] = 0
+  a[ 5] = 0
+  a[ 6] = 1
+  a[ 7] = 0
+  a[ 8] = 0
+  a[ 9] = -s
   a[10] = 0
   a[11] = c
   a[12] = 0
@@ -689,15 +662,15 @@ end
 function class.rot_z(a, angle)
   local c = cos(angle)
   local s = sin(angle)
-  a[1] = c
-  a[2] = -s
-  a[3] = 0
-  a[4] = 0
-  a[5] = s
-  a[6] = c
-  a[7] = 0
-  a[8] = 0
-  a[9] = 0
+  a[ 1] = c
+  a[ 2] = -s
+  a[ 3] = 0
+  a[ 4] = 0
+  a[ 5] = s
+  a[ 6] = c
+  a[ 7] = 0
+  a[ 8] = 0
+  a[ 9] = 0
   a[10] = 0
   a[11] = 1
   a[12] = 0
@@ -717,15 +690,15 @@ function class.mul(a, b, c)
     if not c then
       c = a
     end
-    a[1] = b * c[1]
-    a[2] = b * c[2]
-    a[3] = b * c[3]
-    a[4] = b * c[4]
-    a[5] = b * c[5]
-    a[6] = b * c[6]
-    a[7] = b * c[7]
-    a[8] = b * c[8]
-    a[9] = b * c[9]
+    a[ 1] = b * c[ 1]
+    a[ 2] = b * c[ 2]
+    a[ 3] = b * c[ 3]
+    a[ 4] = b * c[ 4]
+    a[ 5] = b * c[ 5]
+    a[ 6] = b * c[ 6]
+    a[ 7] = b * c[ 7]
+    a[ 8] = b * c[ 8]
+    a[ 9] = b * c[ 9]
     a[10] = b * c[10]
     a[11] = b * c[11]
     a[12] = b * c[12]
@@ -733,21 +706,22 @@ function class.mul(a, b, c)
     a[14] = b * c[14]
     a[15] = b * c[15]
     a[16] = b * c[16]
+    return a
   else
     if not c then
       c = b
       b = a
     end
 
-    local b11 = b[1]
-    local b12 = b[2]
-    local b13 = b[3]
-    local b14 = b[4]
-    local b21 = b[5]
-    local b22 = b[6]
-    local b23 = b[7]
-    local b24 = b[8]
-    local b31 = b[9]
+    local b11 = b[ 1]
+    local b12 = b[ 2]
+    local b13 = b[ 3]
+    local b14 = b[ 4]
+    local b21 = b[ 5]
+    local b22 = b[ 6]
+    local b23 = b[ 7]
+    local b24 = b[ 8]
+    local b31 = b[ 9]
     local b32 = b[10]
     local b33 = b[11]
     local b34 = b[12]
@@ -756,15 +730,15 @@ function class.mul(a, b, c)
     local b43 = b[15]
     local b44 = b[16]
 
-    local c11 = c[1]
-    local c12 = c[2]
-    local c13 = c[3]
-    local c14 = c[4]
-    local c21 = c[5]
-    local c22 = c[6]
-    local c23 = c[7]
-    local c24 = c[8]
-    local c31 = c[9]
+    local c11 = c[ 1]
+    local c12 = c[ 2]
+    local c13 = c[ 3]
+    local c14 = c[ 4]
+    local c21 = c[ 5]
+    local c22 = c[ 6]
+    local c23 = c[ 7]
+    local c24 = c[ 8]
+    local c31 = c[ 9]
     local c32 = c[10]
     local c33 = c[11]
     local c34 = c[12]
@@ -773,15 +747,15 @@ function class.mul(a, b, c)
     local c43 = c[15]
     local c44 = c[16]
 
-    a[1] = b11 * c11 + b12 * c21 + b13 * c31 + b14 * c41
-    a[2] = b11 * c12 + b12 * c22 + b13 * c32 + b14 * c42
-    a[3] = b11 * c13 + b12 * c23 + b13 * c33 + b14 * c43
-    a[4] = b11 * c14 + b12 * c24 + b13 * c34 + b14 * c44
-    a[5] = b21 * c11 + b22 * c21 + b23 * c31 + b24 * c41
-    a[6] = b21 * c12 + b22 * c22 + b23 * c32 + b24 * c42
-    a[7] = b21 * c13 + b22 * c23 + b23 * c33 + b24 * c43
-    a[8] = b21 * c14 + b22 * c24 + b23 * c34 + b24 * c44
-    a[9] = b31 * c11 + b32 * c21 + b33 * c31 + b34 * c41
+    a[ 1] = b11 * c11 + b12 * c21 + b13 * c31 + b14 * c41
+    a[ 2] = b11 * c12 + b12 * c22 + b13 * c32 + b14 * c42
+    a[ 3] = b11 * c13 + b12 * c23 + b13 * c33 + b14 * c43
+    a[ 4] = b11 * c14 + b12 * c24 + b13 * c34 + b14 * c44
+    a[ 5] = b21 * c11 + b22 * c21 + b23 * c31 + b24 * c41
+    a[ 6] = b21 * c12 + b22 * c22 + b23 * c32 + b24 * c42
+    a[ 7] = b21 * c13 + b22 * c23 + b23 * c33 + b24 * c43
+    a[ 8] = b21 * c14 + b22 * c24 + b23 * c34 + b24 * c44
+    a[ 9] = b31 * c11 + b32 * c21 + b33 * c31 + b34 * c41
     a[10] = b31 * c12 + b32 * c22 + b33 * c32 + b34 * c42
     a[11] = b31 * c13 + b32 * c23 + b33 * c33 + b34 * c43
     a[12] = b31 * c14 + b32 * c24 + b33 * c34 + b34 * c44
@@ -789,55 +763,55 @@ function class.mul(a, b, c)
     a[14] = b41 * c12 + b42 * c22 + b43 * c32 + b44 * c42
     a[15] = b41 * c13 + b42 * c23 + b43 * c33 + b44 * c43
     a[16] = b41 * c14 + b42 * c24 + b43 * c34 + b44 * c44
+    return a
   end
-  return a
 end
 
 -- a:mul_transpose_both(matrix4 b, matrix4 c)
 function class.mul_transpose_both(a, b, c)
-  local b11 = b[1]
-  local b12 = b[5]
-  local b13 = b[9]
+  local b11 = b[ 1]
+  local b12 = b[ 5]
+  local b13 = b[ 9]
   local b14 = b[13]
-  local b21 = b[2]
-  local b22 = b[6]
+  local b21 = b[ 2]
+  local b22 = b[ 6]
   local b23 = b[10]
   local b24 = b[14]
-  local b31 = b[3]
-  local b32 = b[7]
+  local b31 = b[ 3]
+  local b32 = b[ 7]
   local b33 = b[11]
   local b34 = b[15]
-  local b41 = b[4]
-  local b42 = b[8]
+  local b41 = b[ 4]
+  local b42 = b[ 8]
   local b43 = b[12]
   local b44 = b[16]
 
-  local c11 = c[1]
-  local c12 = c[5]
-  local c13 = c[9]
+  local c11 = c[ 1]
+  local c12 = c[ 5]
+  local c13 = c[ 9]
   local c14 = c[13]
-  local c21 = c[2]
-  local c22 = c[6]
+  local c21 = c[ 2]
+  local c22 = c[ 6]
   local c23 = c[10]
   local c24 = c[14]
-  local c31 = c[3]
-  local c32 = c[7]
+  local c31 = c[ 3]
+  local c32 = c[ 7]
   local c33 = c[11]
   local c34 = c[15]
-  local c41 = c[4]
-  local c42 = c[8]
+  local c41 = c[ 4]
+  local c42 = c[ 8]
   local c43 = c[12]
   local c44 = c[16]
 
-  a[1] = b11 * c11 + b12 * c21 + b13 * c31 + b14 * c41
-  a[2] = b11 * c12 + b12 * c22 + b13 * c32 + b14 * c42
-  a[3] = b11 * c13 + b12 * c23 + b13 * c33 + b14 * c43
-  a[4] = b11 * c14 + b12 * c24 + b13 * c34 + b14 * c44
-  a[5] = b21 * c11 + b22 * c21 + b23 * c31 + b24 * c41
-  a[6] = b21 * c12 + b22 * c22 + b23 * c32 + b24 * c42
-  a[7] = b21 * c13 + b22 * c23 + b23 * c33 + b24 * c43
-  a[8] = b21 * c14 + b22 * c24 + b23 * c34 + b24 * c44
-  a[9] = b31 * c11 + b32 * c21 + b33 * c31 + b34 * c41
+  a[ 1] = b11 * c11 + b12 * c21 + b13 * c31 + b14 * c41
+  a[ 2] = b11 * c12 + b12 * c22 + b13 * c32 + b14 * c42
+  a[ 3] = b11 * c13 + b12 * c23 + b13 * c33 + b14 * c43
+  a[ 4] = b11 * c14 + b12 * c24 + b13 * c34 + b14 * c44
+  a[ 5] = b21 * c11 + b22 * c21 + b23 * c31 + b24 * c41
+  a[ 6] = b21 * c12 + b22 * c22 + b23 * c32 + b24 * c42
+  a[ 7] = b21 * c13 + b22 * c23 + b23 * c33 + b24 * c43
+  a[ 8] = b21 * c14 + b22 * c24 + b23 * c34 + b24 * c44
+  a[ 9] = b31 * c11 + b32 * c21 + b33 * c31 + b34 * c41
   a[10] = b31 * c12 + b32 * c22 + b33 * c32 + b34 * c42
   a[11] = b31 * c13 + b32 * c23 + b33 * c33 + b34 * c43
   a[12] = b31 * c14 + b32 * c24 + b33 * c34 + b34 * c44
@@ -850,15 +824,15 @@ end
 
 -- a:mul_transpose_right(matrix4 b, matrix4 c)
 function class.mul_transpose_right(a, b, c)
-  local b11 = b[1]
-  local b12 = b[2]
-  local b13 = b[3]
-  local b14 = b[4]
-  local b21 = b[5]
-  local b22 = b[6]
-  local b23 = b[7]
-  local b24 = b[8]
-  local b31 = b[9]
+  local b11 = b[ 1]
+  local b12 = b[ 2]
+  local b13 = b[ 3]
+  local b14 = b[ 4]
+  local b21 = b[ 5]
+  local b22 = b[ 6]
+  local b23 = b[ 7]
+  local b24 = b[ 8]
+  local b31 = b[ 9]
   local b32 = b[10]
   local b33 = b[11]
   local b34 = b[12]
@@ -867,32 +841,32 @@ function class.mul_transpose_right(a, b, c)
   local b43 = b[15]
   local b44 = b[16]
 
-  local c11 = c[1]
-  local c12 = c[5]
-  local c13 = c[9]
+  local c11 = c[ 1]
+  local c12 = c[ 5]
+  local c13 = c[ 9]
   local c14 = c[13]
-  local c21 = c[2]
-  local c22 = c[6]
+  local c21 = c[ 2]
+  local c22 = c[ 6]
   local c23 = c[10]
   local c24 = c[14]
-  local c31 = c[3]
-  local c32 = c[7]
+  local c31 = c[ 3]
+  local c32 = c[ 7]
   local c33 = c[11]
   local c34 = c[15]
-  local c41 = c[4]
-  local c42 = c[8]
+  local c41 = c[ 4]
+  local c42 = c[ 8]
   local c43 = c[12]
   local c44 = c[16]
 
-  a[1] = b11 * c11 + b12 * c21 + b13 * c31 + b14 * c41
-  a[2] = b11 * c12 + b12 * c22 + b13 * c32 + b14 * c42
-  a[3] = b11 * c13 + b12 * c23 + b13 * c33 + b14 * c43
-  a[4] = b11 * c14 + b12 * c24 + b13 * c34 + b14 * c44
-  a[5] = b21 * c11 + b22 * c21 + b23 * c31 + b24 * c41
-  a[6] = b21 * c12 + b22 * c22 + b23 * c32 + b24 * c42
-  a[7] = b21 * c13 + b22 * c23 + b23 * c33 + b24 * c43
-  a[8] = b21 * c14 + b22 * c24 + b23 * c34 + b24 * c44
-  a[9] = b31 * c11 + b32 * c21 + b33 * c31 + b34 * c41
+  a[ 1] = b11 * c11 + b12 * c21 + b13 * c31 + b14 * c41
+  a[ 2] = b11 * c12 + b12 * c22 + b13 * c32 + b14 * c42
+  a[ 3] = b11 * c13 + b12 * c23 + b13 * c33 + b14 * c43
+  a[ 4] = b11 * c14 + b12 * c24 + b13 * c34 + b14 * c44
+  a[ 5] = b21 * c11 + b22 * c21 + b23 * c31 + b24 * c41
+  a[ 6] = b21 * c12 + b22 * c22 + b23 * c32 + b24 * c42
+  a[ 7] = b21 * c13 + b22 * c23 + b23 * c33 + b24 * c43
+  a[ 8] = b21 * c14 + b22 * c24 + b23 * c34 + b24 * c44
+  a[ 9] = b31 * c11 + b32 * c21 + b33 * c31 + b34 * c41
   a[10] = b31 * c12 + b32 * c22 + b33 * c32 + b34 * c42
   a[11] = b31 * c13 + b32 * c23 + b33 * c33 + b34 * c43
   a[12] = b31 * c14 + b32 * c24 + b33 * c34 + b34 * c44
@@ -905,32 +879,32 @@ end
 
 -- a:mul_transpose_left(matrix4 b, matrix4 c)
 function class.mul_transpose_left(a, b, c)
-  local b11 = b[1]
-  local b12 = b[5]
-  local b13 = b[9]
+  local b11 = b[ 1]
+  local b12 = b[ 5]
+  local b13 = b[ 9]
   local b14 = b[13]
-  local b21 = b[2]
-  local b22 = b[6]
+  local b21 = b[ 2]
+  local b22 = b[ 6]
   local b23 = b[10]
   local b24 = b[14]
-  local b31 = b[3]
-  local b32 = b[7]
+  local b31 = b[ 3]
+  local b32 = b[ 7]
   local b33 = b[11]
   local b34 = b[15]
-  local b41 = b[4]
-  local b42 = b[8]
+  local b41 = b[ 4]
+  local b42 = b[ 8]
   local b43 = b[12]
   local b44 = b[16]
 
-  local c11 = c[1]
-  local c12 = c[2]
-  local c13 = c[3]
-  local c14 = c[4]
-  local c21 = c[5]
-  local c22 = c[6]
-  local c23 = c[7]
-  local c24 = c[8]
-  local c31 = c[9]
+  local c11 = c[ 1]
+  local c12 = c[ 2]
+  local c13 = c[ 3]
+  local c14 = c[ 4]
+  local c21 = c[ 5]
+  local c22 = c[ 6]
+  local c23 = c[ 7]
+  local c24 = c[ 8]
+  local c31 = c[ 9]
   local c32 = c[10]
   local c33 = c[11]
   local c34 = c[12]
@@ -939,15 +913,15 @@ function class.mul_transpose_left(a, b, c)
   local c43 = c[15]
   local c44 = c[16]
 
-  a[1] = b11 * c11 + b12 * c21 + b13 * c31 + b14 * c41
-  a[2] = b11 * c12 + b12 * c22 + b13 * c32 + b14 * c42
-  a[3] = b11 * c13 + b12 * c23 + b13 * c33 + b14 * c43
-  a[4] = b11 * c14 + b12 * c24 + b13 * c34 + b14 * c44
-  a[5] = b21 * c11 + b22 * c21 + b23 * c31 + b24 * c41
-  a[6] = b21 * c12 + b22 * c22 + b23 * c32 + b24 * c42
-  a[7] = b21 * c13 + b22 * c23 + b23 * c33 + b24 * c43
-  a[8] = b21 * c14 + b22 * c24 + b23 * c34 + b24 * c44
-  a[9] = b31 * c11 + b32 * c21 + b33 * c31 + b34 * c41
+  a[ 1] = b11 * c11 + b12 * c21 + b13 * c31 + b14 * c41
+  a[ 2] = b11 * c12 + b12 * c22 + b13 * c32 + b14 * c42
+  a[ 3] = b11 * c13 + b12 * c23 + b13 * c33 + b14 * c43
+  a[ 4] = b11 * c14 + b12 * c24 + b13 * c34 + b14 * c44
+  a[ 5] = b21 * c11 + b22 * c21 + b23 * c31 + b24 * c41
+  a[ 6] = b21 * c12 + b22 * c22 + b23 * c32 + b24 * c42
+  a[ 7] = b21 * c13 + b22 * c23 + b23 * c33 + b24 * c43
+  a[ 8] = b21 * c14 + b22 * c24 + b23 * c34 + b24 * c44
+  a[ 9] = b31 * c11 + b32 * c21 + b33 * c31 + b34 * c41
   a[10] = b31 * c12 + b32 * c22 + b33 * c32 + b34 * c42
   a[11] = b31 * c13 + b32 * c23 + b33 * c33 + b34 * c43
   a[12] = b31 * c14 + b32 * c24 + b33 * c34 + b34 * c44
@@ -1020,12 +994,13 @@ end
 -- a:transform(point3 b)
 -- a:transform(tuple4 b)
 function class.transform(a, b, c)
-  local n = #b
   if #b == 3 then
-    if b.is_vector3 then
+    if b.is_point3 then
+      return transform_point3(a, b, c)
+    elseif b.is_vector3 then
       return transform_vector3(a, b, c)
     else
-      return transform_point3(a, b, c)
+      error "bad argument #2 (point3 or vector3 expected)"
     end
   else
     if not c then
@@ -1047,22 +1022,17 @@ end
 -- a:set_rotation(quat4 b)
 -- a:set_rotation(matrix3 b)
 function class.set_rotation(a, b)
-  local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
-  svd3(m)
   if #b == 4 then
-    local n = {}
-    matrix3.set(n, b)
-    matrix3.mul(m, n, m)
-    a[ 1] = m[1]
-    a[ 2] = m[2]
-    a[ 3] = m[3]
-    a[ 5] = m[4]
-    a[ 6] = m[5]
-    a[ 7] = m[6]
-    a[ 9] = m[7]
-    a[10] = m[8]
-    a[11] = m[9]
+    if b.is_axis_angle4 then
+      return set_rotation_axis_angle4(a, b)
+    elseif b.is_quat4 then
+      return set_rotation_quat4(a, b)
+    else
+      error "bad argument #2 (axis_angle4 or quat4 expected)"
+    end
   else
+    local m = { a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
+    svd3(m)
     matrix3.mul(m, b, m)
     a[ 1] = m[1]
     a[ 2] = m[2]
@@ -1073,8 +1043,8 @@ function class.set_rotation(a, b)
     a[ 9] = m[7]
     a[10] = m[8]
     a[11] = m[9]
+    return a
   end
-  return a
 end
 
 -- a:set_zero()
