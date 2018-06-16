@@ -80,50 +80,6 @@ local function set_matrix3(a, b11, b12, b13, b21, b22, b23, b31, b32, b33)
   end
 end
 
-local function interpolate(a, b, c, alpha)
-  local bx = b[1]
-  local by = b[2]
-  local bz = b[3]
-  local bw = b[4]
-  local d = sqrt(bx * bx + by * by + bz * bz + bw * bw)
-  bx = bx / d
-  by = by / d
-  bz = bz / d
-  bw = bw / d
-
-  local cx = c[1]
-  local cy = c[2]
-  local cz = c[3]
-  local cw = c[4]
-  local d = sqrt(cx * cx + cy * cy + cz * cz + cw * cw)
-  cx = cx / d
-  cy = cy / d
-  cz = cz / d
-  cw = cw / d
-
-  local dot = bx * cx + by * cy + bz * cz + bw * cw
-  if dot < 0 then
-    local omega = acos(-dot)
-    local s = sin(omega)
-    local beta = -sin((1 - alpha) * omega) / s
-    local alpha = sin(alpha * omega) / s
-    a[1] = beta * bx + alpha * cx
-    a[2] = beta * by + alpha * cy
-    a[3] = beta * bz + alpha * cz
-    a[4] = beta * bw + alpha * cw
-  else
-    local omega = acos(dot)
-    local s = sin(omega)
-    local beta = sin((1 - alpha) * omega) / s
-    local alpha = sin(alpha * omega) / s
-    a[1] = beta * bx + alpha * cx
-    a[2] = beta * by + alpha * cy
-    a[3] = beta * bz + alpha * cz
-    a[4] = beta * bw + alpha * cw
-  end
-  return a
-end
-
 local super = tuple4
 local class = {
   is_quat4 = true;
@@ -131,17 +87,17 @@ local class = {
 }
 local metatable = { __tostring = super.to_string }
 
--- a:set(number b, number c, number z, number w)
+-- a:set(number b, number y, number z, number w)
 -- a:set(axis_angle4 b)
 -- a:set(tuple4 b)
 -- a:set(matrix3 b)
 -- a:set(matrix4 b)
 -- a:set()
-function class.set(a, b, c, z, w)
+function class.set(a, b, y, z, w)
   if b then
-    if c then
+    if y then
       a[1] = b
-      a[2] = c
+      a[2] = y
       a[3] = z
       a[4] = w
       return a
@@ -180,144 +136,146 @@ function class.conjugate(a, b)
     a[2] = -b[2]
     a[3] = -b[3]
     a[4] = b[4]
+    return a
   else
     a[1] = -a[1]
     a[2] = -a[2]
     a[3] = -a[3]
+    return a
   end
-  return a
 end
 
 -- a:mul(quat4 b, quat4 c)
 -- a:mul(quat4 b)
 function class.mul(a, b, c)
-  if c then
-    local bx = b[1]
-    local by = b[2]
-    local bz = b[3]
-    local bw = b[4]
-    local cx = c[1]
-    local cy = c[2]
-    local cz = c[3]
-    local cw = c[4]
-    a[1] = bx * cw + bw * cx - bz * cy + by * cz
-    a[2] = by * cw + bz * cx + bw * cy - bx * cz
-    a[3] = bz * cw - by * cx + bx * cy + bw * cz
-    a[4] = bw * cw - bx * cx - by * cy - bz * cz
-  else
-    local ax = a[1]
-    local ay = a[2]
-    local az = a[3]
-    local aw = a[4]
-    local bx = b[1]
-    local by = b[2]
-    local bz = b[3]
-    local bw = b[4]
-    a[1] = ax * bw + aw * bx - az * by + ay * bz
-    a[2] = ay * bw + az * bx + aw * by - ax * bz
-    a[3] = az * bw - ay * bx + ax * by + aw * bz
-    a[4] = aw * bw - ax * bx - ay * by - az * bz
+  if not c then
+    c = b
+    b = a
   end
+  local bx = b[1]
+  local by = b[2]
+  local bz = b[3]
+  local bw = b[4]
+  local cx = c[1]
+  local cy = c[2]
+  local cz = c[3]
+  local cw = c[4]
+  a[1] = bx * cw + bw * cx - bz * cy + by * cz
+  a[2] = by * cw + bz * cx + bw * cy - bx * cz
+  a[3] = bz * cw - by * cx + bx * cy + bw * cz
+  a[4] = bw * cw - bx * cx - by * cy - bz * cz
   return a
 end
 
 -- a:mul_inverse(quat4 b, quat4 c)
 -- a:mul_inverse(quat4 b)
 function class.mul_inverse(a, b, c)
-  if c then
-    local bx = b[1]
-    local by = b[2]
-    local bz = b[3]
-    local bw = b[4]
-    local cx = c[1]
-    local cy = c[2]
-    local cz = c[3]
-    local cw = c[4]
-    local d = cx * cx + cy * cy + cz * cz + cw * cw
-    a[1] = (bx * cw - bw * cx + bz * cy - by * cz) / d
-    a[2] = (by * cw - bz * cx - bw * cy + bx * cz) / d
-    a[3] = (bz * cw + by * cx - bx * cy - bw * cz) / d
-    a[4] = (bw * cw + bx * cx + by * cy + bz * cz) / d
-  else
-    local ax = a[1]
-    local ay = a[2]
-    local az = a[3]
-    local aw = a[4]
-    local bx = b[1]
-    local by = b[2]
-    local bz = b[3]
-    local bw = b[4]
-    local d = bx * bx + by * by + bz * bz + bw * bw
-    a[1] = (ax * bw - aw * bx + az * by - ay * bz) / d
-    a[2] = (ay * bw - az * bx - aw * by + ax * bz) / d
-    a[3] = (az * bw + ay * bx - ax * by - aw * bz) / d
-    a[4] = (aw * bw + ax * bx + ay * by + az * bz) / d
+  if not c then
+    c = b
+    b = a
   end
+  local bx = b[1]
+  local by = b[2]
+  local bz = b[3]
+  local bw = b[4]
+  local cx = c[1]
+  local cy = c[2]
+  local cz = c[3]
+  local cw = c[4]
+  local d = cx * cx + cy * cy + cz * cz + cw * cw
+  a[1] = (bx * cw - bw * cx + bz * cy - by * cz) / d
+  a[2] = (by * cw - bz * cx - bw * cy + bx * cz) / d
+  a[3] = (bz * cw + by * cx - bx * cy - bw * cz) / d
+  a[4] = (bw * cw + bx * cx + by * cy + bz * cz) / d
   return a
 end
 
 -- a:inverse(quat4 b)
 -- a:inverse()
 function class.inverse(a, b)
-  if b then
-    local x = b[1]
-    local y = b[2]
-    local z = b[3]
-    local w = b[4]
-    local d = x * x + y * y + z * z + w * w
-    a[1] = -x / d
-    a[2] = -y / d
-    a[3] = -z / d
-    a[4] = w / d
-  else
-    local x = a[1]
-    local y = a[2]
-    local z = a[3]
-    local w = a[4]
-    local d = x * x + y * y + z * z + w * w
-    a[1] = -x / d
-    a[2] = -y / d
-    a[3] = -z / d
-    a[4] = w / d
+  if not b then
+    b = a
   end
+  local x = b[1]
+  local y = b[2]
+  local z = b[3]
+  local w = b[4]
+  local d = x * x + y * y + z * z + w * w
+  a[1] = -x / d
+  a[2] = -y / d
+  a[3] = -z / d
+  a[4] = w / d
   return a
 end
 
 -- a:normalize(quat4 b)
 -- a:normalize()
 function class.normalize(a, b)
-  if b then
-    local x = b[1]
-    local y = b[2]
-    local z = b[3]
-    local w = b[4]
-    local d = sqrt(x * x + y * y + z * z + w * w)
-    a[1] = x / d
-    a[2] = y / d
-    a[3] = z / d
-    a[4] = w / d
-  else
-    local x = a[1]
-    local y = a[2]
-    local z = a[3]
-    local w = a[4]
-    local d = sqrt(x * x + y * y + z * z + w * w)
-    a[1] = x / d
-    a[2] = y / d
-    a[3] = z / d
-    a[4] = w / d
+  if not b then
+    b = a
   end
+  local x = b[1]
+  local y = b[2]
+  local z = b[3]
+  local w = b[4]
+  local d = sqrt(x * x + y * y + z * z + w * w)
+  a[1] = x / d
+  a[2] = y / d
+  a[3] = z / d
+  a[4] = w / d
   return a
 end
 
 -- a:interpolate(quat4 b, quat4 c, number d)
 -- a:interpolate(quat4 b, number c)
 function class.interpolate(a, b, c, d)
-  if d then
-    return interpolate(a, b, c, d)
-  else
-    return interpolate(a, a, b, c)
+  if not d then
+    d = c
+    c = b
+    b = a
   end
+
+  local bx = b[1]
+  local by = b[2]
+  local bz = b[3]
+  local bw = b[4]
+  local bd = sqrt(bx * bx + by * by + bz * bz + bw * bw)
+  bx = bx / bd
+  by = by / bd
+  bz = bz / bd
+  bw = bw / bd
+
+  local cx = c[1]
+  local cy = c[2]
+  local cz = c[3]
+  local cw = c[4]
+  local cd = sqrt(cx * cx + cy * cy + cz * cz + cw * cw)
+  cx = cx / cd
+  cy = cy / cd
+  cz = cz / cd
+  cw = cw / cd
+
+  local dot = bx * cx + by * cy + bz * cz + bw * cw
+  if dot < 0 then
+    local omega = acos(-dot)
+    local s = sin(omega)
+    local beta = -sin((1 - d) * omega) / s
+    local alpha = sin(d * omega) / s
+    a[1] = beta * bx + alpha * cx
+    a[2] = beta * by + alpha * cy
+    a[3] = beta * bz + alpha * cz
+    a[4] = beta * bw + alpha * cw
+  else
+    local omega = acos(dot)
+    local s = sin(omega)
+    local beta = sin((1 - d) * omega) / s
+    local alpha = sin(d * omega) / s
+    a[1] = beta * bx + alpha * cx
+    a[2] = beta * by + alpha * cy
+    a[3] = beta * bz + alpha * cz
+    a[4] = beta * bw + alpha * cw
+  end
+  return a
 end
 
 function metatable.__index(a, key)
@@ -333,7 +291,7 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c, number d, number e)
+-- class(number b, number y, number z, number e)
 -- class(tuple4 b)
 -- class()
 return setmetatable(class, {
