@@ -13,6 +13,7 @@ description = {
 build = {
   type = "builtin";
   modules = {
+    ["dromozoa.vecmath"] = "dromozoa/vecmath.lua";
     ["dromozoa.vecmath.axis_angle4"] = "dromozoa/vecmath/axis_angle4.lua";
     ["dromozoa.vecmath.color3"] = "dromozoa/vecmath/color3.lua";
     ["dromozoa.vecmath.color4"] = "dromozoa/vecmath/color4.lua";
