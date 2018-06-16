@@ -321,14 +321,14 @@ table td.subclass {
   s
   K^T J (G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T)
 \end{align}
-\(u_n\)は
+\(u\)は
 \begin{align}
   u &amp;= (G_{\theta_n} \dots G_{\theta_1}) K \\
     &amp;= u_n' K \\
   u_0' &amp;= I \\
   u_{i+1}' &amp;= u_i G_{\theta_i} \\
 \end{align}
-\(v_n\)は
+\(v\)は
 \begin{align}
   v_n^* &amp;= K^T J G_{\theta_n}^T G_{\phi_n}^T \dots G_{\theta_1}^T G_{\phi_1}^T \\
   v_n &amp;= G_{\phi_1} G_{\theta_1} \dots G_{\phi_n} G_{\theta_n} J K \\
@@ -336,7 +336,7 @@ table td.subclass {
   v_0' &amp;= I \\
   v_{i+1}' &amp;= v_i' G_{\phi_i} G_{\theta_i}
 \end{align}
-回転成分\(u v^{*}\)だけが必要なのであれば\(K\)を考える必要はない。
+回転成分\(u v^{*}\)を求めるだけであれば\(K\)を導入する必要はない。
 </p>
 
 <table>
