@@ -80,19 +80,21 @@ local metatable = { __tostring = tuple4.to_string }
 -- a:set(tuple4 b)
 -- a:set(matrix3 b)
 -- a:set(matrix4 b)
-function class.set(a, b, c, d, e)
+function class.set(a, b, c, z, w)
   if b then
     if c then
-      if d then
+      if z then
         a[1] = b
         a[2] = c
-        a[3] = d
-        a[4] = e
+        a[3] = z
+        a[4] = w
+        return a
       else
         a[1] = b[1]
         a[2] = b[2]
         a[3] = b[3]
         a[4] = c
+        return a
       end
     else
       local n = #b
@@ -104,6 +106,7 @@ function class.set(a, b, c, d, e)
           a[2] = b[2]
           a[3] = b[3]
           a[4] = b[4]
+          return a
         end
       elseif n == 9 then
         return set_matrix3(a, b)
@@ -117,8 +120,8 @@ function class.set(a, b, c, d, e)
     a[2] = 0
     a[3] = 1
     a[4] = 0
+    return a
   end
-  return a
 end
 
 function metatable.__index(a, key)
