@@ -164,6 +164,10 @@ end
 assert(m:epsilon_equals(data.set_rotation_matrix3, epsilon))
 
 m:set(m1):set_rotation(q1)
+if verbose then
+  print(tostring(m))
+  print(tostring(matrix4(data.set_rotation_quat4)))
+end
 assert(m:epsilon_equals(data.set_rotation_quat4, epsilon))
 
 m:set(m1):set_rotation(a1)

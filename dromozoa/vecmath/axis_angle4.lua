@@ -42,10 +42,10 @@ local function set_quat4(a, b)
   return a
 end
 
-local function set_matrix3(a, b)
-  local x = b[8] - b[6]
-  local y = b[3] - b[7]
-  local z = b[4] - b[2]
+local function set_matrix3(a, b11, b12, b13, b21, b22, b23, b31, b32, b33)
+  local x = b32 - b23
+  local y = b13 - b31
+  local z = b21 - b12
   local d = sqrt(x * x + y * y + z * z)
   if d == 0 then
     a[1] = 0
@@ -56,7 +56,7 @@ local function set_matrix3(a, b)
     a[1] = x / d
     a[2] = y / d
     a[3] = z / d
-    a[4] = atan2(d, b[1] + b[5] + b[9] - 1)
+    a[4] = atan2(d, b11 + b22 + b33 - 1)
   end
   return a
 end
@@ -70,29 +70,30 @@ local class = {
   equals = tuple4.equals;
   epsilon_equals = tuple4.epsilon_equals;
   set_quat4 = set_quat4;
-  set_matrix3 = set_matrix3;
 }
 local metatable = { __tostring = tuple4.to_string }
 
--- a:set(number b, number c, number d, number e)
+-- a:set(number b, number c, number z, number angle)
 -- a:set(vector3 b, number c)
 -- a:set(quat4 b)
 -- a:set(tuple4 b)
 -- a:set(matrix3 b)
 -- a:set(matrix4 b)
-function class.set(a, b, c, d, e)
+function class.set(a, b, c, z, angle)
   if b then
     if c then
-      if d then
+      if z then
         a[1] = b
         a[2] = c
-        z[3] = d
-        a[4] = e
+        a[3] = z
+        a[4] = angle
+        return a
       else
         a[1] = b[1]
         a[2] = b[2]
         a[3] = b[3]
         a[4] = c
+        return a
       end
     else
       local n = #b
@@ -104,12 +105,12 @@ function class.set(a, b, c, d, e)
           a[2] = b[2]
           a[3] = b[3]
           a[4] = b[4]
+          return a
         end
       elseif n == 9 then
-        return set_matrix3(a, b)
+        return set_matrix3(a, b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9])
       else
-        local m = { b[1], b[2], b[3], b[5], b[6], b[7], b[9], b[10], b[11] }
-        return set_matrix3(a, m)
+        return set_matrix3(a, b[1], b[2], b[3], b[5], b[6], b[7], b[9], b[10], b[11])
       end
     end
   else
@@ -117,8 +118,8 @@ function class.set(a, b, c, d, e)
     a[2] = 0
     a[3] = 1
     a[4] = 0
+    return a
   end
-  return a
 end
 
 function metatable.__index(a, key)
@@ -134,7 +135,7 @@ function metatable.__newindex(a, key, value)
   rawset(a, class.index[key], value)
 end
 
--- class(number b, number c, number d, number e)
+-- class(number b, number c, number z, number w)
 -- class(vector3 b, number c)
 -- class(axis_angle4 b)
 -- class()

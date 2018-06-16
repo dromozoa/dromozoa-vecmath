@@ -15,35 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local tuple4 = require "dromozoa.vecmath.tuple4"
+local axis_angle4 = require "dromozoa.vecmath.axis_angle4"
 
-local rawget = rawget
-local rawset = rawset
-local setmetatable = setmetatable
-
-local super = tuple4
-local class = { is_color4 = true }
-local metatable = { __tostring = super.to_string }
-
-function metatable.__index(a, key)
-  local value = class[key]
-  if value then
-    return value
-  else
-    return rawget(a, class.index[key])
-  end
-end
-
-function metatable.__newindex(a, key, value)
-  rawset(a, class.index[key], value)
-end
-
--- class(number b, number y, number z, number w)
--- class(tuple4 b)
--- class()
-return setmetatable(class, {
-  __index = super;
-  __call = function (_, ...)
-    return setmetatable(class.set({}, ...), metatable)
-  end;
-})
+local a = axis_angle4(1, 2, 3, math.pi * 0.5)
+assert(a.x == 1)
+assert(a.y == 2)
+assert(a.z == 3)
+assert(a.angle == math.pi * 0.5)
