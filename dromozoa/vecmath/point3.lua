@@ -62,9 +62,17 @@ function class.distance_linf(a, b)
   if y < 0 then y = -y end
   if z < 0 then z = -z end
   if x > y then
-    if x > z then return x else return z end
+    if x > z then
+      return x
+    else
+      return z
+    end
   else
-    if y > z then return y else return z end
+    if y > z then
+      return y
+    else
+      return z
+    end
   end
 end
 
