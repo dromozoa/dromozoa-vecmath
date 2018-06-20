@@ -41,7 +41,7 @@ local function test(n, class)
 
   local t1 = class(1,2,3,4)
   local t2 = class(2,3,4,5)
-  assert(t1:get(t2) == t1)
+  assert(t1:get(t2) == t2)
   assert(t1:equals(t2))
 
   local t1 = class(1,2,3,4)

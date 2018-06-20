@@ -58,7 +58,7 @@ function class.get(a, b)
   b[2] = a[2]
   b[3] = a[3]
   b[4] = a[4]
-  return a
+  return b
 end
 
 -- a:add(tuple4 b, tuple4 c)
