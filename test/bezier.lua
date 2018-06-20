@@ -68,13 +68,14 @@ for i = 1, n do
   io.write(("  %.17g %.17g\n"):format(p.x, p.y))
 end
 io.write(([[
-"/>
+" fill="none" stroke="black"/>
 <!--
+  n: %.17g
   distance: %.17g
   min_x: %.17g
   max_x: %.17g
   min_y: %.17g
   max_y: %.17g
 -->
-]]):format(distance, min_x, max_x, min_y, max_y))
+]]):format(n, distance, min_x, max_x, min_y, max_y))
 
