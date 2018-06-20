@@ -698,11 +698,11 @@ function class.negate(a, b)
   return a
 end
 
--- a:transform(point2 b, point2 c)
--- a:transform(vector2 b, vector2 c)
+-- a:transform(point2 b, point2 c) [EX]
+-- a:transform(vector2 b, vector2 c) [EX]
 -- a:transform(tuple3 b, tuple3 c)
--- a:transform(point2 b)
--- a:transform(vector2 b)
+-- a:transform(point2 b) [EX]
+-- a:transform(vector2 b) [EX]
 -- a:transform(tuple3 b)
 function class.transform(a, b, c)
   if #b == 2 then
