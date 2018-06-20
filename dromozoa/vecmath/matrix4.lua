@@ -89,7 +89,7 @@ local function transform_point3(a, b, c)
   c[1] = a[1] * x + a[ 2] * y + a[ 3] * z + a[ 4]
   c[2] = a[5] * x + a[ 6] * y + a[ 7] * z + a[ 8]
   c[3] = a[9] * x + a[10] * y + a[11] * z + a[12]
-  return a
+  return c
 end
 
 local function transform_vector3(a, b, c)
@@ -102,7 +102,7 @@ local function transform_vector3(a, b, c)
   c[1] = a[1] * x + a[ 2] * y + a[ 3] * z
   c[2] = a[5] * x + a[ 6] * y + a[ 7] * z
   c[3] = a[9] * x + a[10] * y + a[11] * z
-  return a
+  return c
 end
 
 local function set_rotation_axis_angle4(a, b)
@@ -185,20 +185,18 @@ function class.get(a, b, c)
     c[1] = a[4]
     c[2] = a[8]
     c[3] = a[12]
-    return a
+    return b, c
   else
     local n = #b
     if n == 3 then
       b[1] = a[4]
       b[2] = a[8]
       b[3] = a[12]
-      return a
+      return b
     elseif n == 4 then
-      quat4.set(b, matrix3.normalize{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] })
-      return a
+      return quat4.set(b, matrix3.normalize{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] })
     else
-      matrix3.normalize(matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11]))
-      return a
+      return matrix3.normalize(matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11]))
     end
   end
 end
@@ -214,7 +212,7 @@ function class.get_rotation_scale(a, b)
   b[7] = a[ 9]
   b[8] = a[10]
   b[9] = a[11]
-  return a
+  return b
 end
 
 -- a:get_scale()
@@ -1016,8 +1014,8 @@ function class.epsilon_equals(a, b, epsilon)
   end
 end
 
--- a:transform(vector3 b, vector3 c)
 -- a:transform(point3 b, point3 c)
+-- a:transform(vector3 b, vector3 c)
 -- a:transform(tuple4 b, tuple4 c)
 -- a:transform(vector3 b)
 -- a:transform(point3 b)
@@ -1043,7 +1041,7 @@ function class.transform(a, b, c)
     c[2] = a[ 5] * x + a[ 6] * y + a[ 7] * z + a[ 8] * w
     c[3] = a[ 9] * x + a[10] * y + a[11] * z + a[12] * w
     c[4] = a[13] * x + a[14] * y + a[15] * z + a[16] * w
-    return a
+    return c
   end
 end
 

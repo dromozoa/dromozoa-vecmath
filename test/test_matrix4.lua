@@ -44,7 +44,7 @@ local v = vector3()
 local q = quat4()
 local t = vector4()
 
-m1:get(n)
+assert(m1:get(n) == n)
 if verbose then
   print(tostring(m1))
   print(tostring(n))
@@ -53,19 +53,21 @@ end
 assert(n:epsilon_equals(data.get_matrix3, epsilon))
 
 n:set()
-m1:get(n, v)
+local result = { m1:get(n, v) }
+assert(result[1] == n)
+assert(result[2] == v)
 assert(n:epsilon_equals(data.get_matrix3_vector3[1], epsilon))
 assert(v:equals(data.get_matrix3_vector3[2]))
 
-m1:get(q)
+assert(m1:get(q) == q)
 assert(q:epsilon_equals(data.get_quat4, epsilon))
 
 v:set()
-m1:get(v)
+assert(m1:get(v) == v)
 assert(v:equals(data.get_vector3))
 
 n:set()
-m1:get_rotation_scale(n)
+assert(m1:get_rotation_scale(n) == n)
 assert(n:equals(data.get_rotation_scale))
 
 assert(math.abs(m1:get_scale() - data.get_scale) <= epsilon)
@@ -133,7 +135,7 @@ assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
 assert(m:mul_transpose_right(m1, m2):equals(data.mul_transpose_right))
 assert(m:mul_transpose_left(m1, m2):equals(data.mul_transpose_left))
 
-m:set(m1):transform(t:set(v2))
+assert(m:set(m1):transform(t:set(v2)) == t)
 if verbose then
   print(tostring(t))
   print(tostring(vector4(data.transform_tuple4)))
@@ -145,10 +147,10 @@ if verbose then
   print(tostring(t))
   print(tostring(vector4(data.transform_tuple4)))
 end
-m:transform(v2, t)
+assert(m:transform(v2, t) == t)
 assert(t:equals(data.transform_tuple4))
 
-m:transform(p:set(p1))
+assert(m:transform(p:set(p1)) == p)
 if verbose then
   print(tostring(p1))
   print(tostring(p))

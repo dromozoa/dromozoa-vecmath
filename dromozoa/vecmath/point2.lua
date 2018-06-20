@@ -62,6 +62,14 @@ function class.distance_linf(a, b)
   end
 end
 
+-- a:project(point3 b) [EX]
+function class.project(a, b)
+  local d = b[3]
+  a[1] = b[1] / d
+  a[2] = b[2] / d
+  return a
+end
+
 function metatable.__index(a, key)
   local value = class[key]
   if value then

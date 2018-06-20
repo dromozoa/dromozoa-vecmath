@@ -49,6 +49,9 @@ assert(point4(4,3,1,1):distance_linf{0,0,0,0} == 4)
 assert(point4(4,3,2,1):distance_linf{0,0,0,0} == 4)
 
 assert(point4():project{2,3,4,2}:equals{1,1.5,2,1})
+assert(point3():project{2,3,4,2}:equals{1,1.5,2})
+assert(point3():project{2,3,2}:equals{1,1.5,1})
+assert(point2():project{2,3,2}:equals{1,1.5})
 
 local function check(class, data)
   local p1 = class(data[1])

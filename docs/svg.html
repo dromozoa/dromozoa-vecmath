@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>dromozoa-vecmath</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="http://www.mlab.im.dendai.ac.jp/~saitoh/CADCAM/080421P.pdf">CAD/CAMにおける曲線理論: ペンシル</a>
+</ul>
+
+<h2>ベジェ曲線</h2>
+
+<svg width="162" height="152">
+  <rect x="0" y="0" width="162" height="152" fill="#CCC"/>
+  <g transform="translate(16,16)">
+    <g transform="translate(30,0)">
+      <path d="
+        M 0 0
+        C 30 160 -30 160 0 0
+      " fill="none" stroke="#000"/>
+    </g>
+
+    <g transform="translate(100,0)">
+
+<path d="
+  M 0 0
+  L
+  2.5543212890625 14.53125
+  4.6142578125 28.125
+  6.2127685546875 40.78125
+  7.3828125 52.5
+  8.1573486328125 63.28125
+  8.5693359375 73.125
+  8.6517333984375 82.03125
+  8.4375 90
+  7.9595947265625 97.03125
+  7.2509765625 103.125
+  6.3446044921875 108.28125
+  5.2734375 112.5
+  4.0704345703125 115.78125
+  2.7685546875 118.125
+  1.4007568359375 119.53125
+  0 120
+  -1.4007568359375 119.53125
+  -2.7685546875 118.125
+  -4.0704345703125 115.78125
+  -5.2734375 112.5
+  -6.3446044921875 108.28125
+  -7.2509765625 103.125
+  -7.9595947265625 97.03125
+  -8.4375 90
+  -8.6517333984375 82.03125
+  -8.5693359375 73.125
+  -8.1573486328125 63.28125
+  -7.3828125 52.5
+  -6.2127685546875 40.78125
+  -4.6142578125 28.125
+  -2.5543212890625 14.53125
+  0 0
+" fill="none" stroke="#000"/>
+<!--
+  n: 32
+  distance: 245.92278647980635
+  min_x: -8.6517333984375
+  max_x: 8.6517333984375
+  min_y: 0
+  max_y: 120
+-->
+
+    </g>
+  </g>
+</svg>
+
+<h2>円と楕円</h2>
+
+<!--
+  s:a^2 * b^2
+  t:-a^2
+  f:s * ((x/a)^2 + (y/b)^2 - 1) + t * ((x-a)^2 + y^2 - r^2)
+
+  ratsimp(f)
+  expand(f)
+  solve(f, x)
+-->
+
+<p>
+半径\(a, b\)の楕円
+\[
+  \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1
+\]
+と、\((a, 0)\)を中心とする半径\(r\)（ただし、\(r \lt 2a\)）の円
+\[
+  (x - a)^2 + y^2 = r^2
+\]
+の交点は
+\[
+  s (\frac{x^2}{a^2} + \frac{y^2}{b^2} - 1) + t ((x - a)^2 + y^2 - r^2) = 0
+\]
+上にあるので、適当な\(s,t\)を定めて\(y^2\)を消去する。
+\[
+  \frac{s}{b^2} + t = 0
+\]
+なので
+\begin{align}
+  s &amp;= a^2 b^2 \\
+  t &amp;= -a^2
+\end{align}
+とおくと、\(a \ne b\)のとき
+\[
+  x = a\left(
+    \frac{a^2}{a^2 - b^2}
+    \pm
+    \frac{\sqrt{(a^2 - b^2) r^2 + b^4}}{a^2 - b^2}
+  \right)
+\]
+\(|x| \lt a\)なので
+\begin{align}
+  x &amp;= a\left(
+    \frac{a^2}{a^2 - b^2}
+    -
+    \frac{\sqrt{(a^2 - b^2) r^2 + b^4}}{a^2 - b^2}
+  \right) \\
+  y &amp;= \pm \sqrt{r^2 - (a - x)^2}
+\end{align}
+</p>
+
+<svg width="632" height="432">
+  <rect x="0" y="0" width="632" height="432" fill="#CCC"/>
+  <g transform="translate(316,216)">
+    <ellipse cx="0" cy="0" rx="100" ry="60" fill="none" stroke="#000"/>
+    <circle cx="100" cy="0" r="50" fill="none" stroke="#000"/>
+    <path d="
+      M 72.16484970578931 -200 V 200
+    " fill="none" stroke="#000"/>
+  </g>
+</svg>
+
+<svg width="632" height="432">
+  <rect x="0" y="0" width="632" height="432" fill="#CCC"/>
+  <g transform="translate(316,216)">
+    <ellipse cx="0" cy="0" rx="100" ry="60" fill="none" stroke="#000"/>
+    <circle cx="100" cy="0" r="150" fill="none" stroke="#000"/>
+    <path d="
+      M -39.50574704207281 -200 V 200
+    " fill="none" stroke="#000"/>
+  </g>
+</svg>
+
+<svg width="632" height="432">
+  <rect x="0" y="0" width="632" height="432" fill="#CCC"/>
+  <g transform="translate(316,216)">
+    <ellipse cx="0" cy="0" rx="60" ry="100" fill="none" stroke="#000"/>
+    <circle cx="60" cy="0" r="50" fill="none" stroke="#000"/>
+    <path d="
+      M 52.173294280422 -200 V 200
+    " fill="none" stroke="#000"/>
+  </g>
+</svg>
+
+</div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  CommonHTML: {
+    undefinedFamily: "sans-serif"
+  }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML"></script>
+</body>
+</html>
