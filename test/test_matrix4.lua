@@ -133,7 +133,7 @@ assert(m:mul_transpose_both(m1, m2):equals(data.mul_transpose_both))
 assert(m:mul_transpose_right(m1, m2):equals(data.mul_transpose_right))
 assert(m:mul_transpose_left(m1, m2):equals(data.mul_transpose_left))
 
-m:set(m1):transform(t:set(v2))
+assert(m:set(m1):transform(t:set(v2)) == t)
 if verbose then
   print(tostring(t))
   print(tostring(vector4(data.transform_tuple4)))
@@ -145,10 +145,10 @@ if verbose then
   print(tostring(t))
   print(tostring(vector4(data.transform_tuple4)))
 end
-m:transform(v2, t)
+assert(m:transform(v2, t) == t)
 assert(t:equals(data.transform_tuple4))
 
-m:transform(p:set(p1))
+assert(m:transform(p:set(p1)) == p)
 if verbose then
   print(tostring(p1))
   print(tostring(p))

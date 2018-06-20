@@ -686,7 +686,7 @@ function class.transform(a, b, c)
   c[1] = a[1] * x + a[2] * y + a[3] * z
   c[2] = a[4] * x + a[5] * y + a[6] * z
   c[3] = a[7] * x + a[8] * y + a[9] * z
-  return a
+  return c
 end
 
 function metatable.__index(a, key)

@@ -89,7 +89,7 @@ local function transform_point3(a, b, c)
   c[1] = a[1] * x + a[ 2] * y + a[ 3] * z + a[ 4]
   c[2] = a[5] * x + a[ 6] * y + a[ 7] * z + a[ 8]
   c[3] = a[9] * x + a[10] * y + a[11] * z + a[12]
-  return a
+  return c
 end
 
 local function transform_vector3(a, b, c)
@@ -102,7 +102,7 @@ local function transform_vector3(a, b, c)
   c[1] = a[1] * x + a[ 2] * y + a[ 3] * z
   c[2] = a[5] * x + a[ 6] * y + a[ 7] * z
   c[3] = a[9] * x + a[10] * y + a[11] * z
-  return a
+  return c
 end
 
 local function set_rotation_axis_angle4(a, b)
@@ -1043,7 +1043,7 @@ function class.transform(a, b, c)
     c[2] = a[ 5] * x + a[ 6] * y + a[ 7] * z + a[ 8] * w
     c[3] = a[ 9] * x + a[10] * y + a[11] * z + a[12] * w
     c[4] = a[13] * x + a[14] * y + a[15] * z + a[16] * w
-    return a
+    return c
   end
 end
 

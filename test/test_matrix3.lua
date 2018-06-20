@@ -138,10 +138,10 @@ assert(m:negate(m:set(m1)):equals(data.negate))
 assert(m:set(m1):negate():equals(data.negate))
 
 v:set(v1)
-m:set(m1):transform(v)
+assert(m:set(m1):transform(v) == v)
 assert(v:equals(data.transform))
 v:set()
-m:set(m1):transform(v1, v)
+assert(m:set(m1):transform(v1, v) == v)
 assert(v:equals(data.transform))
 
 local m = matrix3(0,0,0,0,0,0,0,0,nil)
