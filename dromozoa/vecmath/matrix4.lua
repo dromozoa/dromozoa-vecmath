@@ -185,20 +185,18 @@ function class.get(a, b, c)
     c[1] = a[4]
     c[2] = a[8]
     c[3] = a[12]
-    return a
+    return b, c
   else
     local n = #b
     if n == 3 then
       b[1] = a[4]
       b[2] = a[8]
       b[3] = a[12]
-      return a
+      return b
     elseif n == 4 then
-      quat4.set(b, matrix3.normalize{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] })
-      return a
+      return quat4.set(b, matrix3.normalize{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] })
     else
-      matrix3.normalize(matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11]))
-      return a
+      return matrix3.normalize(matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11]))
     end
   end
 end
@@ -214,7 +212,7 @@ function class.get_rotation_scale(a, b)
   b[7] = a[ 9]
   b[8] = a[10]
   b[9] = a[11]
-  return a
+  return b
 end
 
 -- a:get_scale()
