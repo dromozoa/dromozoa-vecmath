@@ -204,6 +204,28 @@ local function set_quat4(a, b)
   return a
 end
 
+local function transform_point2(a, b, c)
+  if not c then
+    c = b
+  end
+  local x = b[1]
+  local y = b[2]
+  c[1] = a[1] * x + a[2] * y + a[3]
+  c[2] = a[4] * x + a[5] * y + a[6]
+  return c
+end
+
+local function transform_vector2(a, b, c)
+  if not c then
+    c = b
+  end
+  local x = b[1]
+  local y = b[2]
+  c[1] = a[1] * x + a[2] * y
+  c[2] = a[4] * x + a[5] * y
+  return c
+end
+
 local class = {
   is_matrix3 = true;
   index = {
@@ -218,6 +240,8 @@ local class = {
   normalize = normalize;
   set_axis_angle4 = set_axis_angle4;
   set_quat4 = set_quat4;
+  transform_point2 = transform_point2;
+  transform_vector2 = transform_vector2;
 }
 local metatable = { __tostring = to_string }
 
@@ -674,19 +698,33 @@ function class.negate(a, b)
   return a
 end
 
+-- a:transform(point2 b, point2 c)
+-- a:transform(vector2 b, vector2 c)
 -- a:transform(tuple3 b, tuple3 c)
+-- a:transform(point2 b)
+-- a:transform(vector2 b)
 -- a:transform(tuple3 b)
 function class.transform(a, b, c)
-  if not c then
-    c = b
+  if #b == 2 then
+    if b.is_point2 then
+      return transform_point2(a, b, c)
+    elseif b.is_vector2 then
+      return transform_vector2(a, b, c)
+    else
+      error "bad argument #2 (point2 or vector2 expected)"
+    end
+  else
+    if not c then
+      c = b
+    end
+    local x = b[1]
+    local y = b[2]
+    local z = b[3]
+    c[1] = a[1] * x + a[2] * y + a[3] * z
+    c[2] = a[4] * x + a[5] * y + a[6] * z
+    c[3] = a[7] * x + a[8] * y + a[9] * z
+    return c
   end
-  local x = b[1]
-  local y = b[2]
-  local z = b[3]
-  c[1] = a[1] * x + a[2] * y + a[3] * z
-  c[2] = a[4] * x + a[5] * y + a[6] * z
-  c[3] = a[7] * x + a[8] * y + a[9] * z
-  return c
 end
 
 function metatable.__index(a, key)

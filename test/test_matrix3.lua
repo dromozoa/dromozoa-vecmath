@@ -16,6 +16,8 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local matrix3 = require "dromozoa.vecmath.matrix3"
+local point2 = require "dromozoa.vecmath.point2"
+local vector2 = require "dromozoa.vecmath.vector2"
 local vector3 = require "dromozoa.vecmath.vector3"
 
 local verbose = os.getenv "VERBOSE" == "1"
@@ -147,3 +149,9 @@ assert(v:equals(data.transform))
 local m = matrix3(0,0,0,0,0,0,0,0,nil)
 assert(not m[9])
 assert(not m.m33)
+
+m:rot_z(math.pi * 0.5)
+m.m13 = 10
+m.m23 = 20
+assert(m:transform(point2(3,4)):epsilon_equals({6,23}, epsilon))
+assert(m:transform(vector2(3,4)):epsilon_equals({-4,3}, epsilon))

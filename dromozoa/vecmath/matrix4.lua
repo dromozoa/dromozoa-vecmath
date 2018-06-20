@@ -1014,8 +1014,8 @@ function class.epsilon_equals(a, b, epsilon)
   end
 end
 
--- a:transform(vector3 b, vector3 c)
 -- a:transform(point3 b, point3 c)
+-- a:transform(vector3 b, vector3 c)
 -- a:transform(tuple4 b, tuple4 c)
 -- a:transform(vector3 b)
 -- a:transform(point3 b)
