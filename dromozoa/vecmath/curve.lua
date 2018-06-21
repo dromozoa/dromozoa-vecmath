@@ -19,20 +19,20 @@ local class = {}
 
 function class.quadratic_bezier(p1, p2, p3, t, p)
   local u = 1 - t
+  p:scale    (u * u,     p1)
+  p:scale_add(2 * t * u, p2, p)
+  p:scale_add(t * t,     p3, p)
   return p
-      :scale    (u * u,     p1)
-      :scale_add(2 * t * u, p2, p)
-      :scale_add(t * t,     p3, p)
 end
 
 function class.cubic_bezier(p1, p2, p3, p4, t, p)
   local u = 1 - t
   local tu3 = 3 * t * u
+  p:scale    (u * u * u, p1)
+  p:scale_add(u * tu3,   p2, p)
+  p:scale_add(t * tu3,   p3, p)
+  p:scale_add(t * t * t, p4, p)
   return p
-      :scale    (u * u * u, p1)
-      :scale_add(u * tu3,   p2, p)
-      :scale_add(t * tu3,   p3, p)
-      :scale_add(t * t * t, p4, p)
 end
 
 function class.catmull_rom(p1, p2, p3, p4, t, p)
@@ -42,17 +42,21 @@ function class.catmull_rom(p1, p2, p3, p4, t, p)
   local tu = t * u
   local tum = -tu
   local tu3_1 = 1 + 3 * tu
+  p:scale    (uh * tum,         p1)
+  p:scale_add(uh * (u + tu3_1), p2, p)
+  p:scale_add(th * (t + tu3_1), p3, p)
+  p:scale_add(th * tum,         p4, p)
   return p
-      :scale    (uh * tum,         p1)
-      :scale_add(uh * (u + tu3_1), p2, p)
-      :scale_add(th * (t + tu3_1), p3, p)
-      :scale_add(th * tum,         p4, p)
 end
 
 function class.catmull_rom_to_cubic_bezier(p1, p2, p3, p4, q1, q2)
-  return
-      q1:set(p2):scale_add(1/6, p3, q1):scale_add(-1/6, p1, q1),
-      q2:set(p3):scale_add(1/6, p2, q2):scale_add(-1/6, p4, q2)
+  q1:set(p2)
+  q1:scale_add( 1/6, p3, q1)
+  q1:scale_add(-1/6, p1, q1)
+  q2:set(p3)
+  q2:scale_add(-1/6, p4, q2)
+  q2:scale_add( 1/6, p2, q2)
+  return q1, q2
 end
 
 return class
