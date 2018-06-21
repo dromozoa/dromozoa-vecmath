@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local vecmath = require "dromozoa.vecmath"
+local curve = require "dromozoa.vecmath.curve"
 
 local function subdivide(p1, p2, p3, p4, t)
   local v1 = vecmath.vector2(p3):sub(p1):scale(0.5)
@@ -32,6 +33,10 @@ local function subdivide(p1, p2, p3, p4, t)
   p:scale_add(b, v1, p)
   p:scale_add(c, v2, p)
   p:scale_add(d, p3, p)
+
+  local r = curve.catmull_rom(p1, p2, p3, p4, t, vecmath.point2())
+  assert(r:epsilon_equals(p, 1e-9))
+
   return p
 end
 
@@ -40,6 +45,11 @@ local function bezier(p1, p2, p3, p4)
   local v2 = vecmath.vector2(p4):sub(p2):scale(1/6)
   local q1 = vecmath.point2(p2):add(v1)
   local q2 = vecmath.point2(p3):sub(v2)
+
+  local r1, r2 = curve.catmull_rom_to_cubic_bezier(p1, p2, p3, p4, vecmath.point2(), vecmath.point2())
+  assert(r1:epsilon_equals(q1, 1e-9))
+  assert(r2:epsilon_equals(q2, 1e-9))
+
   return q1, q2
 end
 

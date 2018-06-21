@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local vecmath = require "dromozoa.vecmath"
+local curve = require "dromozoa.vecmath.curve"
 
 local n = tonumber(arg[1])
 local p1 = vecmath.point2(tonumber(arg[2]), tonumber(arg[3]))
@@ -62,6 +63,9 @@ for i = 1, n do
   if min_y > p.y then
     min_y = p.y
   end
+
+  local p2 = curve.cubic_bezier(p1, p2, p3, p4, i / n, vecmath.point2())
+  assert(p:epsilon_equals(p2, 1e-9))
 
   distance = distance + p:distance(q)
   q = p
