@@ -159,7 +159,7 @@ table td.subclass {
 <p>
 行列\(m\)が与えられたとき、\(M = m m^*\)を固有値分解するとユニタリ行列\(U\)と固有値行列\(S\)が得られる。
 \[
-  (U, S) = \mathrm{eig}(M)
+  (U, S) = \R{eig}(M)
 \]
 \(m\)を特異値分解する。
 \begin{align}
@@ -273,16 +273,16 @@ table td.subclass {
     0     &amp; 0     &amp; |s_z|
   \end{pmatrix} \\
   J &amp;= \begin{pmatrix}
-    \mathrm{sign}(s_x) &amp;
+    \R{sign}(s_x) &amp;
     0 &amp;
     0 \\
     0 &amp;
-    \mathrm{sign}(s_y) &amp;
+    \R{sign}(s_y) &amp;
     0 \\
     0 &amp;
-    0 &amp; \mathrm{sign}(s_z)
+    0 &amp; \R{sign}(s_z)
   \end{pmatrix} \\
-  \mathrm{sign}(x) &amp;= \begin{cases}
+  \R{sign}(x) &amp;= \begin{cases}
      1 &amp; (x \ge 0) \\
     -1 &amp; (x \lt 0)
   \end{cases}
@@ -524,7 +524,7 @@ table td.subclass {
 <p>
 RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 \begin{align}
-  \tan\theta &amp;= \frac{\mathrm{sign}(\cot 2\theta)}{|\cot 2\theta| + \sqrt{1 + \cot^2 2\theta}} \\
+  \tan\theta &amp;= \frac{\R{sign}(\cot 2\theta)}{|\cot 2\theta| + \sqrt{1 + \cot^2 2\theta}} \\
   \cos\theta &amp;= \frac{1}{\sqrt{1 + tan^2 \theta}} \\
   \sin\theta &amp;= \cos\theta \tan\theta \\
   \tan\frac{\theta}{2} &amp;= \frac{\sin\theta}{1 + \cos\theta} \\
@@ -650,7 +650,7 @@ RutishauserはThe Jacobi Method for Real Symmetric Matricesで
 <p>
 行列式の3乗根をかける。
 \[
-  B = \sqrt[3]{\mathrm{det}(A)} A
+  B = \sqrt[3]{\R{det}(A)} A
 \]
 </p>
 
@@ -803,7 +803,7 @@ Shoemakeのチュートリアルでは\(m_{11} + m_{22} + m_{33} \ge 0\)なら�
 <p>
 単位四元数\(q_1, q_2\)の球面線形補間は
 \[
-  \mathrm{slerp}(q_1, q_2, t)
+  \R{slerp}(q_1, q_2, t)
   = q_1 \frac{\sin (1 - t)\Omega}{\sin\Omega}
   + q_2 \frac{\sin t \Omega}{\sin\Omega}
 \]
@@ -833,7 +833,7 @@ Shoemakeのチュートリアルでは\(m_{11} + m_{22} + m_{33} \ge 0\)なら�
 \[
   m^{-1}
   =
-  \frac{1}{\mathrm{det}(m)}
+  \frac{1}{\R{det}(m)}
   \begin{pmatrix}
     n_{11} &amp; n_{12} &amp; n_{13} &amp; n_{14} \\
     n_{21} &amp; n_{22} &amp; n_{23} &amp; n_{24} \\
@@ -865,7 +865,7 @@ Shoemakeのチュートリアルでは\(m_{11} + m_{22} + m_{33} \ge 0\)なら�
 
 <p>
 \begin{align}
-  \mathrm{det}(m)
+  \R{det}(m)
   &amp;=
   m_{11} n_{11} + m_{21} n_{12} + m_{31} n_{13} + m_{41} n_{14} \\
   &amp;=
@@ -885,6 +885,11 @@ Shoemakeのチュートリアルでは\(m_{11} + m_{22} + m_{33} \ge 0\)なら�
 MathJax.Hub.Config({
   CommonHTML: {
     undefinedFamily: "sans-serif"
+  },
+  TeX: {
+    Macros: {
+      R: [ "\\mathrm{#1}", 1 ]
+    }
   }
 });
 </script>
