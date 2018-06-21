@@ -29,6 +29,7 @@
 
 <ul>
   <li><a href="https://www.cs.cmu.edu/~462/projects/assn2/assn2/catmullRom.pdf">Catmull-Rom splines</a></li>
+  <li><a href="https://cat-in-136.github.io/2014/03/bezier-1-kappa.html">ベジェ曲線による円の描画の制御点の位置はなぜ0.55228…なのか？</a></li>
 </ul>
 
 <h2>媒介変数</h2>
@@ -149,6 +150,19 @@ Cubic Bezierの式に代入すると
     - \tau ut^2 \V{p_4}
 \end{align}
 Catmull-Romの式と等しくなる。
+</p>
+
+<h2>円弧</h2>
+
+<h3>Cubic Bezierによる近似</h3>
+
+<p>
+一般に円を四分割して近似する。
+原点を中心として端点\((1, 0), (0, 1)\)を持つ90度の円弧を考える。
+制御点\((1, k), (k, 1)\)を持つCubic Bezierで近似される。
+\[
+  k = \frac{4 \left( \sqrt{2} - 1 \right)}{3}
+\]
 </p>
 
 </div>
