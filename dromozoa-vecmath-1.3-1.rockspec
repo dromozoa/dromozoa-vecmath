@@ -1,8 +1,8 @@
 package = "dromozoa-vecmath"
-version = "1.2-1"
+version = "1.3-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.2.tar.gz";
-  file = "dromozoa-vecmath-1.2.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.3.tar.gz";
+  file = "dromozoa-vecmath-1.3.tar.gz";
 }
 description = {
   summary = "Pure-Lua implementation of javax.vecmath package";
@@ -17,6 +17,7 @@ build = {
     ["dromozoa.vecmath.axis_angle4"] = "dromozoa/vecmath/axis_angle4.lua";
     ["dromozoa.vecmath.color3"] = "dromozoa/vecmath/color3.lua";
     ["dromozoa.vecmath.color4"] = "dromozoa/vecmath/color4.lua";
+    ["dromozoa.vecmath.curve"] = "dromozoa/vecmath/curve.lua";
     ["dromozoa.vecmath.matrix3"] = "dromozoa/vecmath/matrix3.lua";
     ["dromozoa.vecmath.matrix4"] = "dromozoa/vecmath/matrix4.lua";
     ["dromozoa.vecmath.point2"] = "dromozoa/vecmath/point2.lua";
