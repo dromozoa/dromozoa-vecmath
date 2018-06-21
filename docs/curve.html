@@ -31,6 +31,15 @@
   <li><a href="https://www.cs.cmu.edu/~462/projects/assn2/assn2/catmullRom.pdf">Catmull-Rom splines</a></li>
 </ul>
 
+<h2>媒介変数</h2>
+
+<p>
+\(0 \le t \le 1\)である媒介変数を用いる。
+\[
+  u = 1 - t
+\]
+</p>
+
 <h2>Quadratic Bezier</h2>
 
 <p>
@@ -81,10 +90,8 @@
     (1 + 2t) u^2 \V{p_2}
     + t u^2 \V{v_1}
     - t^2 u \V{v_2}
-    + t^2 (1 + 2u) \V{p_3} \\
-  u &amp;= 1 - t
+    + t^2 (1 + 2u) \V{p_3}
 \end{align}
-
 </p>
 
 <h2>Catmull-Rom Spline</h2>
