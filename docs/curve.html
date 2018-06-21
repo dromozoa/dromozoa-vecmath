@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>曲線</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="https://www.cs.cmu.edu/~462/projects/assn2/assn2/catmullRom.pdf">Catmull-Rom splines</a></li>
+</ul>
+
+<h2>媒介変数</h2>
+
+<p>
+\(0 \le t \le 1\)である媒介変数を用いる。
+\[
+  u = 1 - t
+\]
+</p>
+
+<h2>Quadratic Bezier</h2>
+
+<p>
+\begin{align}
+  \V{p_4} &amp;= u \V{p_1} + t \V{p_2} \\
+  \V{p_5} &amp;= u \V{p_2} + t \V{p_3} \\
+  \V{P} &amp;= u \V{p_4} + t \V{p_5} \\
+  &amp;= u (u \V{p_1} + t \V{p_2}) + t (u \V{p_2} + t \V{p_3}) \\
+  &amp;= u^2 \V{p_1} + 2ut \V{p_2} + t^2 \V{p_3} \\
+\end{align}
+</p>
+
+<h2>Cubic Bezier</h2>
+
+<p>
+\begin{align}
+  \V{p_5} &amp;= u \V{p_1} + t \V{p_2} \\
+  \V{p_6} &amp;= u \V{p_2} + t \V{p_3} \\
+  \V{p_7} &amp;= u \V{p_3} + t \V{p_4} \\
+  \V{p_8} &amp;= u \V{p_5} + t \V{p_6} \\
+  \V{p_9} &amp;= u \V{p_6} + t \V{p_7} \\
+  \V{P} &amp;= u \V{p_8} + t \V{p_9} \\
+  &amp;= u (u \V{p_5} + t \V{p_6}) + t (u \V{p_6} + t \V{p_7}) \\
+  &amp;= u^2 \V{p_5} + 2ut \V{p_6} + t^2 \V{p_7} \\
+  &amp;=
+    u^2 (u \V{p_1} + t \V{p_2})
+    + 2ut (u \V{p_2} + t \V{p_3})
+    + t^2 (u \V{p_3} + t \V{p_4}) \\
+  &amp;= u^3 \V{p_1} + 3u^2t \V{p_2} + 3ut^2 \V{p_3} + t^3 \V{p_4}
+\end{align}
+</p>
+
+<h2>Cubic Hermite Spline</h2>
+
+<p>
+\begin{align}
+  \V{p}(t) &amp;=
+    (2t^3 - 3t^2 + 1) \V{p_2}
+    + (t^3 - 2t^2 + t) \V{v_1}
+    + (t^3 - t^2) \V{v_2}
+    + (-2t^3 + 3t^2) \V{p_3} \\
+  &amp;=
+    (1 + 2t) (1 - t)^2 \V{p_2}
+    + t (1 - t)^2 \V{v_1}
+    - t^2 (1 - t) \V{v_2}
+    + t^2 (1 + 2(1 - t)) \V{p_3} \\
+  &amp;=
+    (1 + 2t) u^2 \V{p_2}
+    + t u^2 \V{v_1}
+    - t^2 u \V{v_2}
+    + t^2 (1 + 2u) \V{p_3}
+\end{align}
+</p>
+
+<h2>Catmull-Rom Spline</h2>
+
+<p>
+曲線のtightnessを表すパラメーター\(\tau\)を用いて、エルミート曲線の速度を
+\begin{align}
+  \V{v_1} &amp;= \tau (\V{p_3} - \V{p_1}) \\
+  \V{v_2} &amp;= \tau (\V{p_4} - \V{p_2})
+\end{align}
+と定める。
+\begin{align}
+  \V{p}(t) &amp;=
+    (1 + 2t) u^2 \V{p_2}
+    + \tau t u^2 (\V{p_3} - \V{p_1})
+    - \tau t^2 u (\V{p_4} - \V{p_2})
+    + t^2 (1 + 2u) \V{p_3} \\
+  &amp;= a \V{p_1} + b \V{p_2} + c \V{p_3} + d \V{p_4} \\
+  a &amp;= - \tau t u^2 \\
+  b &amp;= (1 + 2t) u^2 + \tau t^2 u \\
+    &amp;= (u + 2tu + \tau t^2) u \\
+  c &amp;= t^2 (1 + 2u) + \tau t u^2 \\
+    &amp;= t (t + 2tu + \tau u^2) \\
+  d &amp;= - \tau t^2 u
+\end{align}
+\(\tau = \frac{1}{2}\)のとき、
+\begin{align}
+  a &amp;= -\frac{t u^2}{2} \\
+  b &amp;= \frac{(2u + 4tu + t^2) u}{2} \\
+    &amp;= \frac{(1 + u + 3tu) u}{2} \\
+  c &amp;= \frac{t (2t + 4tu + u^2)}{2} \\
+    &amp;= \frac{t (1 + t + 3tu)}{2} \\
+  d &amp;= -\frac{t^2 u}{2}
+\end{align}
+</p>
+
+<h3>Cubic Bezierによる表現</h3>
+
+<p>
+\(\V{p_1}, \V{p_2}, \V{p_3}, \V{p_4}\)で定義されるCatmull-Rom Splineを端点\(\V{p_2}, \V{p_3}\)と制御点\(\V{q_1}, \V{q_2}\)で定義されるCubic Bezierで表現する。
+\begin{align}
+  \V{q_1} &amp;= \V{p_2} + \frac{\tau}{3}(\V{p_3} - \V{p_1}) \\
+  \V{q_2} &amp;= \V{p_3} - \frac{\tau}{3}(\V{p_4} - \V{p_2})
+\end{align}
+Cubic Bezierの式に代入すると
+\begin{align}
+  P &amp;= u^3 \V{p_2} + 3u^2t \V{q_1} + 3ut^2 \V{q_2} + t^3 \V{p_3} \\
+  &amp;= u^3 \V{p_2}
+    + 3u^2t \V{p_2} + \tau u^2t (\V{p_3} - \V{p_1})
+    + 3ut^2 \V{p_3} - \tau ut^2 (\V{p_4} - \V{p_2})
+    + t^3 \V{p_3} \\
+  &amp;= -\tau u^2t \V{p_1}
+    + (u^3 + 3u^2t + \tau ut^2) \V{p_2}
+    + (t^3 + 3ut^2 + \tau u^2t) \V{p_3}
+    - \tau ut^2 \V{p_4}
+\end{align}
+Catmull-Romの式と等しくなる。
+</p>
+
+</div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  CommonHTML: {
+    undefinedFamily: "sans-serif"
+  },
+  TeX: {
+    Macros: {
+      V: [ "\\boldsymbol{#1}", 1 ]
+    }
+  }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML"></script>
+</body>
+</html>
