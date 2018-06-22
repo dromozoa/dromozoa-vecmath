@@ -23,7 +23,7 @@ local tightness = 0.5
 local n = 64
 local epsilon = 1e-9
 
-local function subdivide(p1, p2, p3, p4, t)
+local function catmull_rom(p1, p2, p3, p4, t)
   local p2 = vecmath.point2(p2)
   local v1 = vecmath.vector2():sub(p3, p1):scale(tightness)
   local v2 = vecmath.vector2():sub(p4, p2):scale(tightness)
@@ -50,7 +50,7 @@ local function check(p1, p2, p3, p4)
   for i = 0, n do
     local t = i / n
     local p = curve.catmull_rom(p1, p2, p3, p4, t, vecmath.point2())
-    local r = subdivide(p1, p2, p3, p4, t)
+    local r = catmull_rom(p1, p2, p3, p4, t)
     if verbose then
       print(tostring(p))
     end
