@@ -20,6 +20,7 @@ local curve = require "dromozoa.vecmath.curve"
 
 local verbose = os.getenv "VERBOSE" == "1"
 local tightness = 0.5
+local n = 64
 local epsilon = 1e-9
 
 local function subdivide(p1, p2, p3, p4, t)
@@ -46,9 +47,8 @@ local function to_cubic_bezier(p1, p2, p3, p4)
 end
 
 local function check(p1, p2, p3, p4)
-  local N = 64
-  for i = 0, N do
-    local t = i / N
+  for i = 0, n do
+    local t = i / n
     local p = curve.catmull_rom(p1, p2, p3, p4, t, vecmath.point2())
     local r = subdivide(p1, p2, p3, p4, t)
     if verbose then
