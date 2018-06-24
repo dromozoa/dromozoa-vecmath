@@ -52,9 +52,25 @@
   </li>
 </ul>
 
-<h2>Bezier Clipping</h2>
+<h2>線分の交差判定</h2>
 
 <p>
+線分\((\V{p_1}, \V{p_2})\)と線分\((\V{p_3}, \V{p_4})\)が存在するとき
+\begin{align}
+  \V{v_1} &amp;= \V{p_2} - \V{p_1} \\
+  \V{v_2} &amp;= \V{p_4} - \V{p_3}
+\end{align}
+\(\V{v_1} \times \V{v_2}\)が\(0\)の場合、線分は同一直線上に存在する。
+\begin{align}
+  \V{v_3} &amp;= \V{p_3} - \V{p_1} \\
+  a &amp;= \frac{\V{v_3} \times \V{v_2}}{\V{v_1} \times \V{v_2}} \\
+  b &amp;= \frac{\V{v_3} \times \V{v_1}}{\V{v_1} \times \V{v_2}}
+\end{align}
+\(0 \le a \le 1\)かつ\(0 \le b \le 1\)ならば交点
+\[
+  \V{q} = \V{p_1} + a \V{v_1} = \V{p_3} + b \V{v_2}
+\]
+が存在する。交点を求める必要がなければ除算は不要である。
 </p>
 
 </div>

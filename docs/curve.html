@@ -47,30 +47,56 @@
 \begin{align}
   \V{p_4} &amp;= u \V{p_1} + t \V{p_2} \\
   \V{p_5} &amp;= u \V{p_2} + t \V{p_3} \\
-  \V{P} &amp;= u \V{p_4} + t \V{p_5} \\
-  &amp;= u (u \V{p_1} + t \V{p_2}) + t (u \V{p_2} + t \V{p_3}) \\
+
+  \V{p} &amp;= u \V{p_4} + t \V{p_5} \\
   &amp;= u^2 \V{p_1} + 2ut \V{p_2} + t^2 \V{p_3} \\
+  &amp;= t^2 ((\V{p_3} - \V{p_2}) - (\V{p_2} - \V{p_1}))
+    + 2t (\V{p_2} - \V{p_1})
+    + \V{p_1}
 \end{align}
 </p>
 
 <h2>Cubic Bezier</h2>
 
 <p>
+\(\V{p_1}, \V{p_5}, \V{p_8}, \V{p}\)と\(\V{p}, \V{p_9}, \V{p_7}, \V{p_4}\)に分割する。
 \begin{align}
   \V{p_5} &amp;= u \V{p_1} + t \V{p_2} \\
   \V{p_6} &amp;= u \V{p_2} + t \V{p_3} \\
   \V{p_7} &amp;= u \V{p_3} + t \V{p_4} \\
+
   \V{p_8} &amp;= u \V{p_5} + t \V{p_6} \\
+  &amp;= u^2 \V{p_1} + 2ut \V{p_2} + t^2 \V{p_3} \\
+
   \V{p_9} &amp;= u \V{p_6} + t \V{p_7} \\
-  \V{P} &amp;= u \V{p_8} + t \V{p_9} \\
-  &amp;= u (u \V{p_5} + t \V{p_6}) + t (u \V{p_6} + t \V{p_7}) \\
-  &amp;= u^2 \V{p_5} + 2ut \V{p_6} + t^2 \V{p_7} \\
-  &amp;=
-    u^2 (u \V{p_1} + t \V{p_2})
-    + 2ut (u \V{p_2} + t \V{p_3})
-    + t^2 (u \V{p_3} + t \V{p_4}) \\
-  &amp;= u^3 \V{p_1} + 3u^2t \V{p_2} + 3ut^2 \V{p_3} + t^3 \V{p_4}
+  &amp;= u^2 \V{p_2} + 2ut \V{p_3}+ t^2 \V{p_4} \\
+
+  \V{p} &amp;= u \V{p_8} + t \V{p_9} \\
+  &amp;= u^3 \V{p_1} + 3u^2t \V{p_2} + 3ut^2 \V{p_3} + t^3 \V{p_4} \\
+  &amp;= t^3 (\V{p_4}-3\V{p_3}+3\V{p_2}-\V{p_1})
+    + t^2 (3\V{p_3}-6\V{p_2}+3\V{p_1})
+    + t (3\V{p_2} - 3\V{p_1})
+    + \V{p_1} \\
+
+  \V{p}' &amp;= 3t^2 (\V{p_4}-3\V{p_3}+3\V{p_2}-\V{p_1})
+    + 2t (3\V{p_3}-6\V{p_2}+3\V{p_1})
+    + (3\V{p_2} - 3\V{p_1}) \\
+  &amp;= 3t^2\V{p_4}
+    + 3(2t-3t^2)\V{p_3}
+    + 3(1-4t+3t^2)\V{p_2}
+    - 3(1-2t+t^2)\V{p_1} \\
+  &amp;= 3t^2 \V{p_4}
+    + 9t (\frac{2}{3} - t) \V{p_3}
+    + 9 (\frac{1}{3} - t) (1 - t) \V{p_2}
+    - 3 (1-t)^2 \V{p_1} \\
+  &amp;= 3 (
+    t^2 \V{p_4}
+    + 3 t (u - \frac{1}{3}) \V{p_3}
+    - 3 (t - \frac{1}{3}) u \V{p_2}
+    - u^2 \V{p_1}
+  )
 \end{align}
+
 </p>
 
 <h2>Cubic Hermite Spline</h2>
