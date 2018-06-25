@@ -69,7 +69,6 @@ local function draw_cubic_bezier(node, P)
       c1 = math.min(cy, c1)
     end
   end
-  print(c0, c1)
 
   local d1 = path_data()
   local d2 = path_data()
@@ -115,10 +114,10 @@ local function draw_cubic_bezier(node, P)
 end
 
 local P = {
-  point2( 50,  100);
-  point2(150,    0);
-  point2(250,  400);
-  point2(  0, -300);
+  point2(-200, 100);
+  point2( -25, 200);
+  point2(  25, 200);
+  point2( 200, 100);
 }
 
 local root = _"g" {
