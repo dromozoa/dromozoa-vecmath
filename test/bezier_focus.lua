@@ -115,10 +115,10 @@ local function draw_cubic_bezier(node, P)
 end
 
 local P = {
-  point2(-200,    0);
-  point2( -50, -300);
-  point2( 100,    0);
-  point2( 200,    0);
+  point2( 50,  100);
+  point2(150,    0);
+  point2(250,  400);
+  point2(  0, -300);
 }
 
 local root = _"g" {
