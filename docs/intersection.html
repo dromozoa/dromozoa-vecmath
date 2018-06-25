@@ -73,6 +73,123 @@
 が存在する。交点を求める必要がなければ除算は不要である。
 </p>
 
+<h2>Bezier Clipping</h2>
+
+<h3>Bezier Focus</h3>
+
+<p>
+焦点曲線\(\V{F}(t) = \V{P}(t) + c(t) \V{N}(t)\)を考える。
+\(\V{N}(t)\)は接線ベクトルを90度回転して
+\[
+  \V{N}(t) = \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp; 0
+  \end{pmatrix} \V{P}'(t)
+\]
+次に
+\[
+  c(t) = c_0 (1 - t) + c_1 t
+\]
+と与え、\(\V{F}(0) = \V{F}(1)\)になるような\(c_0, c_1\)を求める。
+Cubic Bezierの場合を考えると
+\begin{align}
+  \V{F}(0)
+  &amp;= \V{P}(0) + c_0 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} \V{P}'(0) \\
+  &amp;= \V{p_1} + 3 c_0 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} (\V{p_2} - \V{p_1}) \\
+  &amp;= \begin{pmatrix}
+    x_1 \\
+    y_1
+  \end{pmatrix} + 3 c_0 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} \begin{pmatrix}
+    x_2 - x_1 \\
+    y_2 - y_1
+  \end{pmatrix} \\
+  &amp;= \begin{pmatrix}
+    x_1 \\
+    y_1
+  \end{pmatrix} + 3 c_0 \begin{pmatrix}
+    y_1 - y_2 \\
+    x_2 - x_1
+  \end{pmatrix} \\
+
+  \V{F}(1)
+  &amp;= \V{P}(1) + c_1 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} \V{P}'(1) \\
+  &amp;= \V{p_4} + 3 c_1 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} (\V{p_4} - \V{p_3}) \\
+  &amp;= \begin{pmatrix}
+    x_4 \\
+    y_4
+  \end{pmatrix} + 3c_1 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} \begin{pmatrix}
+    x_4 - x_3 \\
+    y_4 - y_3
+  \end{pmatrix} \\
+  &amp;= \begin{pmatrix}
+    x_4 \\
+    y_4
+  \end{pmatrix} + 3c_1 \begin{pmatrix}
+    y_3 - y_4 \\
+    x_4 - x_3
+  \end{pmatrix} \\
+
+  \begin{pmatrix}
+    x_4 - x_1 \\
+    y_4 - y_1
+  \end{pmatrix}
+  &amp;=
+  3 c_0 \begin{pmatrix}
+    y_1 - y_2 \\
+    x_2 - x_1
+  \end{pmatrix}
+  -
+  3c_1 \begin{pmatrix}
+    y_3 - y_4 \\
+    x_4 - x_3
+  \end{pmatrix} \\
+  &amp;=
+  3
+  \begin{pmatrix}
+    y_1 - y_2 &amp; y_4 - y_3 \\
+    x_2 - x_1 &amp; x_3 - x_4
+  \end{pmatrix}
+  \begin{pmatrix}
+    c_0 \\
+    c_1
+  \end{pmatrix} \\
+
+  3
+  \begin{pmatrix}
+    c_0 \\
+    c_1
+  \end{pmatrix}
+  &amp;=
+  \begin{pmatrix}
+    y_1 - y_2 &amp; y_4 - y_3 \\
+    x_2 - x_1 &amp; x_3 - x_4
+  \end{pmatrix}^{-1}
+  \begin{pmatrix}
+    x_4 - x_1 \\
+    y_4 - y_1
+  \end{pmatrix}
+\end{align}
+両端点の接線ベクトルが平行の場合は行列式が\(0\)になるので、\(\V{F}(0) = \V{F}(1)\)は成立しない。このような場合も含めて、\(c_0, c_1\)の上限を定めておくことで対処するらしい。
+</p>
+
 </div>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
