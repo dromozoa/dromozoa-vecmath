@@ -345,12 +345,13 @@ function class.transpose(a, b)
     a[1] = b[1]
     a[5] = b[5]
     a[9] = b[9]
+    return a
   else
     a[2], a[4] = a[4], a[2]
     a[3], a[7] = a[7], a[3]
     a[6], a[8] = a[8], a[6]
+    return a
   end
-  return a
 end
 
 -- a:set(number b, number m12, ...)

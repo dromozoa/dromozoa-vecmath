@@ -340,6 +340,7 @@ function class.transpose(a, b)
     a[6] = b[6]
     a[11] = b[11]
     a[16] = b[16]
+    return a
   else
     a[2], a[5] = a[5], a[2]
     a[3], a[9] = a[9], a[3]
@@ -347,8 +348,8 @@ function class.transpose(a, b)
     a[7], a[10] = a[10], a[7]
     a[8], a[14] = a[14], a[8]
     a[12], a[15] = a[15], a[12]
+    return a
   end
-  return a
 end
 
 -- a:set(number b, number c, number d, number m14, ...)
