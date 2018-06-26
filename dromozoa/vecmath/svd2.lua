@@ -18,37 +18,40 @@
 local sqrt = math.sqrt
 
 return function (m, u, v)
-  -- p,q = 1,2
-  local m_pp = m[1]
-  local m_pq = m[2]
-  local m_qp = m[3]
-  local m_qq = m[4]
+  local m11 = m[1]
+  local m12 = m[2]
+  local m21 = m[3]
+  local m22 = m[4]
 
-  if m_qp ~= m_pq then
-    local x = m_qp - m_pq
-    local y = m_pp + m_qq
+  local u11 = 1
+  local u12 = 0
+  local u21 = 0
+  local u22 = 1
+
+  local v11 = 1
+  local v12 = 0
+  local v21 = 0
+  local v22 = 1
+
+  if m21 ~= m12 then
+    local x = m21 - m12
+    local y = m11 + m22
     local z = sqrt(x * x + y * y)
     local s = x / z
     local c = y / z
     local h = s / (1 + c)
 
-    m_pp, m_pq = m_pp - (m_pq + m_pp * h) * s, m_pq + (m_pp - m_pq * h) * s
-    m_qq = m_qq + (m_qp - m_qq * h) * s
-    m_qp = m_pq
+    m11, m12 = m11 - (m12 + m11 * h) * s, m12 + (m11 - m12 * h) * s
+    m22 = m22 + (m21 - m22 * h) * s
+    m21 = m12
 
     if v then
-      local v_pp = v[1]
-      local v_pq = v[2]
-      local v_qp = v[3]
-      local v_qq = v[4]
-      v[1] = v_pp - (v_pq + v_pp * h) * s
-      v[2] = v_pq + (v_pp - v_pq * h) * s
-      v[3] = v_qp - (v_qq + v_qp * h) * s
-      v[4] = v_qq + (v_qp - v_qq * h) * s
+      v11, v12 = v11 - (v12 + v11 * h) * s, v12 + (v11 - v12 * h) * s
+      v21, v22 = v21 - (v22 + v21 * h) * s, v22 + (v21 - v22 * h) * s
     end
   end
 
-  local x = (m_qq - m_pp) * 0.5 / m_pq
+  local x = (m22 - m11) * 0.5 / m12
   local t
   if x < 0 then
     t = 1 / (x - sqrt(1 + x * x))
@@ -59,70 +62,73 @@ return function (m, u, v)
   local s = c * t
   local h = s / (1 + c)
 
-  m[1] = m_pp - m_pq * t
-  m[2] = 0
-  m[3] = 0
-  m[4] = m_qq + m_pq * t
+  m11, m22 = m11 - m12 * t, m22 + m12 * t
+  m12 = 0
+  m21 = 0
 
   if u then
-    local u_pp = u[1]
-    local u_pq = u[2]
-    local u_qp = u[3]
-    local u_qq = u[4]
-    u[1] = u_pp - (u_pq + u_pp * h) * s
-    u[2] = u_pq + (u_pp - u_pq * h) * s
-    u[3] = u_qp - (u_qq + u_qp * h) * s
-    u[4] = u_qq + (u_qp - u_qq * h) * s
+    u11, u12 = u11 - (u12 + u11 * h) * s, u12 + (u11 - u12 * h) * s
+    u21, u22 = u21 - (u22 + u21 * h) * s, u22 + (u21 - u22 * h) * s
   end
 
   if v then
-    local v_pp = v[1]
-    local v_pq = v[2]
-    local v_qp = v[3]
-    local v_qq = v[4]
-    v[1] = v_pp - (v_pq + v_pp * h) * s
-    v[2] = v_pq + (v_pp - v_pq * h) * s
-    v[3] = v_qp - (v_qq + v_qp * h) * s
-    v[4] = v_qq + (v_qp - v_qq * h) * s
+    v11, v12 = v11 - (v12 + v11 * h) * s, v12 + (v11 - v12 * h) * s
+    v21, v22 = v21 - (v22 + v21 * h) * s, v22 + (v21 - v22 * h) * s
   end
 
-  local sx = m[1]
-  local sy = m[4]
-
-  if sx < 0 then
-    sx = -sx
-    m[1] = sx
-    m[3] = -m[3]
+  if m11 < 0 then
+    m11 = -m11
+    m21 = -m21
     if v then
-      v[1] = -v[1]
-      v[3] = -v[3]
+      v11 = -v11
+      v21 = -v21
     end
   end
 
-  if sy < 0 then
-    sy = -sy
-    m[2] = -m[2]
-    m[4] = sy
+  if m22 < 0 then
+    m22 = -m22
+    m12 = -m12
     if v then
-      v[2] = -v[2]
-      v[4] = -v[4]
+      v12 = -v12
+      v22 = -v22
     end
   end
 
-  if sx > sy then
-    return sx, sy
-  else
-    m[1] = sy
-    m[4] = sx
-    m[2], m[3] = -m[3], -m[2]
+  if m11 > m22 then
+    m[1] = m11
+    m[2] = m12
+    m[3] = m21
+    m[4] = m22
     if u then
-      u[1], u[2] = -u[2], u[1]
-      u[3], u[4] = -u[4], u[3]
+      u[1] = u11
+      u[2] = u12
+      u[3] = u21
+      u[4] = u22
     end
     if v then
-      v[1], v[2] = -v[2], v[1]
-      v[3], v[4] = -v[4], v[3]
+      v[1] = v11
+      v[2] = v12
+      v[3] = v21
+      v[4] = v22
     end
-    return sy, sx
+    return m11, m22
+  else
+    m[1] = m22
+    m[2] = -m21
+    m[3] = -m12
+    m[4] = m11
+    if u then
+      u[1] = -u12
+      u[2] = u11
+      u[3] = -u22
+      u[4] = u21
+    end
+    if v then
+      v[1] = -v12
+      v[2] = v11
+      v[3] = -v22
+      v[4] = v21
+    end
+    return m22, m11
   end
 end
