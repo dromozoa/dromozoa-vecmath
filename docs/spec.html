@@ -43,7 +43,7 @@ z座標を0として計算してもよいが、計算はなるべく軽量にし
 <p>
 まず、<code>matrix2</code>を導入する。
 2次元の回転は一種類しかないので角度をスカラーで指定する。
-外積も同様にスカラーを返す。
+<code>vector2</code>の外積もスカラーを返す。
 </p>
 
 <h3>タプル</h3>
@@ -83,6 +83,105 @@ javax.vecmathは同次座標系を扱うためのユーティリティを提供�
     <td><code>tuple3</code></td>
     <td><code>(x, y, z, 0)</code></td>
   </tr>
+</table>
+
+<h3>行列</h3>
+
+<table>
+  <tr>
+    <th>self</th>
+    <th>operation</th>
+    <th>operands</th>
+  </tr>
+
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set</code></td>
+    <td><code>rotation, translation, scale</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set</code></td>
+    <td><code>scale, translation</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set</code></td>
+    <td><code>translation, scale</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set</code></td>
+    <td><code>rotation</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set</code></td>
+    <td><code>scale</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set</code></td>
+    <td><code>translation</code></td>
+  </tr>
+
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set_rotation</code></td>
+    <td><code>rotation</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set_rotation_scale</code></td>
+    <td><code>matrix3</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>set_translation</code></td>
+    <td><code>vector3</code></td>
+  </tr>
+
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>get</code></td>
+    <td><code>rotation, translation -&gt; scale</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>get</code></td>
+    <td><code>rotation</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>get</code></td>
+    <td><code>translation</code></td>
+  </tr>
+
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>get_rotation_scale</code></td>
+    <td><code>matrix3</code></td>
+  </tr>
+
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>transform</code></td>
+    <td><code>tuple4</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>transform</code></td>
+    <td><code>point3</code></td>
+  </tr>
+  <tr>
+    <td><code>matrix4</code></td>
+    <td><code>transform</code></td>
+    <td><code>vector3</code></td>
+  </tr>
+
+
+
+
 </table>
 
 <h2>型階層</h2>

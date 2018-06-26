@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local svd2 = require "dromozoa.vecmath.svd2"
+
 local type = type
 local cos = math.cos
 local sin = math.sin
@@ -27,6 +29,74 @@ local function to_string(a)
       a[3], a[4])
 end
 
+-- a:mul(number b, matrix2 c)
+-- a:mul(matrix2 b, matrix2 c)
+-- a:mul(number b)
+-- a:mul(matrix2 b)
+local function mul(a, b, c)
+  if type(b) == "number" then
+    if not c then
+      c = a
+    end
+    a[1] = b * c[1]
+    a[2] = b * c[2]
+    a[3] = b * c[3]
+    a[4] = b * c[4]
+    return a
+  else
+    if not c then
+      c = b
+      b = a
+    end
+    local b11 = b[1]
+    local b12 = b[2]
+    local b21 = b[3]
+    local b22 = b[4]
+
+    local c11 = c[1]
+    local c12 = c[2]
+    local c21 = c[3]
+    local c22 = c[4]
+
+    a[1] = b11 * c11 + b12 * c21
+    a[2] = b11 * c12 + b12 * c22
+    a[3] = b21 * c11 + b22 * c21
+    a[4] = b21 * c12 + b22 * c22
+    return a
+  end
+end
+
+-- a:mul_transpose_right(matrix2 b, matrix2 c)
+local function mul_transpose_right(a, b, c)
+  local b11 = b[1]
+  local b12 = b[2]
+  local b21 = b[3]
+  local b22 = b[4]
+
+  local c11 = c[1]
+  local c12 = c[3]
+  local c21 = c[2]
+  local c22 = c[4]
+
+  a[1] = b11 * c11 + b12 * c21
+  a[2] = b11 * c12 + b12 * c22
+  a[3] = b21 * c11 + b22 * c21
+  a[4] = b21 * c12 + b22 * c22
+  return a
+end
+
+-- a:normalize(matrix2 b)
+-- a:normalize()
+local function normalize(a, b)
+  if not b then
+    b = a
+  end
+  local u = { 1, 0, 0, 1 }
+  local v = { 1, 0, 0, 1 }
+  svd2({ b[1], b[2], b[3], b[4] }, u, v)
+  return mul_transpose_right(a, u, v)
+end
+
 local class = {
   is_matrix2 = true;
   index = {
@@ -35,6 +105,9 @@ local class = {
     m21 = 3, m22 = 4,
   };
   to_string = to_string;
+  mul = mul;
+  mul_transpose_right = mul_transpose_right;
+  normalize = normalize;
 }
 local metatable = { __tostring = to_string }
 
@@ -172,41 +245,10 @@ function class.rot(a, angle)
   return a
 end
 
--- a:mul(number b, matrix2 c)
--- a:mul(matrix2 b, matrix2 c)
--- a:mul(number b)
--- a:mul(matrix2 b)
-function class.mul(a, b, c)
-  if type(b) == "number" then
-    if not c then
-      c = a
-    end
-    a[1] = b * c[1]
-    a[2] = b * c[2]
-    a[3] = b * c[3]
-    a[4] = b * c[4]
-    return a
-  else
-    if not c then
-      c = b
-      b = a
-    end
-    local b11 = b[1]
-    local b12 = b[2]
-    local b21 = b[3]
-    local b22 = b[4]
-
-    local c11 = c[1]
-    local c12 = c[2]
-    local c21 = c[3]
-    local c22 = c[4]
-
-    a[1] = b11 * c11 + b12 * c21
-    a[2] = b11 * c12 + b12 * c22
-    a[3] = b21 * c11 + b22 * c21
-    a[4] = b21 * c12 + b22 * c22
-    return a
-  end
+-- a:mul_normalize(matrix2 b, matrix2 c)
+-- a:mul_normalize(matrix2 b)
+function class.mul_normalize(a, b, c)
+  return normalize(mul(a, b, c))
 end
 
 -- a:mul_transpose_both(matrix2 b, matrix2 c)
@@ -214,25 +256,6 @@ function class.mul_transpose_both(a, b, c)
   local b11 = b[1]
   local b12 = b[3]
   local b21 = b[2]
-  local b22 = b[4]
-
-  local c11 = c[1]
-  local c12 = c[3]
-  local c21 = c[2]
-  local c22 = c[4]
-
-  a[1] = b11 * c11 + b12 * c21
-  a[2] = b11 * c12 + b12 * c22
-  a[3] = b21 * c11 + b22 * c21
-  a[4] = b21 * c12 + b22 * c22
-  return a
-end
-
--- a:mul_transpose_right(matrix2 b, matrix2 c)
-function class.mul_transpose_right(a, b, c)
-  local b11 = b[1]
-  local b12 = b[2]
-  local b21 = b[3]
   local b22 = b[4]
 
   local c11 = c[1]
