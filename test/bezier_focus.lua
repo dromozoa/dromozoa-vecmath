@@ -113,10 +113,6 @@ local function draw_cubic_bezier(node, P)
   q3:scale_add(-3, q2, q3)
   q3:scale(1/3)
 
-  -- node[#node + 1] = _"circle" { cx = qa.x, cy = qa.y, r = 4 }
-  -- node[#node + 1] = _"circle" { cx = qb.x, cy = qb.y, r = 4 }
-  -- node[#node + 1] = _"circle" { cx = qc.x, cy = qc.y, r = 4 }
-
   node[#node + 1] = _"path" {
     d = path_data():M(q1.x, q1.y):C(q2.x, q2.y, q3.x, q3.y, q4.x, q4.y);
     fill = "none";
