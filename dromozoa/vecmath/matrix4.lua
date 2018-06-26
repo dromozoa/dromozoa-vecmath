@@ -181,11 +181,14 @@ end
 -- a:get(matrix3 b)
 function class.get(a, b, c)
   if c then
-    matrix3.normalize(matrix3.set(b, a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11]))
+    local u = { 1, 0, 0, 0, 1, 0, 0, 0, 1 }
+    local v = { 1, 0, 0, 0, 1, 0, 0, 0, 1 }
+    local s = svd3({ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }, u, v)
+    matrix3.mul_transpose_right(b, u, v)
     c[1] = a[4]
     c[2] = a[8]
     c[3] = a[12]
-    return b, c
+    return s, b, c
   else
     local n = #b
     if n == 3 then
