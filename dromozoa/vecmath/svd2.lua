@@ -43,11 +43,12 @@ return function (m, u, v)
 
     m11, m12 = m11 - (m12 + m11 * h) * s, m12 + (m11 - m12 * h) * s
     m22 = m22 + (m21 - m22 * h) * s
-    m21 = m12
 
     if v then
-      v11, v12 = v11 - (v12 + v11 * h) * s, v12 + (v11 - v12 * h) * s
-      v21, v22 = v21 - (v22 + v21 * h) * s, v22 + (v21 - v22 * h) * s
+      v11 = c
+      v12 = s
+      v21 = -s
+      v22 = c
     end
   end
 
@@ -63,12 +64,12 @@ return function (m, u, v)
   local h = s / (1 + c)
 
   m11, m22 = m11 - m12 * t, m22 + m12 * t
-  m12 = 0
-  m21 = 0
 
   if u then
-    u11, u12 = u11 - (u12 + u11 * h) * s, u12 + (u11 - u12 * h) * s
-    u21, u22 = u21 - (u22 + u21 * h) * s, u22 + (u21 - u22 * h) * s
+    u11 = c
+    u12 = s
+    u21 = -s
+    u22 = c
   end
 
   if v then
@@ -78,7 +79,6 @@ return function (m, u, v)
 
   if m11 < 0 then
     m11 = -m11
-    m21 = -m21
     if v then
       v11 = -v11
       v21 = -v21
@@ -87,7 +87,6 @@ return function (m, u, v)
 
   if m22 < 0 then
     m22 = -m22
-    m12 = -m12
     if v then
       v12 = -v12
       v22 = -v22
@@ -96,8 +95,8 @@ return function (m, u, v)
 
   if m11 > m22 then
     m[1] = m11
-    m[2] = m12
-    m[3] = m21
+    m[2] = 0
+    m[3] = 0
     m[4] = m22
     if u then
       u[1] = u11
@@ -114,8 +113,8 @@ return function (m, u, v)
     return m11, m22
   else
     m[1] = m22
-    m[2] = -m21
-    m[3] = -m12
+    m[2] = 0
+    m[3] = 0
     m[4] = m11
     if u then
       u[1] = -u12
