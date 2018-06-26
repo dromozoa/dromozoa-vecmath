@@ -238,6 +238,76 @@ Bezier曲線\(\V{Q}(u)\)の焦点は\(\V{F_Q}(u)\)である。
 これにより、Collinear Normalが存在しそうな\(t,u\)の範囲を絞る。
 </p>
 
+<h3>non-parametric</h3>
+
+<p>
+Cubic Bezierでは、制御点を\((t, d) = (0, d_1), (1/3, d_2), (2/3, d_3), (1, d_4)\)として
+\begin{align}
+  u &amp;= 1 - t \\
+  d(t) &amp;= u^3 d_1 + 3u^2t d_2 + 3ut^2 d_3 + t^3 d_4 \\
+  d(0) &amp;= d_1 \\
+  d(1) &amp;= d_4 \\
+  27 d(1/3) &amp; = 8d_1 + 12d_2 + 6d_3 + d_4 \\
+  27 d(2/3) &amp; = d_1 + 6d_2 + 12d_3 + 8d_4 \\
+  \begin{pmatrix}
+    d_2 \\
+    d_3
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    12 &amp;  6 \\
+     6 &amp; 12
+  \end{pmatrix}^{-1}
+  \begin{pmatrix}
+    27 d(1/3) - 8 d(0) - d(1) \\
+    27 d(2/3) - d(0) - 8 d(4)
+  \end{pmatrix} \\
+  &amp;= \frac{1}{18} \begin{pmatrix}
+     2 &amp; -1 \\
+    -1 &amp;  2
+  \end{pmatrix}
+  \begin{pmatrix}
+    27 d(1/3) - 8 d(0) - d(1) \\
+    27 d(2/3) - d(0) - 8 d(4)
+  \end{pmatrix}
+\end{align}
+5次のBezier曲線では制御点を\((t, d) = (0, d_1), (1/5, d_2), (2/5, d_3), (3/5, d_4), (4/5, d_5), (1, d_6)\)として
+\begin{align}
+  d(t) &amp;= u^5 d_1 + 5u^4t d_2 + 10u^3t^2 d_3 + 10u^2t^3 d_4 + 5ut^4 d_5 + t^5 d_6 \\
+  d(0) &amp;= d_1 \\
+  d(1) &amp;= d_6 \\
+  1024 d(1/4) &amp;= 243d_1 + 405d_2 + 270d_3 + 90d_4 + 15d_5 + d_6 \\
+  243 d(1/3) &amp;= 32d_1 + 80d_2 + 80d_3 + 40d_4 + 10d_5 + d_6 \\
+  243 d(2/3) &amp;= d_1 + 10d_2 + 40d_3 + 80d_4 + 80d_5 + 32d_6 \\
+  1024 d(3/4) &amp;= d_1 + 15d_2 + 90d_3 + 270d_4 + 405d_5 + 243d_6 \\
+  \begin{pmatrix}
+    d_2 \\
+    d_3 \\
+    d_4 \\
+    d_5
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    405 &amp; 270 &amp;  90 &amp;  15 \\
+     80 &amp;  80 &amp;  40 &amp;  10 \\
+     10 &amp;  40 &amp;  80 &amp;  80 \\
+     15 &amp;  90 &amp; 270 &amp; 405
+  \end{pmatrix}^{-1} \begin{pmatrix}
+    1024 d(1/4) - 243 d(0) - d(1) \\
+     243 d(1/3) -  32 d(0) - d(1) \\
+     243 d(2/3) - d(0) -  32 d(1) \\
+    1024 d(3/4) - d(0) - 243 d(1)
+  \end{pmatrix} \\
+  &amp;= \frac{1}{1200} \begin{pmatrix}
+     12 &amp; -48 &amp;  24 &amp;  -4 \\
+    -17 &amp;  92 &amp; -64 &amp;  11 \\
+     11 &amp; -64 &amp;  92 &amp; -17 \\
+     -4 &amp;  24 &amp; -48 &amp;  12
+  \end{pmatrix} \begin{pmatrix}
+    1024 d(1/4) - 243 d(0) - d(1) \\
+     243 d(1/3) -  32 d(0) - d(1) \\
+     243 d(2/3) - d(0) -  32 d(1) \\
+    1024 d(3/4) - d(0) - 243 d(1)
+  \end{pmatrix}
+\end{align}
+</p>
+
 </div>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
