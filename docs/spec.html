@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+</head>
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+table td.subclass {
+  padding-left: 2em;
+}
+</style>
+<body>
+<div class="markdown-body">
+
+<h1>仕様</h1>
+
+<ul>
+  <li><a href="https://download.java.net/media/java3d/javadoc/1.5.0/index.html">Java 3D 1.5.0</a></li>
+</ul>
+
+<h2>コンセプト</h2>
+
+<p>
+javax.vecmathは3次元を扱うことを扱うことを目的としているので、たとえば<code>Matrix2d</code>を持たない。
+z座標を0として計算してもよいが、計算はなるべく軽量にしたい。
+そこで、2次元を扱うためのユーティリティを導入する。
+</p>
+
+<p>
+まず、<code>matrix2</code>を導入する。
+2次元の回転は一種類しかないので角度をスカラーで指定する。
+外積も同様にスカラーを返す。
+</p>
+
+<h3>タプル</h3>
+
+<p>
+javax.vecmathは同次座標系を扱うためのユーティリティを提供している。
+</p>
+
+<table>
+  <tr>
+    <th>self</th>
+    <th>operation</th>
+    <th>operand</th>
+    <th>result</th>
+  </tr>
+  <tr>
+    <td><code>point4</code></td>
+    <td><code>set</code></td>
+    <td><code>tuple3</code></td>
+    <td><code>(x, y, z, 1)</code></td>
+  </tr>
+  <tr>
+    <td><code>point4</code></td>
+    <td><code>project</code></td>
+    <td><code>point4</code></td>
+    <td><code>(x/w, y/w, z/w, 1)</code></td>
+  </tr>
+  <tr>
+    <td><code>point3</code></td>
+    <td><code>project</code></td>
+    <td><code>point4</code></td>
+    <td><code>(x/w, y/w, z/w)</code></td>
+  </tr>
+  <tr>
+    <td><code>vector4</code></td>
+    <td><code>set</code></td>
+    <td><code>tuple3</code></td>
+    <td><code>(x, y, z, 0)</code></td>
+  </tr>
+</table>
+
+<h2>型階層</h2>
+
+<table>
+  <tr>
+    <th>#</th>
+    <th>class</th>
+    <th>abstract</th>
+  </tr>
+
+  <tr>
+    <td rowspan="4">2</td>
+    <td>tuple2</td>
+    <td>abstract</td>
+  </tr>
+  <tr>
+    <td class="subclass">point2</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">vector2</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord2</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td rowspan="5">3</td>
+    <td>tuple3</td>
+    <td>abstract</td>
+  </tr>
+  <tr>
+    <td class="subclass">point3</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">vector3</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord3</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">color3</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td rowspan="6">4</td>
+    <td>tuple4</td>
+    <td>abstract</td>
+  </tr>
+  <tr>
+    <td class="subclass">point4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">vector4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">quat4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">tex_coord4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="subclass">color4</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>4</td>
+    <td>axis_angle4</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>4</td>
+    <td>matrix2 [EX]</td>
+    <td></td>
+  </tr>
+
+
+  <tr>
+    <td>9</td>
+    <td>matrix3</td>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>16</td>
+    <td>matrix4</td>
+    <td></td>
+  </tr>
+</table>
+
+</div>
+</body>
+</html>
