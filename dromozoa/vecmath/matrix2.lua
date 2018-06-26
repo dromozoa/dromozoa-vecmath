@@ -120,6 +120,21 @@ function class.set_identity(a)
   return a
 end
 
+-- a:set_scale(number scale)
+function class.set_scale(a, scale)
+  normalize(a)
+  a[1] = a[1] * scale
+  a[2] = a[2] * scale
+  a[3] = a[3] * scale
+  a[4] = a[4] * scale
+  return a
+end
+
+-- a:get_scale()
+function class.get_scale(a)
+  return svd2{ a[1], a[2], a[3], a[4] }
+end
+
 -- a:add(number b, matrix2 c)
 -- a:add(matrix2 b, matrix2 c)
 -- a:add(number b)

@@ -84,7 +84,7 @@ assert(matrix2(1,2,3,4):invert():equals{-2,1,3/2,-1/2})
 assert(matrix2(1,2,3,4):determinant() == -2)
 
 if verbose then
-  print(matrix2():rot(math.pi/2))
+  print(tostring(matrix2():rot(math.pi/2)))
 end
 assert(matrix2():rot(math.pi/2):epsilon_equals({0,-1,1,0}, epsilon))
 
@@ -113,3 +113,9 @@ assert(matrix2(1,1/2,1/2,1/3):normalize():epsilon_equals({1,0,0,1}, epsilon))
 assert(matrix2(1,2,2,4):normalize():epsilon_equals({1,0,0,1}, epsilon))
 assert(matrix2(9,0,0,3):normalize():epsilon_equals({1,0,0,1}, epsilon))
 assert(matrix2(3,0,0,9):normalize():epsilon_equals({1,0,0,1}, epsilon))
+
+if verbose then
+  print(tostring(matrix2(1,2,3,4):set_scale(2)))
+end
+assert(matrix2(1,2,3,4):set_scale(2):epsilon_equals({-1.02899151085505,1.71498585142509,1.71498585142509,1.02899151085505}, epsilon))
+assert(matrix2(1,2,3,4):get_scale() == 5.464985704219043)
