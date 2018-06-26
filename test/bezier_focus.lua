@@ -26,8 +26,38 @@ local unpack = table.unpack or unpack
 local _ = element
 local point2 = vecmath.point2
 local vector2 = vecmath.vector2
+local vector3 = vecmath.vector3
+local matrix3 = vecmath.matrix3
 
-local N = 128
+local N = 16
+
+local function cubic_bezier(P, t)
+  local p1, p2, p3, p4 = unpack(P)
+  local u = 1 - t
+  local p = vector2()
+  p:scale_add(t * t * t, p4, p)
+  p:scale_add(3 * u * t * t, p3, p)
+  p:scale_add(3 * u * u * t, p2, p)
+  p:scale_add(u * u * u, p1, p)
+  return p
+end
+
+local function cubic_bezier_d(P, t)
+  local p1, p2, p3, p4 = unpack(P)
+  local u = 1 - t
+  local v = vector2()
+  v:scale_add(t * t, p4, v)
+  v:scale_add(3 * t * (u - 1/3), p3, v)
+  v:scale_add(-3 * (t - 1/3) * u, p2, v)
+  v:scale_add(-u * u, p1, v)
+  v:scale(3)
+  return v
+end
+
+local function rot90(v)
+  v:set(-v.y, v.x)
+  return v
+end
 
 local function draw_cubic_bezier(node, P)
   local p1, p2, p3, p4 = unpack(P)
@@ -44,31 +74,54 @@ local function draw_cubic_bezier(node, P)
   local c0 = 10
   local c1 = 10
 
-  local m11 = p1.y - p2.y
-  local m12 = p4.y - p3.y
-  local m21 = p2.x - p1.x
-  local m22 = p3.x - p4.x
-  local det = m11 * m22 - m12 * m21
-  if det ~= 0 then
-    local n11 = m22 / det
-    local n12 = -m12 / det
-    local n21 = -m21 / det
-    local n22 = m11 / det
-    local x = p4.x - p1.x
-    local y = p4.y - p1.y
-    local cx = (n11 * x + n12 * y) / 3
-    local cy = (n21 * x + n22 * y) / 3
-    if cx < 0 then
-      c0 = math.max(cx, -c0)
+  local m = matrix3(1)
+  m.m11 = p1.y - p2.y
+  m.m12 = p4.y - p3.y
+  m.m21 = p2.x - p1.x
+  m.m22 = p3.x - p4.x
+  if m:determinant() ~= 0 then
+    m:invert()
+    local c = vector3(p4.x, p4.y, 1):sub{ p1.x, p1.y, 1 }
+    m:transform(c)
+    c:scale(1/3)
+    if c.x < 0 then
+      c0 = math.max(c.x, -c0)
     else
-      c0 = math.min(cx, c0)
+      c0 = math.min(c.x, c0)
     end
-    if cy < 0 then
-      c1 = math.max(cy, -c1)
+    if c.y < 0 then
+      c1 = math.max(c.y, -c1)
     else
-      c1 = math.min(cy, c1)
+      c1 = math.min(c.y, c1)
     end
   end
+
+  local q1 = point2():add(cubic_bezier(P, 0), rot90(cubic_bezier_d(P, 0)):scale(c0))
+  local q4 = point2():add(cubic_bezier(P, 1), rot90(cubic_bezier_d(P, 1)):scale(c1))
+  local qa = point2():add(cubic_bezier(P, 1/3), rot90(cubic_bezier_d(P, 1/3)):scale(c0*2/3 + c1*1/3))
+  local qb = point2():add(cubic_bezier(P, 2/3), rot90(cubic_bezier_d(P, 2/3)):scale(c0*1/3 + c1*2/3))
+  local qc = point2():add(cubic_bezier(P, 1/2), rot90(cubic_bezier_d(P, 1/2)):scale(c0*1/2 + c1*1/2))
+  local q2 = point2()
+  q2:scale_add(3, qa, q2)
+  q2:scale_add(-3/2, qb, q2)
+  q2:scale_add(-5/6, q1, q2)
+  q2:scale_add(1/3, q4, q2)
+  local q3 = point2()
+  q3:scale_add(8, qc, q3)
+  q3:sub(q1)
+  q3:sub(q4)
+  q3:scale_add(-3, q2, q3)
+  q3:scale(1/3)
+
+  -- node[#node + 1] = _"circle" { cx = qa.x, cy = qa.y, r = 4 }
+  -- node[#node + 1] = _"circle" { cx = qb.x, cy = qb.y, r = 4 }
+  -- node[#node + 1] = _"circle" { cx = qc.x, cy = qc.y, r = 4 }
+
+  node[#node + 1] = _"path" {
+    d = path_data():M(q1.x, q1.y):C(q2.x, q2.y, q3.x, q3.y, q4.x, q4.y);
+    fill = "none";
+    stroke = "#333";
+  }
 
   local d1 = path_data()
   local d2 = path_data()
@@ -110,14 +163,15 @@ local function draw_cubic_bezier(node, P)
     d = d2;
     fill = "none";
     stroke = "#F33";
+    ["stroke-opacity"] = 0.5;
   }
 end
 
 local P = {
-  point2(-200, 100);
+  point2(-100, 100);
   point2( -25, 200);
   point2(  25, 200);
-  point2( 200, 100);
+  point2( 100, 200);
 }
 
 local root = _"g" {
