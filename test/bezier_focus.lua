@@ -57,10 +57,16 @@ local function cubic_bezier_d(P, t)
   return v
 end
 
-local function distance(P, F, t)
-  local a = cubic_bezier_d(P, t)
-  local b = cubic_bezier(P, t):sub(F)
-  return a:dot(b)
+local function distance(P, F, t, u)
+  if u then
+    local a = cubic_bezier_d(P, t)
+    local b = cubic_bezier(P, t):sub(cubic_bezier(F, u))
+    return a:dot(b)
+  else
+    local a = cubic_bezier_d(P, t)
+    local b = cubic_bezier(P, t):sub(F)
+    return a:dot(b)
+  end
 end
 
 local function rot90(v)
@@ -119,8 +125,10 @@ local function draw_cubic_bezier(node, P)
       27 * qa.y - 8 * q1.y - q4.y,
       27 * qb.y - q1.y - 8 * q4.y)
   m:transform(vy)
-  local q2 = point2(vx.x, vy.x)
-  local q3 = point2(vx.y, vy.y)
+  local q2 = point2(vx[1], vy[2])
+  local q3 = point2(vx[2], vy[2])
+
+  local F = { q1, q2, q3, q4 }
 
   node[#node + 1] = _"path" {
     d = path_data():M(q1.x, q1.y):C(q2.x, q2.y, q3.x, q3.y, q4.x, q4.y);
@@ -170,9 +178,11 @@ local function draw_cubic_bezier(node, P)
     stroke = "#F33";
     ["stroke-opacity"] = 0.5;
   }
+
+  return F
 end
 
-local function draw_td(node, P, F)
+local function draw_td_p(node, P, F)
   local p1, p2, p3, p4 = unpack(P)
 
   node[#node + 1] = _"path" {
@@ -212,22 +222,89 @@ local function draw_td(node, P, F)
   m:transform(v)
 
   local data = { d0, v.x, v.y, v.z, v.w, d1 }
-  for i = 1, 6 do
-    node[#node + 1] = _"circle" {
-      cx = (i - 1) / 5 * x;
-      cy = data[i] * y;
-      r = 4;
+  local d = path_data()
+  d:M(0, data[1] * y)
+  for i = 1, 5 do
+    d:L(i / 5 * x, data[i + 1] * y)
+  end
+
+  node[#node + 1] = _"path" {
+    d = d;
+    fill = "none";
+    stroke = "#F33";
+  }
+end
+
+local function draw_td_c(node, P, F)
+  local p1, p2, p3, p4 = unpack(P)
+
+  node[#node + 1] = _"path" {
+    d = path_data():M(0, 0):H(640);
+    fill = "none";
+    stroke = "#CCC";
+  }
+
+  local x = 640
+  local y = 1/640
+
+  for j = 0, 3 do
+    local u = j / 3
+    local d = path_data()
+
+    local d0 = distance(P, F, 0, u)
+    local d1 = distance(P, F, 1, u)
+    d:M(0, d0 * y)
+    for i = 1, M do
+      local t = i / M
+      d:L(t * x, distance(P, F, t, u) * y)
+    end
+
+    -- node[#node + 1] = _"path" {
+    --   d = d;
+    --   fill = "none";
+    --   stroke = "#333";
+    -- }
+
+    local m = matrix4(
+       48/30000, -48/30000,  32/30000, -12/30000,
+      -58/30000, 118/30000, -92/30000,  37/30000,
+       37/30000, -92/30000, 118/30000, -58/30000,
+      -12/30000,  32/30000, -48/30000,  48/30000)
+    local v = vector4(
+      3125 * distance(P, F, 1/5, u) - 1024 * d0 -        d1,
+      3125 * distance(P, F, 2/5, u) -  243 * d0 -   32 * d1,
+      3125 * distance(P, F, 3/5, u) -   32 * d0 -  243 * d1,
+      3125 * distance(P, F, 4/5, u) -        d0 - 1024 * d1)
+    m:transform(v)
+
+    local data = { d0, v.x, v.y, v.z, v.w, d1 }
+    local d = path_data()
+    d:M(0, data[1] * y)
+    for i = 1, 5 do
+      d:L(i / 5 * x, data[i + 1] * y)
+    end
+
+    node[#node + 1] = _"path" {
+      d = d;
       fill = "none";
-      stroke = "#333";
+      stroke = "#F33";
+      ["stroke-opacity"] = 0.5;
     }
   end
 end
 
 local P = {
-  point2(-10, -100);
-  point2(-50,    0);
-  point2( 50,    0);
-  point2( 10, -100);
+  point2(-100, -100);
+  point2( -50,    0);
+  point2(  50,    0);
+  point2( 100, -100);
+}
+
+local Q = {
+  point2(-50, -100);
+  point2(  0,    0);
+  point2(100,    0);
+  point2(250, -100);
 }
 
 local F = point2(100, -50)
@@ -240,14 +317,17 @@ local td_root = _"g" {
   transform = "translate(640, 320)";
 }
 
-draw_cubic_bezier(root, P)
-draw_td(td_root, P, F)
+local Fp = draw_cubic_bezier(root, P)
+local Fq = draw_cubic_bezier(root, Q)
+-- draw_td_c(td_root, P, Fq)
+draw_td_c(td_root, Q, Fp)
 
-root[#root + 1] = _"circle" {
-  cx = F.x;
-  cy = F.y;
-  r = 2;
-}
+-- root[#root + 1] = _"circle" {
+--   cx = F.x;
+--   cy = F.y;
+--   r = 2;
+-- }
+-- draw_td_p(td_root, P, F)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
