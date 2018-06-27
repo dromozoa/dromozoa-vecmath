@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local matrix2 = require "dromozoa.vecmath.matrix2"
+local svd2 = require "dromozoa.vecmath.svd2"
 local svd3 = require "dromozoa.vecmath.svd3"
 
 local error = error
@@ -204,6 +206,19 @@ local function set_quat4(a, b)
   return a
 end
 
+local function set_matrix2(a, b)
+  a[1] = b[1]
+  a[2] = b[2]
+  a[3] = 0
+  a[4] = b[3]
+  a[5] = b[4]
+  a[6] = 0
+  a[7] = 0
+  a[8] = 0
+  a[9] = 1
+  return a
+end
+
 local function transform_point2(a, b, c)
   if not c then
     c = b
@@ -345,33 +360,78 @@ function class.transpose(a, b)
     a[1] = b[1]
     a[5] = b[5]
     a[9] = b[9]
+    return a
   else
     a[2], a[4] = a[4], a[2]
     a[3], a[7] = a[7], a[3]
     a[6], a[8] = a[8], a[6]
+    return a
   end
-  return a
 end
 
--- a:set(number b, number m12, ...)
+-- a:set(number b, number c, number d, number m21...)
+-- a:set(matrix2 b, vector2 c, number d) [EX]
+-- a:set(number b, vector2 c) [EX]
+-- a:set(vector2 b, number b) [EX]
 -- a:set(number b)
+-- a:set(vector2 b) [EX]
 -- a:set(axis_angle4 b)
 -- a:set(quat4 b)
+-- a:set(matrix2 b) [EX]
 -- a:set(matrix3 b)
 -- a:set()
-function class.set(a, b, m12, m13, m21, m22, m23, m31, m32, m33)
+function class.set(a, b, c, d, m21, m22, m23, m31, m32, m33)
   if b then
-    if m12 then
-      a[1] = b
-      a[2] = m12
-      a[3] = m13
-      a[4] = m21
-      a[5] = m22
-      a[6] = m23
-      a[7] = m31
-      a[8] = m32
-      a[9] = m33
-      return a
+    if c then
+      if d then
+        if m21 then
+          a[1] = b
+          a[2] = c
+          a[3] = d
+          a[4] = m21
+          a[5] = m22
+          a[6] = m23
+          a[7] = m31
+          a[8] = m32
+          a[9] = m33
+          return a
+        else
+          a[1] = b[1] * d
+          a[2] = b[2] * d
+          a[3] = c[1]
+          a[4] = b[3] * d
+          a[5] = b[4] * d
+          a[6] = c[2]
+          a[7] = 0
+          a[8] = 0
+          a[9] = 1
+          return a
+        end
+      else
+        if type(b) == "number" then
+          a[1] = b
+          a[2] = 0
+          a[3] = c[1]
+          a[4] = 0
+          a[5] = b
+          a[6] = c[2]
+          a[7] = 0
+          a[8] = 0
+          a[9] = 1
+          return a
+        else
+          a[1] = c
+          a[2] = 0
+          a[3] = b[1] * c
+          a[4] = 0
+          a[5] = c
+          a[6] = b[2] * c
+          a[7] = 0
+          a[8] = 0
+          a[9] = 1
+          return a
+        end
+      end
     else
       if type(b) == "number" then
         a[1] = b
@@ -386,13 +446,26 @@ function class.set(a, b, m12, m13, m21, m22, m23, m31, m32, m33)
         return a
       else
         local n = #b
-        if n == 4 then
+        if n == 2 then
+          a[1] = 1
+          a[2] = 0
+          a[3] = b[1]
+          a[4] = 0
+          a[5] = 1
+          a[6] = b[2]
+          a[7] = 0
+          a[8] = 0
+          a[9] = 1
+          return a
+        elseif n == 4 then
           if b.is_axis_angle4 then
             return set_axis_angle4(a, b)
           elseif b.is_quat4 then
             return set_quat4(a, b)
+          elseif b.is_matrix2 then
+            return set_matrix2(a, b)
           else
-            error "bad argument #2 (axis_angle4 or quat4 expected)"
+            error "bad argument #2 (axis_angle4/quat4/matrix2 expected)"
           end
         else
           a[1] = b[1]
@@ -725,6 +798,64 @@ function class.transform(a, b, c)
     c[3] = a[7] * x + a[8] * y + a[9] * z
     return c
   end
+end
+
+-- a:set_rotation(matrix2 b) [EX]
+function class.set_rotation(a, b)
+  local sx, sy = svd2{ a[1], a[2], a[4], a[5] }
+  a[1] = b[1] * sx
+  a[2] = b[2] * sy
+  a[4] = b[3] * sx
+  a[5] = b[4] * sy
+  return a
+end
+
+-- a:set_rotation_scale(matrix2 b) [EX]
+function class.set_rotation_scale(a, b)
+  a[1] = b[1]
+  a[2] = b[2]
+  a[4] = b[3]
+  a[5] = b[4]
+  return a
+end
+
+-- a:set_translation(vector2 b) [EX]
+function class.set_translation(a, b)
+  a[3] = b[1]
+  a[6] = b[2]
+  return a
+end
+
+-- a:get(matrix2 b, vector2 c) [EX]
+-- a:get(vector2 b) [EX]
+-- a:get(matrix2 b) [EX]
+function class.get(a, b, c)
+  if c then
+    local u = { 1, 0, 0, 1 }
+    local v = { 1, 0, 0, 1 }
+    local s = svd2({ a[1], a[2], a[4], a[5] }, u, v)
+    matrix2.mul_transpose_right(b, u, v)
+    c[1] = a[3]
+    c[2] = a[6]
+    return s, b, c
+  else
+    if #b == 2 then
+      b[1] = a[3]
+      b[2] = a[6]
+      return b
+    else
+      return matrix2.normalize(matrix2.set(b, a[1], a[2], a[4], a[5]))
+    end
+  end
+end
+
+-- a:get_rotation_scale(matrix2 b) [EX]
+function class.get_rotation_scale(a, b)
+  b[1] = a[1]
+  b[2] = a[2]
+  b[3] = a[4]
+  b[4] = a[5]
+  return b
 end
 
 function metatable.__index(a, key)

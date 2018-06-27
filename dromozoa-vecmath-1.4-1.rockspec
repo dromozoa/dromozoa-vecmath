@@ -1,8 +1,8 @@
 package = "dromozoa-vecmath"
-version = "1.3-1"
+version = "1.4-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.3.tar.gz";
-  file = "dromozoa-vecmath-1.3.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.4.tar.gz";
+  file = "dromozoa-vecmath-1.4.tar.gz";
 }
 description = {
   summary = "Pure-Lua implementation of javax.vecmath package";
@@ -18,12 +18,14 @@ build = {
     ["dromozoa.vecmath.color3"] = "dromozoa/vecmath/color3.lua";
     ["dromozoa.vecmath.color4"] = "dromozoa/vecmath/color4.lua";
     ["dromozoa.vecmath.curve"] = "dromozoa/vecmath/curve.lua";
+    ["dromozoa.vecmath.matrix2"] = "dromozoa/vecmath/matrix2.lua";
     ["dromozoa.vecmath.matrix3"] = "dromozoa/vecmath/matrix3.lua";
     ["dromozoa.vecmath.matrix4"] = "dromozoa/vecmath/matrix4.lua";
     ["dromozoa.vecmath.point2"] = "dromozoa/vecmath/point2.lua";
     ["dromozoa.vecmath.point3"] = "dromozoa/vecmath/point3.lua";
     ["dromozoa.vecmath.point4"] = "dromozoa/vecmath/point4.lua";
     ["dromozoa.vecmath.quat4"] = "dromozoa/vecmath/quat4.lua";
+    ["dromozoa.vecmath.svd2"] = "dromozoa/vecmath/svd2.lua";
     ["dromozoa.vecmath.svd3"] = "dromozoa/vecmath/svd3.lua";
     ["dromozoa.vecmath.tex_coord2"] = "dromozoa/vecmath/tex_coord2.lua";
     ["dromozoa.vecmath.tex_coord3"] = "dromozoa/vecmath/tex_coord3.lua";

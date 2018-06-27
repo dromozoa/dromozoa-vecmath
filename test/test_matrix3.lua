@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local matrix2 = require "dromozoa.vecmath.matrix2"
 local matrix3 = require "dromozoa.vecmath.matrix3"
 local point2 = require "dromozoa.vecmath.point2"
 local vector2 = require "dromozoa.vecmath.vector2"
@@ -155,3 +156,40 @@ m.m13 = 10
 m.m23 = 20
 assert(m:transform(point2(3,4)):epsilon_equals({6,23}, epsilon))
 assert(m:transform(vector2(3,4)):epsilon_equals({-4,3}, epsilon))
+
+if verbose then
+  print(tostring(matrix3(matrix2():rot(math.pi/4), vector2(10, 20), 2)))
+end
+assert(matrix3(matrix2():rot(math.pi/4), vector2(10, 20), 2):equals{
+  2*math.cos(math.pi/4), -2*math.sin(math.pi/4), 10;
+  2*math.sin(math.pi/4),  2*math.cos(math.pi/4), 20;
+  0, 0, 1;
+})
+assert(matrix3(2,{1,3}):equals{2,0,1;0,2,3;0,0,1})
+assert(matrix3({1,3},2):equals{2,0,2;0,2,6;0,0,1})
+assert(matrix3(matrix2{1,2,3,4}):equals{1,2,0;3,4,0;0,0,1})
+assert(matrix3{1,3}:equals{1,0,1;0,1,3;0,0,1})
+
+local m = matrix3(1,2,3,4,5,6,0,0,1)
+assert(m:set_rotation_scale{2,1,5,4}:equals{2,1,3,5,4,6,0,0,1})
+assert(m:set_translation{6,3}:equals{2,1,6,5,4,3,0,0,1})
+assert(m:set_rotation{0,-1,1,0}:epsilon_equals({0,-0.443273615295610,6,6.767828935632369,0,3,0,0,1}, epsilon))
+
+local m = matrix3(1,2,3,4,5,6,0,0,1)
+local n = matrix2()
+local v = vector2()
+local result = { m:get(n, v) }
+assert(math.abs(result[1] - 6.767828935632369) <= epsilon)
+assert(result[2] == n)
+assert(result[3] == v)
+if verbose then
+  print(tostring(n))
+end
+assert(n:epsilon_equals({-0.554700196225229,0.832050294337844,0.832050294337844,0.554700196225229}, epsilon))
+assert(v:equals{3,6})
+if verbose then
+  print(tostring(m:get(matrix2())))
+end
+assert(m:get(matrix2()):epsilon_equals({-0.554700196225229,0.832050294337844,0.832050294337844,0.554700196225229}, epsilon))
+assert(m:get(vector2()):equals{3,6})
+assert(m:get_rotation_scale(matrix2()):equals{1,2,4,5})

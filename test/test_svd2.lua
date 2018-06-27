@@ -15,24 +15,25 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local matrix3 = require "dromozoa.vecmath.matrix3"
-local svd3 = require "dromozoa.vecmath.svd3"
+local matrix2 = require "dromozoa.vecmath.matrix2"
+local svd2 = require "dromozoa.vecmath.svd2"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
 local epsilon = 1e-9
 
 local function test_svd(m, expect)
-  local a = matrix3(m)
-  local u = matrix3():set_identity()
-  local v = matrix3():set_identity()
-  local sx, sy, sz = svd3(a, u, v)
+  local a = matrix2(m)
+  local u = matrix2():set_identity()
+  local v = matrix2():set_identity()
+  local sx, sy = svd2(a, u, v)
+  if verbose then
+    print(sx, sy)
+  end
   assert(sx == a.m11)
   assert(sy == a.m22)
-  assert(sz == a.m33)
   local e1 = math.abs(sx - expect[1])
   local e2 = math.abs(sy - expect[2])
-  local e3 = math.abs(sz - expect[3])
   if verbose then
     print(("="):rep(80))
     print(tostring(m))
@@ -43,8 +44,7 @@ local function test_svd(m, expect)
   end
   assert(e1 < epsilon)
   assert(e2 < epsilon)
-  assert(e3 < epsilon)
-  local b = matrix3():mul(u, a)
+  local b = matrix2():mul(u, a)
   b:mul_transpose_right(b, v)
   if verbose then
     print(tostring(b))
@@ -52,8 +52,9 @@ local function test_svd(m, expect)
   assert(m:epsilon_equals(b, epsilon))
 end
 
-test_svd(matrix3(16,-1,1,2,12,1,1,3,-24), { 24.2234016039591, 16.1770571732806, 12.0220479098082 })
-test_svd(matrix3(1,1/2,1/3,1/2,1/3,1/4,1/3,1/4,1/5), { 1.4083189271237, 0.1223270658539, 0.0026873403558 })
-test_svd(matrix3(2,1,4,1,-2,3,-3,-1,1), { 5.4842821997180, 3.5307487547555, 1.8591562561142 })
-test_svd(matrix3(1,1,2,1,2,3,1,2,3), { 5.8157204060426, 0.4211842337259, 0 })
-test_svd(matrix3(1,2,3,1,2,3,1,2,3), { 6.4807406984079, 0, 0 })
+test_svd(matrix2(1,2,3,4), {5.464985704219043, 0.365966190626257})
+test_svd(matrix2(1,1/2,1/2,1/3), {1.2675918792439982, 0.0657414540893351})
+test_svd(matrix2(1,2,2,4), {5, 0})
+test_svd(matrix2(1,1,1,1), {2, 0})
+test_svd(matrix2(9,0,0,3), {9, 3})
+test_svd(matrix2(3,0,0,9), {9, 3})

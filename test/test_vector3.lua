@@ -50,3 +50,5 @@ assert(10.67069 < angle and angle < 10.67070)
 
 local angle = v2:angle(v1) * 180 / math.pi
 assert(10.67069 < angle and angle < 10.67070)
+
+assert(vector3{1,2}:equals{1,2,0})

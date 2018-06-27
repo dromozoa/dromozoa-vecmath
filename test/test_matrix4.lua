@@ -54,8 +54,14 @@ assert(n:epsilon_equals(data.get_matrix3, epsilon))
 
 n:set()
 local result = { m1:get(n, v) }
-assert(result[1] == n)
-assert(result[2] == v)
+if verbose then
+  print("[1]", tostring(result[1]))
+  print("[2]", tostring(result[2]))
+  print("[3]", tostring(result[3]))
+end
+assert(math.abs(result[1] - data.get_scale) <= epsilon)
+assert(result[2] == n)
+assert(result[3] == v)
 assert(n:epsilon_equals(data.get_matrix3_vector3[1], epsilon))
 assert(v:equals(data.get_matrix3_vector3[2]))
 

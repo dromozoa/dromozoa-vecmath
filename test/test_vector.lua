@@ -43,3 +43,11 @@ local data = assert(loadfile "test/vector.lua")()
 check(vector2, data.vector2)
 check(vector3, data.vector3)
 check(vector4, data.vector4)
+
+local v1 = vector2(1, 0)
+local v2 = vector2(1, 1)
+assert(v1:cross(v2) == 1)
+
+local v1 = vector2(4, 3):normalize()
+local v2 = vector2(34, -12)
+assert(v1:cross(v2) == -30)

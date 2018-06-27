@@ -36,3 +36,4 @@ for z = 1, 7 do
 end
 
 assert(point3():project{1,2,3,4} :equals {1/4,2/4,3/4})
+assert(point3{1,2}:equals{1,2,1})

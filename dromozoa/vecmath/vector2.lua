@@ -46,7 +46,7 @@ function class.length_squared(a)
   return x * x + y * y
 end
 
--- a:normalize(b)
+-- a:normalize(vector2 b)
 -- a:normalize()
 function class.normalize(a, b)
   if not b then
@@ -60,7 +60,7 @@ function class.normalize(a, b)
   return a
 end
 
--- a:angle(b)
+-- a:angle(vector2 b)
 function class.angle(a, b)
   local ax = a[1]
   local ay = a[2]
@@ -72,6 +72,11 @@ function class.angle(a, b)
   else
     return angle
   end
+end
+
+-- a:cross(vector2 b) [EX]
+function class.cross(a, b)
+  return a[1] * b[2] - a[2] * b[1]
 end
 
 function metatable.__index(a, key)
