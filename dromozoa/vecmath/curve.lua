@@ -17,46 +17,52 @@
 
 local class = {}
 
-function class.quadratic_bezier(p1, p2, p3, t, p)
+function class.linear_bezier(c, t, p)
+  return p:interpolate(c[1], c[2], t)
+end
+
+function class.quadratic_bezier(c, t, p)
   local u = 1 - t
-  p:scale    (u * u,     p1)
-  p:scale_add(2 * t * u, p2, p)
-  p:scale_add(t * t,     p3, p)
+  p:scale    (u * u,     c[1])
+  p:scale_add(2 * u * t, c[2], p)
+  p:scale_add(t * t,     c[3], p)
   return p
 end
 
-function class.cubic_bezier(p1, p2, p3, p4, t, p)
+function class.cubic_bezier(c, t, p)
   local u = 1 - t
   local tu3 = 3 * t * u
-  p:scale    (u * u * u, p1)
-  p:scale_add(u * tu3,   p2, p)
-  p:scale_add(t * tu3,   p3, p)
-  p:scale_add(t * t * t, p4, p)
+  p:scale    (u * u * u, c[1])
+  p:scale_add(u * tu3,   c[2], p)
+  p:scale_add(t * tu3,   c[3], p)
+  p:scale_add(t * t * t, c[4], p)
   return p
 end
 
-function class.catmull_rom(p1, p2, p3, p4, t, p)
+function class.catmull_rom(c, t, p)
   local u = 1 - t
   local th = t * 0.5
   local uh = u * 0.5
   local tu = t * u
   local tum = -tu
   local tu3_1 = 1 + 3 * tu
-  p:scale    (uh * tum,         p1)
-  p:scale_add(uh * (u + tu3_1), p2, p)
-  p:scale_add(th * (t + tu3_1), p3, p)
-  p:scale_add(th * tum,         p4, p)
+  p:scale    (uh * tum,         c[1])
+  p:scale_add(uh * (u + tu3_1), c[2], p)
+  p:scale_add(th * (t + tu3_1), c[3], p)
+  p:scale_add(th * tum,         c[4], p)
   return p
 end
 
-function class.catmull_rom_to_cubic_bezier(p1, p2, p3, p4, q1, q2)
-  q1:set(p2)
-  q1:scale_add( 1/6, p3, q1)
-  q1:scale_add(-1/6, p1, q1)
-  q2:set(p3)
-  q2:scale_add(-1/6, p4, q2)
-  q2:scale_add( 1/6, p2, q2)
-  return q1, q2
+function class.catmull_rom_to_cubic_bezier(c, p1, p2)
+  local c2 = c[2]
+  local c3 = c[3]
+  p1:set(c2)
+  p1:scale_add( 1/6, c3, p1)
+  p1:scale_add(-1/6, c[1], p1)
+  p2:set(c3)
+  p2:scale_add(-1/6, c[4], p2)
+  p2:scale_add( 1/6, c2, p2)
+  return p1, p2
 end
 
 return class

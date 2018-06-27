@@ -49,7 +49,7 @@ end
 local function check(p1, p2, p3, p4)
   for i = 0, n do
     local t = i / n
-    local p = curve.catmull_rom(p1, p2, p3, p4, t, vecmath.point2())
+    local p = curve.catmull_rom({ p1, p2, p3, p4 }, t, vecmath.point2())
     local r = catmull_rom(p1, p2, p3, p4, t)
     if verbose then
       print(tostring(p))
@@ -57,7 +57,7 @@ local function check(p1, p2, p3, p4)
     assert(p:equals(r))
   end
 
-  local q1, q2 = curve.catmull_rom_to_cubic_bezier(p1, p2, p3, p4, vecmath.point2(), vecmath.point2())
+  local q1, q2 = curve.catmull_rom_to_cubic_bezier({ p1, p2, p3, p4 }, vecmath.point2(), vecmath.point2())
   local r1, r2 = to_cubic_bezier(p1, p2, p3, p4)
   if verbose then
     print(tostring(q1), tostring(q2))

@@ -30,7 +30,7 @@ end
 local function check_quadratic_bezier(p1, p2, p3)
   for i = 0, n do
     local t = i / n
-    local p = curve.quadratic_bezier(p1, p2, p3, t, vecmath.point2())
+    local p = curve.quadratic_bezier({ p1, p2, p3 }, t, vecmath.point2())
     local r = quadratic_bezier(p1, p2, p3, t)
     if verbose then
       print(tostring(p))
@@ -52,7 +52,7 @@ end
 local function check_cubic_bezier(p1, p2, p3, p4)
   for i = 0, n do
     local t = i / n
-    local p = curve.cubic_bezier(p1, p2, p3, p4, t, vecmath.point2())
+    local p = curve.cubic_bezier({ p1, p2, p3, p4 }, t, vecmath.point2())
     local r = cubic_bezier(p1, p2, p3, p4, t)
     if verbose then
       print(tostring(p))
