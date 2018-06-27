@@ -168,6 +168,7 @@ function class.clamp(a, min, max, b)
     if y < min then a[2] = min elseif y > max then a[2] = max else a[2] = y end
     if z < min then a[3] = min elseif z > max then a[3] = max else a[3] = z end
     if w < min then a[4] = min elseif w > max then a[4] = max else a[4] = w end
+    return a
   else
     local x = a[1]
     local y = a[2]
@@ -177,8 +178,8 @@ function class.clamp(a, min, max, b)
     if y < min then a[2] = min elseif y > max then a[2] = max end
     if z < min then a[3] = min elseif z > max then a[3] = max end
     if w < min then a[4] = min elseif w > max then a[4] = max end
+    return a
   end
-  return a
 end
 
 -- a:clamp_min(number min, tuple4 b)
@@ -193,13 +194,14 @@ function class.clamp_min(a, min, b)
     if y < min then a[2] = min else a[2] = y end
     if z < min then a[3] = min else a[3] = z end
     if w < min then a[4] = min else a[4] = w end
+    return a
   else
     if a[1] < min then a[1] = min end
     if a[2] < min then a[2] = min end
     if a[3] < min then a[3] = min end
     if a[4] < min then a[4] = min end
+    return a
   end
-  return a
 end
 
 -- a:clamp_max(number max, tuple4 b)
@@ -214,13 +216,14 @@ function class.clamp_max(a, max, b)
     if y > max then a[2] = max else a[2] = y end
     if z > max then a[3] = max else a[3] = z end
     if w > max then a[4] = max else a[4] = w end
+    return a
   else
     if a[1] > max then a[1] = max end
     if a[2] > max then a[2] = max end
     if a[3] > max then a[3] = max end
     if a[4] > max then a[4] = max end
+    return a
   end
-  return a
 end
 
 -- a:absolute(tuple4 b)
@@ -235,6 +238,7 @@ function class.absolute(a, b)
     if y < 0 then a[2] = -y else a[2] = y end
     if z < 0 then a[3] = -z else a[3] = z end
     if w < 0 then a[4] = -w else a[4] = w end
+    return a
   else
     local x = a[1]
     local y = a[2]
@@ -244,8 +248,8 @@ function class.absolute(a, b)
     if y < 0 then a[2] = -y end
     if z < 0 then a[3] = -z end
     if w < 0 then a[4] = -w end
+    return a
   end
-  return a
 end
 
 -- a:interpolate(tuple4 b, tuple4 c, number d)
