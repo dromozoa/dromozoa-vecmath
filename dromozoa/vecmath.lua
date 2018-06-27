@@ -36,5 +36,7 @@ return {
   vector4 = require "dromozoa.vecmath.vector4";
 
   curve = require "dromozoa.vecmath.curve";
+  matrix2 = require "dromozoa.vecmath.matrix2";
+  svd2 = require "dromozoa.vecmath.svd2";
   svd3 = require "dromozoa.vecmath.svd3";
 }

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>交差判定</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="http://nishitalab.org/user/nis/ourworks/BezClip/BezierClipping.html">Bezier Clipping</a>
+    <ul>
+      <li><a href="http://nishitalab.org/user/nis/cdrom/cad/CAGD90Curve.pdf">Curve intersection using B&eacute;zier clipping</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>プリミティブ</h2>
+
+<ul>
+  <li>直線・半直線・線分</li>
+  <li>二次曲線
+    <ul>
+      <li>円・楕円</li>
+      <li>放物線 (Quadratic Bezier)</li>
+    </ul>
+  </li>
+  <li>三次曲線
+    <ul>
+      <li>Cubic Bezier</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>線分の交差判定</h2>
+
+<p>
+線分\((\V{p_1}, \V{p_2})\)と線分\((\V{p_3}, \V{p_4})\)が存在するとき
+\begin{align}
+  \V{v_1} &amp;= \V{p_2} - \V{p_1} \\
+  \V{v_2} &amp;= \V{p_4} - \V{p_3}
+\end{align}
+\(\V{v_1} \times \V{v_2}\)が\(0\)の場合、線分は同一直線上に存在する。
+\begin{align}
+  \V{v_3} &amp;= \V{p_3} - \V{p_1} \\
+  a &amp;= \frac{\V{v_3} \times \V{v_2}}{\V{v_1} \times \V{v_2}} \\
+  b &amp;= \frac{\V{v_3} \times \V{v_1}}{\V{v_1} \times \V{v_2}}
+\end{align}
+\(0 \le a \le 1\)かつ\(0 \le b \le 1\)ならば交点
+\[
+  \V{q} = \V{p_1} + a \V{v_1} = \V{p_3} + b \V{v_2}
+\]
+が存在する。交点を求める必要がなければ除算は不要である。
+</p>
+
+<h2>Bezier Clipping</h2>
+
+<h3>Collinear normal theorem</h3>
+
+<p>
+2個の\(C^1\)連続な曲線分が2点で交差し、どちらの曲線分も90度よりも大きく曲がっていないとき、両方の曲線に垂直な直線が存在する。
+さらに、2個の交点は直線の両側に存在する。
+</p>
+
+<p>
+つまり、両方の曲線に垂直な直線を求めることができれば、2個の近接した交点を分離することができる。
+このような直線をcollinear normalと呼ぶ。
+2個の曲線が接している場合、collinear normalは両方の曲線と接点で交差する。
+</p>
+
+<h3>Bezier focus</h3>
+
+<p>
+焦点曲線\(\V{F}(t) = \V{P}(t) + c(t) \V{N}(t)\)を考える。
+\(\V{N}(t)\)は接線ベクトルを90度回転して
+\[
+  \V{N}(t) = \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp; 0
+  \end{pmatrix} \V{P}'(t)
+\]
+次に
+\[
+  c(t) = c_0 (1 - t) + c_1 t
+\]
+と与え、\(\V{F}(0) = \V{F}(1)\)になるような\(c_0, c_1\)を求める。
+Cubic Bezierの場合を考えると
+\begin{align}
+  \V{F}(0)
+  &amp;= \V{P}(0) + c_0 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} \V{P}'(0) \\
+  &amp;= \V{p_1} + 3 c_0 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} (\V{p_2} - \V{p_1}) \\
+  &amp;= \begin{pmatrix}
+    x_1 \\
+    y_1
+  \end{pmatrix} + 3 c_0 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} \begin{pmatrix}
+    x_2 - x_1 \\
+    y_2 - y_1
+  \end{pmatrix} \\
+  &amp;= \begin{pmatrix}
+    x_1 \\
+    y_1
+  \end{pmatrix} + 3 c_0 \begin{pmatrix}
+    y_1 - y_2 \\
+    x_2 - x_1
+  \end{pmatrix} \\
+
+  \V{F}(1)
+  &amp;= \V{P}(1) + c_1 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} \V{P}'(1) \\
+  &amp;= \V{p_4} + 3 c_1 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} (\V{p_4} - \V{p_3}) \\
+  &amp;= \begin{pmatrix}
+    x_4 \\
+    y_4
+  \end{pmatrix} + 3c_1 \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp;  0
+  \end{pmatrix} \begin{pmatrix}
+    x_4 - x_3 \\
+    y_4 - y_3
+  \end{pmatrix} \\
+  &amp;= \begin{pmatrix}
+    x_4 \\
+    y_4
+  \end{pmatrix} + 3c_1 \begin{pmatrix}
+    y_3 - y_4 \\
+    x_4 - x_3
+  \end{pmatrix} \\
+
+  \begin{pmatrix}
+    x_4 - x_1 \\
+    y_4 - y_1
+  \end{pmatrix}
+  &amp;=
+  3 c_0 \begin{pmatrix}
+    y_1 - y_2 \\
+    x_2 - x_1
+  \end{pmatrix}
+  -
+  3c_1 \begin{pmatrix}
+    y_3 - y_4 \\
+    x_4 - x_3
+  \end{pmatrix} \\
+  &amp;=
+  3
+  \begin{pmatrix}
+    y_1 - y_2 &amp; y_4 - y_3 \\
+    x_2 - x_1 &amp; x_3 - x_4
+  \end{pmatrix}
+  \begin{pmatrix}
+    c_0 \\
+    c_1
+  \end{pmatrix} \\
+
+  3
+  \begin{pmatrix}
+    c_0 \\
+    c_1
+  \end{pmatrix}
+  &amp;=
+  \begin{pmatrix}
+    y_1 - y_2 &amp; y_4 - y_3 \\
+    x_2 - x_1 &amp; x_3 - x_4
+  \end{pmatrix}^{-1}
+  \begin{pmatrix}
+    x_4 - x_1 \\
+    y_4 - y_1
+  \end{pmatrix}
+\end{align}
+両端点の接線ベクトルが平行の場合は行列式が\(0\)になるので、\(\V{F}(0) = \V{F}(1)\)は成立しない。
+このような場合も含めて、\(c_0, c_1\)の上限を定めておくことで対処するらしい。
+（焦点曲線が大きくなるような場合は通常のBezier Clippingによって収束するのだろうと想像する）
+</p>
+
+<h3>Bezier clip application</h3>
+
+<p>
+曲線\(\V{P}(t)\)の垂線が、所与の点\(\V{F}\)を通らないような\(t\)の区間を考える。
+垂線が点\(\V{F}\)を通るならば
+\[
+  d(t) = \V{P}'(t) \cdot (\V{P}(t) - \V{F}) = 0
+\]
+Cubic Bezierの場合、\(d(t)\)は5次のバーンスタイン多項式になる。
+</p>
+
+<p>
+\(\V{F}\)が点でなく、Bezier曲線であるときを考える。
+Bezier曲線\(\V{Q}(u)\)の焦点は\(\V{F_Q}(u)\)である。
+曲線\(\V{P}(t)\)の垂線が、\(\V{F_Q}(u)\)を通らないような\(t\)の区間は
+\[
+  D(t, u) = (\V{P}(t) - \V{F_Q}(u)) \cdot \frac{\V{P}'(t)}{n} \ne 0,
+    0 \le u \le 1
+\]
+\(D(t, u)\)は\(t\)と\(u\)のバーンスタイン形式のテンソル積多項式として表現できる。
+\(\V{P}(t)\)と\(\V{Q}(u)\)がどちらもCubic Bezierの場合、
+5次と3次のバーンスタイン多項式からなる面が与えられることになる。
+</p>
+
+<h3>Collinear normal algorithm</h3>
+
+<p>
+曲線\(\V{P}(t)\)と曲線\(\V{Q}(u)\)が存在して、焦点曲線をそれぞれ\(\V{F_p}(t), \V{F_q}(u)\)とする。
+\(\V{Q}(u)\)の垂線が\(\V{F_p}(t)\)を通る\(u\)の範囲で\(\V{Q}(u)\)を選択し、
+\(\V{P}(t)\)の垂線が\(\V{F_q}(u)\)を通る\(t\)の範囲で\(\V{Q}(t)\)を選択する。
+これにより、Collinear Normalが存在しそうな\(t,u\)の範囲を絞る。
+</p>
+
+<h3>non-parametric</h3>
+
+<p>
+Cubic Bezierでは制御点を\((t, d) = (0, d_1), (1/3, d_2), (2/3, d_3), (1, d_4)\)として
+\begin{align}
+  u &amp;= 1 - t \\
+  d(t) &amp;= u^3 d_1 + 3u^2t d_2 + 3ut^2 d_3 + t^3 d_4 \\
+  d(0) &amp;= d_1 \\
+  d(1) &amp;= d_4 \\
+  27 d(1/3) &amp; = 8d_1 + 12d_2 + 6d_3 + d_4 \\
+  27 d(2/3) &amp; = d_1 + 6d_2 + 12d_3 + 8d_4 \\
+  \begin{pmatrix}
+    d_2 \\
+    d_3
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    12 &amp;  6 \\
+     6 &amp; 12
+  \end{pmatrix}^{-1}
+  \begin{pmatrix}
+    27 d(1/3) - 8 d(0) - d(1) \\
+    27 d(2/3) - d(0) - 8 d(4)
+  \end{pmatrix} \\
+  &amp;= \frac{1}{18} \begin{pmatrix}
+     2 &amp; -1 \\
+    -1 &amp;  2
+  \end{pmatrix}
+  \begin{pmatrix}
+    27 d(1/3) - 8 d(0) - d(1) \\
+    27 d(2/3) - d(0) - 8 d(4)
+  \end{pmatrix}
+\end{align}
+5次のBezier曲線では制御点を\((t, d) = (0, d_1), (1/5, d_2), (2/5, d_3), (3/5, d_4), (4/5, d_5), (1, d_6)\)として
+\begin{align}
+  d(t) &amp;= u^5 d_1 + 5u^4t d_2 + 10u^3t^2 d_3 + 10u^2t^3 d_4 + 5ut^4 d_5 + t^5 d_6 \\
+  d(0) &amp;= d_1 \\
+  d(1) &amp;= d_6 \\
+  3125 d(1/5) &amp;= 1024d_1 + 1280d_2 +  640d_3 +  160d_4 +   20d_5 +     d_6 \\
+  3125 d(2/5) &amp;=  243d_1 +  810d_2 + 1080d_3 +  720d_4 +  240d_5 +   32d_6 \\
+  3125 d(3/5) &amp;=   32d_1 +  240d_2 +  720d_3 + 1080d_4 +  810d_5 +  243d_6 \\
+  3125 d(4/5) &amp;=     d_1 +   20d_2 +  160d_3 +  640d_4 + 1280d_5 + 1024d_6 \\
+  \begin{pmatrix}
+    d_2 \\
+    d_3 \\
+    d_4 \\
+    d_5
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    1280 &amp;  640 &amp;  160 &amp;   20 \\
+     810 &amp; 1080 &amp;  720 &amp;  240 \\
+     240 &amp;  720 &amp; 1080 &amp;  810 \\
+      20 &amp;  160 &amp;  640 &amp; 1280
+  \end{pmatrix}^{-1} \begin{pmatrix}
+    3125 d(1/5) - 1024 d(0) -      d(1) \\
+    3125 d(2/5) -  243 d(0) -   32 d(1) \\
+    3125 d(3/5) -   32 d(0) -  243 d(1) \\
+    3125 d(4/5) -      d(0) - 1024 d(1)
+  \end{pmatrix} \\
+ &amp;= \frac{1}{30000} \begin{pmatrix}
+     48 &amp; -48 &amp;  32 &amp; -12 \\
+    -58 &amp; 118 &amp; -92 &amp;  37 \\
+     37 &amp; -92 &amp; 118 &amp; -58 \\
+    -12 &amp;  32 &amp; -48 &amp;  48
+  \end{pmatrix} \begin{pmatrix}
+    3125 d(1/5) - 1024 d(0) -      d(1) \\
+    3125 d(2/5) -  243 d(0) -   32 d(1) \\
+    3125 d(3/5) -   32 d(0) -  243 d(1) \\
+    3125 d(4/5) -      d(0) - 1024 d(1)
+  \end{pmatrix}
+\end{align}
+</p>
+
+</div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  CommonHTML: {
+    undefinedFamily: "sans-serif"
+  },
+  TeX: {
+    Macros: {
+      V: [ "\\boldsymbol{#1}", 1 ]
+    }
+  }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML"></script>
+</body>
+</html>
