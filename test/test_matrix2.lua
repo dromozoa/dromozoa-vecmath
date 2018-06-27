@@ -119,3 +119,5 @@ if verbose then
 end
 assert(matrix2(1,2,3,4):set_scale(2):epsilon_equals({-1.02899151085505,1.71498585142509,1.71498585142509,1.02899151085505}, epsilon))
 assert(matrix2(1,2,3,4):get_scale() == 5.464985704219043)
+
+assert(math.abs(matrix2():rot(math.pi/4):get_rotation() - math.pi/4) <= epsilon)

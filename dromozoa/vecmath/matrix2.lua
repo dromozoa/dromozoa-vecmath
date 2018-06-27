@@ -18,6 +18,7 @@
 local svd2 = require "dromozoa.vecmath.svd2"
 
 local type = type
+local atan2 = math.atan2
 local cos = math.cos
 local sin = math.sin
 local format = string.format
@@ -363,6 +364,11 @@ function class.transform(a, b, c)
   c[1] = a[1] * x + a[2] * y
   c[2] = a[3] * x + a[4] * y
   return c
+end
+
+-- a:get_rotation()
+function class.get_rotation(a)
+  return atan2(a[3] - a[2], a[1] + a[4])
 end
 
 function metatable.__index(a, key)
