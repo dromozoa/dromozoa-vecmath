@@ -362,10 +362,10 @@ end
 -- a:set(vector3 b, number c)
 -- a:set(number b)
 -- a:set(vector3 b)
--- a:set(matrix4 b)
 -- a:set(axis_angle4 b)
 -- a:set(quat4 b)
 -- a:set(matrix3 b)
+-- a:set(matrix4 b)
 -- a:set()
 function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44)
   if b then
@@ -489,7 +489,33 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[15] = 0
           a[16] = 1
           return a
-        elseif n == 16 then
+        elseif n == 4 then
+          if b.is_axis_angle4 then
+            return set_axis_angle4(a, b)
+          elseif b.is_quat4 then
+            return set_quat4(a, b)
+          else
+            error "bad argument #2 (axis_angle4 or quat4 expected)"
+          end
+        elseif n == 9 then
+          a[ 1] = b[1]
+          a[ 2] = b[2]
+          a[ 3] = b[3]
+          a[ 4] = 0
+          a[ 5] = b[4]
+          a[ 6] = b[5]
+          a[ 7] = b[6]
+          a[ 8] = 0
+          a[ 9] = b[7]
+          a[10] = b[8]
+          a[11] = b[9]
+          a[12] = 0
+          a[13] = 0
+          a[14] = 0
+          a[15] = 0
+          a[16] = 1
+          return a
+        else
           a[ 1] = b[ 1]
           a[ 2] = b[ 2]
           a[ 3] = b[ 3]
@@ -507,34 +533,6 @@ function class.set(a, b, c, d, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41,
           a[15] = b[15]
           a[16] = b[16]
           return a
-        else
-          if n == 4 then
-            if b.is_axis_angle4 then
-              return set_axis_angle4(a, b)
-            elseif b.is_quat4 then
-              return set_quat4(a, b)
-            else
-              error "bad argument #2 (axis_angle4 or quat4 expected)"
-            end
-          else
-            a[ 1] = b[1]
-            a[ 2] = b[2]
-            a[ 3] = b[3]
-            a[ 4] = 0
-            a[ 5] = b[4]
-            a[ 6] = b[5]
-            a[ 7] = b[6]
-            a[ 8] = 0
-            a[ 9] = b[7]
-            a[10] = b[8]
-            a[11] = b[9]
-            a[12] = 0
-            a[13] = 0
-            a[14] = 0
-            a[15] = 0
-            a[16] = 1
-            return a
-          end
         end
       end
     end
