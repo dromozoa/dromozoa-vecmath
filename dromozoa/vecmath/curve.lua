@@ -25,6 +25,12 @@ function class.diff_linear_bezier(p, t, v)
   return v:sub(p[2], p[1])
 end
 
+function class.to_linear_bezier(f, q)
+  f(0, q[1])
+  f(1, q[2])
+  return q
+end
+
 function class.quadratic_bezier(p, t, q)
   local u = 1 - t
   q:scale    (u * u,     p[1])
@@ -39,6 +45,22 @@ function class.diff_quadratic_bezier(p, t, v)
   v:scale_add(  2 * t,     p[3], v)
   v:scale_add(  2 - 4 * t, p[2], v)
   return v
+end
+
+function class.to_quadratic_bezier(f, q)
+  local q1 = q[1]
+  local q2 = q[2]
+  local q3 = q[3]
+
+  f(0,   q1)
+  f(1/2, q2)
+  f(1,   q3)
+
+  q2:scale(2)
+  q2:scale_add(-1/2, q1, q2)
+  q2:scale_add(-1/2, q3, q2)
+
+  return q
 end
 
 function class.cubic_bezier(p, t, q)
@@ -59,6 +81,37 @@ function class.diff_cubic_bezier(p, t, v)
   v:scale_add(  u * (3 - _9t), p[2], v)
   v:scale_add(  t * (6 - _9t), p[3], v)
   return v
+end
+
+function class.to_cubic_bezier(f, q)
+  local q1 = q[1]
+  local q2 = q[2]
+  local q3 = q[3]
+  local q4 = q[4]
+
+  f(0,   q1)
+  f(1/3, q2)
+  f(2/3, q3)
+  f(1,   q4)
+
+  q2:scale(27)
+  q2:scale_add(-8, q1, q2)
+  q2:sub(q4)
+
+  q3:scale(27)
+  q3:sub(q1)
+  q3:scale_add(-8, q4, q3)
+
+  local s2 = {}
+  q2:get(s2)
+
+  q2:scale(1/9)
+  q2:scale_add(-1/18, q3, q2)
+
+  q3:scale(1/9)
+  q3:scale_add(-1/18, s2, q3)
+
+  return q
 end
 
 function class.quartic_bezier(p, t, q)
@@ -85,6 +138,51 @@ function class.diff_quartic_bezier(p, t, v)
   v:scale_add(  _t2 * (12 - _16t),     p[4], v)
   v:scale_add(  u * t * (12 - 24 * t), p[3], v)
   return v
+end
+
+function class.to_quartic_bezier(f, q)
+  local q1 = q[1]
+  local q2 = q[2]
+  local q3 = q[3]
+  local q4 = q[4]
+  local q5 = q[5]
+
+  f(0,   q1)
+  f(1/4, q2)
+  f(2/4, q3)
+  f(3/4, q4)
+  f(1,   q5)
+
+  q2:scale(256)
+  q2:scale_add(-81, q1, q2)
+  q2:sub(q5)
+
+  q3:scale(16)
+  q3:sub(q1)
+  q3:sub(q5)
+
+  q4:scale(256)
+  q4:sub(q1)
+  q4:scale_add(-81, q5, q4)
+
+  local s2 = {}
+  local s3 = {}
+  q2:get(s2)
+  q3:get(s3)
+
+  q2:scale    (   9/576)
+  q2:scale_add(-108/576, q3, q2)
+  q2:scale_add(   3/576, q4, q2)
+
+  q3:scale    ( 240/576)
+  q3:scale_add(-  8/576, q4, q3)
+  q3:scale_add(-  8/576, s2, q3)
+
+  q4:scale    (   9/576)
+  q4:scale_add(   3/576, s2, q4)
+  q4:scale_add(-108/576, s3, q4)
+
+  return q
 end
 
 function class.quintic_bezier(p, t, q)
@@ -117,6 +215,67 @@ function class.diff_quintic_bezier(p, t, v)
   v:scale_add(  t * _u2 * (20 - _50t), p[3], v)
   v:scale_add(  u * _t2 * (30 - _50t), p[4], v)
   return v
+end
+
+function class.to_quintic_bezier(f, q)
+  local q1 = q[1]
+  local q2 = q[2]
+  local q3 = q[3]
+  local q4 = q[4]
+  local q5 = q[5]
+  local q6 = q[6]
+
+  f(0,   q1)
+  f(1/5, q2)
+  f(2/5, q3)
+  f(3/5, q4)
+  f(4/5, q5)
+  f(1,   q6)
+
+  q2:scale(3125)
+  q2:scale_add(-1024, q1, q2)
+  q2:sub(q6)
+
+  q3:scale(3125)
+  q3:scale_add(-243, q1, q3)
+  q3:scale_add(-32, q6, q3)
+
+  q4:scale(3125)
+  q4:scale_add(-32, q1, q4)
+  q4:scale_add(-243, q6, q4)
+
+  q5:scale(3125)
+  q5:sub(q1)
+  q5:scale_add(-1024, q6, q5)
+
+  local s2 = {}
+  local s3 = {}
+  local s4 = {}
+  q2:get(s2)
+  q3:get(s3)
+  q4:get(s4)
+
+  q2:scale    (  48/30000)
+  q2:scale_add(- 48/30000, q3, q2)
+  q2:scale_add(  32/30000, q4, q2)
+  q2:scale_add(- 12/30000, q5, q2)
+
+  q3:scale    ( 118/30000)
+  q3:scale_add(- 92/30000, q4, q3)
+  q3:scale_add(  37/30000, q5, q3)
+  q3:scale_add(- 58/30000, s2, q3)
+
+  q4:scale    ( 118/30000)
+  q4:scale_add(- 58/30000, q5, q4)
+  q4:scale_add(  37/30000, s2, q4)
+  q4:scale_add(- 92/30000, s3, q4)
+
+  q5:scale    (  48/30000)
+  q5:scale_add(- 12/30000, s2, q5)
+  q5:scale_add(  32/30000, s3, q5)
+  q5:scale_add(- 48/30000, s4, q5)
+
+  return q
 end
 
 function class.catmull_rom(p, t, q)

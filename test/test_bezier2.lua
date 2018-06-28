@@ -63,7 +63,8 @@ end
 
 local function check(P)
   local f = curve[names[#P] .. "_bezier"]
-  local d = curve["diff_" .. names[#P] .. "_bezier"]
+  local diff = curve["diff_" .. names[#P] .. "_bezier"]
+  local to = curve["to_" .. names[#P] .. "_bezier"]
   for i = 1, #P do
     P[i] = point2(P[i])
   end
@@ -73,11 +74,24 @@ local function check(P)
     local q = f(P, t, point2())
     assert(p:epsilon_equals(q, epsilon))
     local u = diff_bezier(P, t)
-    local v = d(P, t, vector2())
+    local v = diff(P, t, vector2())
     if verbose then
       print(i, tostring(u), tostring(v))
     end
     assert(u:epsilon_equals(v, epsilon))
+  end
+  local Q = {}
+  for i = 1, #P do
+    Q[i] = point2()
+  end
+  to(function (t, p) return f(P, t, p) end, Q)
+  for i = 1, #P do
+    local p = P[i]
+    local q = Q[i]
+    if verbose then
+      print(i, tostring(p), tostring(q))
+    end
+    assert(p:epsilon_equals(q, epsilon))
   end
 end
 
@@ -88,6 +102,8 @@ check{ {1,1}, {1,1}, {1,1} }
 check{ {0,0}, {1,0}, {0,0} }
 check{ {0,0}, {1,0}, {0,1} }
 check{ {0,0}, {1,0}, {1,1} }
+check{ {2,3}, {5,7}, {11,13} }
+check{ {2,-3}, {-5,7}, {11,-13} }
 
 check{ {0,0}, {1,1}, {2,-1}, {3, 0} }
 check{ {1,1}, {1,1}, {2,-1}, {3, 0} }
@@ -96,6 +112,8 @@ check{ {1,1}, {1,1}, {2,-1}, {2,-1} }
 check{ {0,0}, {1,0}, {0, 1}, {0, 0} }
 check{ {0,0}, {1,0}, {0, 1}, {1, 0} }
 check{ {0,0}, {1,0}, {0, 1}, {0, 1} }
+check{ {2,3}, {5,7}, {11,13}, {17,19} }
+check{ {2,-3}, {-5,7}, {11,-13}, {-17,19} }
 
 check{ {0,0}, {1,1}, {2,0}, {3,1}, {4,0} }
 check{ {0,0}, {1,1}, {2,0}, {1,-1}, {0,0} }
