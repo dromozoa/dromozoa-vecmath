@@ -52,9 +52,9 @@ function class.to_quadratic_bezier(f, q)
   local q2 = q[2]
   local q3 = q[3]
 
-  f(0,   q1)
+  f(0/2, q1)
   f(1/2, q2)
-  f(1,   q3)
+  f(2/2, q3)
 
   q2:scale(2)
   q2:scale_add(-1/2, q1, q2)
@@ -89,14 +89,14 @@ function class.to_cubic_bezier(f, q)
   local q3 = q[3]
   local q4 = q[4]
 
-  f(0,   q1)
+  f(0/3, q1)
   f(1/3, q2)
   f(2/3, q3)
-  f(1,   q4)
+  f(3/3, q4)
 
   q2:scale(27)
-  q2:scale_add(-8, q1, q2)
   q2:sub(q4)
+  q2:scale_add(-8, q1, q2)
 
   q3:scale(27)
   q3:sub(q1)
@@ -105,10 +105,10 @@ function class.to_cubic_bezier(f, q)
   local s2 = {}
   q2:get(s2)
 
-  q2:scale(1/9)
+  q2:scale    ( 2/18)
   q2:scale_add(-1/18, q3, q2)
 
-  q3:scale(1/9)
+  q3:scale    ( 2/18)
   q3:scale_add(-1/18, s2, q3)
 
   return q
@@ -147,15 +147,15 @@ function class.to_quartic_bezier(f, q)
   local q4 = q[4]
   local q5 = q[5]
 
-  f(0,   q1)
+  f(0/4, q1)
   f(1/4, q2)
   f(2/4, q3)
   f(3/4, q4)
-  f(1,   q5)
+  f(4/4, q5)
 
   q2:scale(256)
-  q2:scale_add(-81, q1, q2)
   q2:sub(q5)
+  q2:scale_add(-81, q1, q2)
 
   q3:scale(16)
   q3:sub(q1)
@@ -225,16 +225,16 @@ function class.to_quintic_bezier(f, q)
   local q5 = q[5]
   local q6 = q[6]
 
-  f(0,   q1)
+  f(0/5, q1)
   f(1/5, q2)
   f(2/5, q3)
   f(3/5, q4)
   f(4/5, q5)
-  f(1,   q6)
+  f(5/5, q6)
 
   q2:scale(3125)
-  q2:scale_add(-1024, q1, q2)
   q2:sub(q6)
+  q2:scale_add(-1024, q1, q2)
 
   q3:scale(3125)
   q3:scale_add(-243, q1, q3)
