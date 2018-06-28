@@ -33,6 +33,7 @@
       <li><a href="http://nishitalab.org/user/nis/cdrom/cad/CAGD90Curve.pdf">Curve intersection using B&eacute;zier clipping</a></li>
     </ul>
   </li>
+  <li><a href="https://www.cise.ufl.edu/~ungor/courses/fall06/papers/QuickHull.pdf">The Quickhull Algorithm for Convex Hulls</a></li>
 </ul>
 
 <h2>プリミティブ</h2>
@@ -71,6 +72,29 @@
   \V{q} = \V{p_1} + a \V{v_1} = \V{p_3} + b \V{v_2}
 \]
 が存在する。交点を求める必要がなければ除算は不要である。
+</p>
+
+<h2>三角形の内外判定</h2>
+
+<p>
+三角形\((\V{p_1}, \V{p_2}, \V{p_3})\)の内部に点\(\V{q}\)が存在するかを判定する。
+\begin{align}
+  \V{u_1} &amp;= \V{p_2} - \V{p_1} \\
+  \V{u_2} &amp;= \V{p_3} - \V{p_2} \\
+  \V{u_3} &amp;= \V{p_1} - \V{p_3} \\
+  \V{v_1} &amp;= \V{q} - \V{p_1} \\
+  \V{v_2} &amp;= \V{q} - \V{p_2} \\
+  \V{v_3} &amp;= \V{q} - \V{p_3}
+\end{align}
+それぞれの外積
+\begin{align}
+  \V{u_1} &amp;\times \V{v_1} \\
+  \V{u_2} &amp;\times \V{v_2} \\
+  \V{u_3} &amp;\times \V{v_3}
+\end{align}
+の符号が一致すれば三角形の内部に存在する。
+三角形を時計回りと反時計回りのどちらに回るかによって外積の符号が定まる。
+外積が0の場合、対応する三角形の辺上に点\(\V{q}\)が存在する。
 </p>
 
 <h2>Bezier Clipping</h2>
