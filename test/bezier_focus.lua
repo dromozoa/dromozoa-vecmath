@@ -28,8 +28,10 @@ local point2 = vecmath.point2
 local vector2 = vecmath.vector2
 local vector3 = vecmath.vector3
 local vector4 = vecmath.vector4
+local matrix2 = vecmath.matrix2
 local matrix3 = vecmath.matrix3
 local matrix4 = vecmath.matrix4
+local curve = vecmath.curve
 
 local N = 16
 local M = 64
@@ -86,52 +88,23 @@ local function draw_cubic_bezier(node, P)
     stroke = "#333";
   }
 
-  local c0 = 10
-  local c1 = 10
-
-  local m = matrix3(1)
-  m.m11 = p1.y - p2.y
-  m.m12 = p4.y - p3.y
-  m.m21 = p2.x - p1.x
-  m.m22 = p3.x - p4.x
+  local m = matrix2(p1.y - p2.y, p4.y - p3.y, p2.x - p1.x, p3.x - p4.x)
+  local c = { math.huge, math.huge }
   if m:determinant() ~= 0 then
-    m:invert()
-    local c = vector3(p4.x, p4.y, 1):sub{ p1.x, p1.y, 1 }
-    m:transform(c)
-    c:scale(1/3)
-    if c.x < 0 then
-      c0 = math.max(c.x, -c0)
-    else
-      c0 = math.min(c.x, c0)
-    end
-    if c.y < 0 then
-      c1 = math.max(c.y, -c1)
-    else
-      c1 = math.min(c.y, c1)
-    end
+    c = m:invert():transform(point2(p4.x - p1.x, p4.y - p1.y)):scale(1/3)
   end
 
-  local q1 = point2():add(cubic_bezier(P, 0), rot90(cubic_bezier_d(P, 0)):scale(c0))
-  local q4 = point2():add(cubic_bezier(P, 1), rot90(cubic_bezier_d(P, 1)):scale(c1))
-  local qa = point2():add(cubic_bezier(P, 1/3), rot90(cubic_bezier_d(P, 1/3)):scale(c0*2/3 + c1*1/3))
-  local qb = point2():add(cubic_bezier(P, 2/3), rot90(cubic_bezier_d(P, 2/3)):scale(c0*1/3 + c1*2/3))
-
-  local m = matrix3(2/18, -1/18, 0, -1/18, 2/18, 0, 0, 0, 1)
-  local vx = vector2(
-      27 * qa.x - 8 * q1.x - q4.x,
-      27 * qb.x - q1.x - 8 * q4.x)
-  m:transform(vx)
-  local vy = vector2(
-      27 * qa.y - 8 * q1.y - q4.y,
-      27 * qb.y - q1.y - 8 * q4.y)
-  m:transform(vy)
-  local q2 = point2(vx[1], vy[2])
-  local q3 = point2(vx[2], vy[2])
-
-  local F = { q1, q2, q3, q4 }
+  local F = { point2(), point2(), point2(), point2() }
+  curve.to_cubic_bezier(function (t, q)
+    curve.diff_cubic_bezier(P, t, q)
+    q.x, q.y = -q.y, q.x
+    q:scale(c[1] * (1 - t) + c[2] * t)
+    q:add(curve.cubic_bezier(P, t, point2()))
+    return q
+  end, F)
 
   node[#node + 1] = _"path" {
-    d = path_data():M(q1.x, q1.y):C(q2.x, q2.y, q3.x, q3.y, q4.x, q4.y);
+    d = path_data():M(F[1].x, F[1].y):C(F[2].x, F[2].y, F[3].x, F[3].y, F[4].x, F[4].y);
     fill = "none";
     stroke = "#333";
   }
@@ -155,7 +128,7 @@ local function draw_cubic_bezier(node, P)
     v:scale_add(- u * u, p1, v)
     v:scale(3)
     v.x, v.y = -v.y, v.x
-    v:scale(c0 * u + c1 * t)
+    v:scale(c[1] * u + c[2] * t)
 
     d1:M(p.x, p.y):L(p.x + v.x, p.y + v.y)
     if i == 0 then

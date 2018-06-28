@@ -101,24 +101,24 @@
 \]
 次に
 \[
-  c(t) = c_0 (1 - t) + c_1 t
+  c(t) = c_1 (1 - t) + c_2 t
 \]
-と与え、\(\V{F}(0) = \V{F}(1)\)になるような\(c_0, c_1\)を求める。
+と与え、\(\V{F}(0) = \V{F}(1)\)になるような\(c_1, c_2\)を求める。
 Cubic Bezierの場合を考えると
 \begin{align}
   \V{F}(0)
-  &amp;= \V{P}(0) + c_0 \begin{pmatrix}
+  &amp;= \V{P}(0) + c_1 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} \V{P}'(0) \\
-  &amp;= \V{p_1} + 3 c_0 \begin{pmatrix}
+  &amp;= \V{p_1} + 3 c_1 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} (\V{p_2} - \V{p_1}) \\
   &amp;= \begin{pmatrix}
     x_1 \\
     y_1
-  \end{pmatrix} + 3 c_0 \begin{pmatrix}
+  \end{pmatrix} + 3 c_1 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} \begin{pmatrix}
@@ -128,24 +128,24 @@ Cubic Bezierの場合を考えると
   &amp;= \begin{pmatrix}
     x_1 \\
     y_1
-  \end{pmatrix} + 3 c_0 \begin{pmatrix}
+  \end{pmatrix} + 3 c_1 \begin{pmatrix}
     y_1 - y_2 \\
     x_2 - x_1
   \end{pmatrix} \\
 
   \V{F}(1)
-  &amp;= \V{P}(1) + c_1 \begin{pmatrix}
+  &amp;= \V{P}(1) + c_2 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} \V{P}'(1) \\
-  &amp;= \V{p_4} + 3 c_1 \begin{pmatrix}
+  &amp;= \V{p_4} + 3 c_2 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} (\V{p_4} - \V{p_3}) \\
   &amp;= \begin{pmatrix}
     x_4 \\
     y_4
-  \end{pmatrix} + 3c_1 \begin{pmatrix}
+  \end{pmatrix} + 3c_2 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} \begin{pmatrix}
@@ -155,7 +155,7 @@ Cubic Bezierの場合を考えると
   &amp;= \begin{pmatrix}
     x_4 \\
     y_4
-  \end{pmatrix} + 3c_1 \begin{pmatrix}
+  \end{pmatrix} + 3c_2 \begin{pmatrix}
     y_3 - y_4 \\
     x_4 - x_3
   \end{pmatrix} \\
@@ -165,12 +165,12 @@ Cubic Bezierの場合を考えると
     y_4 - y_1
   \end{pmatrix}
   &amp;=
-  3 c_0 \begin{pmatrix}
+  3 c_1 \begin{pmatrix}
     y_1 - y_2 \\
     x_2 - x_1
   \end{pmatrix}
   -
-  3c_1 \begin{pmatrix}
+  3c_2 \begin{pmatrix}
     y_3 - y_4 \\
     x_4 - x_3
   \end{pmatrix} \\
@@ -181,14 +181,14 @@ Cubic Bezierの場合を考えると
     x_2 - x_1 &amp; x_3 - x_4
   \end{pmatrix}
   \begin{pmatrix}
-    c_0 \\
-    c_1
+    c_1 \\
+    c_2
   \end{pmatrix} \\
 
   3
   \begin{pmatrix}
-    c_0 \\
-    c_1
+    c_1 \\
+    c_2
   \end{pmatrix}
   &amp;=
   \begin{pmatrix}
@@ -201,7 +201,7 @@ Cubic Bezierの場合を考えると
   \end{pmatrix}
 \end{align}
 両端点の接線ベクトルが平行の場合は行列式が\(0\)になるので、\(\V{F}(0) = \V{F}(1)\)は成立しない。
-このような場合も含めて、\(c_0, c_1\)の上限を定めておくことで対処するらしい。
+このような場合も含めて、\(c_1, c_2\)の上限を定めておくことで対処するらしい。
 （焦点曲線が大きくなるような場合は通常のBezier Clippingによって収束するのだろうと想像する）
 </p>
 
