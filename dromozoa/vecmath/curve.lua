@@ -26,8 +26,8 @@ function class.diff_linear_bezier(p, t, v)
 end
 
 function class.to_linear_bezier(f, q)
-  f(0, q[1])
-  f(1, q[2])
+  f(0/1, q[1])
+  f(1/1, q[2])
   return q
 end
 
@@ -41,9 +41,9 @@ end
 
 function class.diff_quadratic_bezier(p, t, v)
   local u = 1 - t
-  v:scale    (- 2 * u,     p[1])
-  v:scale_add(  2 * t,     p[3], v)
-  v:scale_add(  2 - 4 * t, p[2], v)
+  v:scale    (-2 * u,     p[1])
+  v:scale_add( 2 * t,     p[3], v)
+  v:scale_add( 2 - 4 * t, p[2], v)
   return v
 end
 
@@ -76,10 +76,10 @@ end
 function class.diff_cubic_bezier(p, t, v)
   local u = 1 - t
   local _9t = 9 * t
-  v:scale    (- 3 * u * u,     p[1])
-  v:scale_add(  3 * t * t,     p[4], v)
-  v:scale_add(  u * (3 - _9t), p[2], v)
-  v:scale_add(  t * (6 - _9t), p[3], v)
+  v:scale    (-3 * u * u,     p[1])
+  v:scale_add( 3 * t * t,     p[4], v)
+  v:scale_add( u * (3 - _9t), p[2], v)
+  v:scale_add( t * (6 - _9t), p[3], v)
   return v
 end
 
@@ -95,8 +95,8 @@ function class.to_cubic_bezier(f, q)
   f(3/3, q4)
 
   q2:scale(27)
-  q2:sub(q4)
   q2:scale_add(-8, q1, q2)
+  q2:sub(q4)
 
   q3:scale(27)
   q3:sub(q1)
@@ -132,11 +132,11 @@ function class.diff_quartic_bezier(p, t, v)
   local _u2 = u * u
   local _t2 = t * t
   local _16t = 16 * t
-  v:scale    (- 4 * u * _u2,           p[1])
-  v:scale_add(  4 * t * _t2,           p[5], v)
-  v:scale_add(  _u2 * ( 4 - _16t),     p[2], v)
-  v:scale_add(  _t2 * (12 - _16t),     p[4], v)
-  v:scale_add(  u * t * (12 - 24 * t), p[3], v)
+  v:scale    (-4 * u * _u2,           p[1])
+  v:scale_add( 4 * t * _t2,           p[5], v)
+  v:scale_add( _u2 * ( 4 - _16t),     p[2], v)
+  v:scale_add( _t2 * (12 - _16t),     p[4], v)
+  v:scale_add( u * t * (12 - 24 * t), p[3], v)
   return v
 end
 
@@ -208,12 +208,12 @@ function class.diff_quintic_bezier(p, t, v)
   local _t2 = t * t
   local _25t = 25 * t
   local _50t = 50 * t
-  v:scale    (- 5 * _u2 * _u2,         p[1])
-  v:scale_add(  5 * _t2 * _t2,         p[6], v)
-  v:scale_add(  u * _u2 * ( 5 - _25t), p[2], v)
-  v:scale_add(  t * _t2 * (20 - _25t), p[5], v)
-  v:scale_add(  t * _u2 * (20 - _50t), p[3], v)
-  v:scale_add(  u * _t2 * (30 - _50t), p[4], v)
+  v:scale    (-5 * _u2 * _u2,         p[1])
+  v:scale_add( 5 * _t2 * _t2,         p[6], v)
+  v:scale_add( u * _u2 * ( 5 - _25t), p[2], v)
+  v:scale_add( t * _t2 * (20 - _25t), p[5], v)
+  v:scale_add( t * _u2 * (20 - _50t), p[3], v)
+  v:scale_add( u * _t2 * (30 - _50t), p[4], v)
   return v
 end
 
@@ -233,8 +233,8 @@ function class.to_quintic_bezier(f, q)
   f(5/5, q6)
 
   q2:scale(3125)
-  q2:sub(q6)
   q2:scale_add(-1024, q1, q2)
+  q2:sub(q6)
 
   q3:scale(3125)
   q3:scale_add(-243, q1, q3)
