@@ -35,10 +35,10 @@ end
 
 function class.diff_quadratic_bezier(c, t, v)
   local u = 1 - t
-  p:scale    (  2 * t,     c[3])
-  p:scale_add(- 2 * u,     c[1], p)
-  p:scale_add(  2 - 4 * t, c[2], p)
-  return p
+  v:scale    (  2 * t,     c[3])
+  v:scale_add(- 2 * u,     c[1], v)
+  v:scale_add(  2 - 4 * t, c[2], v)
+  return v
 end
 
 function class.cubic_bezier(c, t, p)
@@ -51,17 +51,14 @@ function class.cubic_bezier(c, t, p)
   return p
 end
 
-function class.diff_cubic_bezier(c, t, p)
+function class.diff_cubic_bezier(c, t, v)
   local u = 1 - t
-  local _t2 = t * t
-  local _u2 = u * u
-  local _16t = 16 * t
-  p:scale    (  4 * t * _t2,           c[5])
-  p:scale_add(- 4 * u * _u2,           c[1], p)
-  p:scale_add(  _t2 * (12 - _16t),     c[4], p)
-  p:scale_add(  _u2 * ( 4 - _16t),     c[2], p)
-  p:scale_add(  u * t * (12 - 24 * t), c[3], p)
-  return p
+  local _9t = 9 * t
+  v:scale    (  3 * t * t,     c[4])
+  v:scale_add(- 3 * u * u,     c[1], v)
+  v:scale_add(  t * (6 - _9t), c[3], v)
+  v:scale_add(  u * (3 - _9t), c[2], v)
+  return v
 end
 
 function class.catmull_rom(c, t, p)
