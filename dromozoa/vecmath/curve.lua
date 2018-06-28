@@ -133,14 +133,20 @@ function class.catmull_rom(p, t, q)
   return q
 end
 
-function class.catmull_rom_to_cubic_bezier(p, q1, q2)
+function class.catmull_rom_to_cubic_bezier(p, q)
+  local p1 = p[1]
   local p2 = p[2]
   local p3 = p[3]
-  q1:scale_add( 1/6, p3, p2)
-  q1:scale_add(-1/6, p[1], q1)
-  q2:scale_add( 1/6, p2, p3)
-  q2:scale_add(-1/6, p[4], q2)
-  return q1, q2
+  local p4 = p[4]
+  local q2 = q[2]
+  local q3 = q[3]
+  q[1]:set(p1)
+  q2:scale_add( 1/6, p3, p2)
+  q2:scale_add(-1/6, p1, q2)
+  q3:scale_add( 1/6, p2, p3)
+  q3:scale_add(-1/6, p4, q3)
+  q[4]:set(p4)
+  return q
 end
 
 return class

@@ -57,14 +57,14 @@ local function check(p1, p2, p3, p4)
     assert(p:equals(r))
   end
 
-  local q1, q2 = curve.catmull_rom_to_cubic_bezier({ p1, p2, p3, p4 }, vecmath.point2(), vecmath.point2())
+  local q = curve.catmull_rom_to_cubic_bezier({ p1, p2, p3, p4 }, { vecmath.point2(), vecmath.point2(), vecmath.point2(), vecmath.point2() })
   local r1, r2 = to_cubic_bezier(p1, p2, p3, p4)
   if verbose then
-    print(tostring(q1), tostring(q2))
+    print(tostring(q[2]), tostring(q[3]))
     print(tostring(r1), tostring(r2))
   end
-  assert(q1:epsilon_equals(r1, epsilon))
-  assert(q2:epsilon_equals(r2, epsilon))
+  assert(q[2]:epsilon_equals(r1, epsilon))
+  assert(q[3]:epsilon_equals(r2, epsilon))
 end
 
 check(vecmath.point2(0,0), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
