@@ -46,9 +46,7 @@ local root = _"g" {
   transform = "translate(320, 320)";
 }
 
-local R = {}
-
-quickhull(P, R)
+local R = quickhull(P, {})
 
 for i = 1, #P do
   local p = P[i]

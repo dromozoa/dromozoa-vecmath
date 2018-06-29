@@ -15,98 +15,79 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local vector2 = require "dromozoa.vecmath.vector2"
+local function in_triangle(p1, p2, p3, q)
+  local p1_x = p1[1]
+  local p1_y = p1[2]
+  local p2_x = p2[1]
+  local p2_y = p2[2]
+  local p3_x = p3[1]
+  local p3_y = p3[2]
+  local q_x = q[1]
+  local q_y = q[2]
+  return (p2_x - p1_x) * (q_y - p1_y) >= (p2_y - p1_y) * (q_x - p1_x)
+      and (p3_x - p2_x) * (q_y - p2_y) >= (p3_y - p2_y) * (q_x - p2_x)
+      and (p1_x - p3_x) * (q_y - p3_y) >= (p1_y - p3_y) * (q_x - p3_x)
+end
 
 return function (source, result)
-  local u1 = vector2()
-  local u2 = vector2()
-  local u3 = vector2()
-  local v1 = vector2()
-  local v2 = vector2()
-  local v3 = vector2()
-
   local list_first = 1
   local list = {}
 
-  local p0_i = 1
-  local p0_x = source[1][1]
-  local p1_i = p0_i
-  local p1_x = p0_x
+  local p1_i = 1
+  local p1_x = source[1][1]
+  local p2_i = p1_i
+  local p2_x = p1_x
 
   for i = 2, #source do
     list[i - 1] = i
     local x = source[i][1]
-    if p0_x > x then
-      p0_i = i
-      p0_x = x
-    end
-    if p1_x < x then
+    if p1_x > x then
       p1_i = i
       p1_x = x
     end
+    if p2_x < x then
+      p2_i = i
+      p2_x = x
+    end
   end
 
-  local p0 = source[p0_i]
   local p1 = source[p1_i]
+  local p1_y = p1[2]
+  local p2 = source[p2_i]
+  local v_x = p2[1] - p1_x
+  local v_y = p2[2] - p1_y
 
-  local p2_i = p0_i
-  local p2_d = 0
   local p3_i = p1_i
   local p3_d = 0
+  local p4_i = p2_i
+  local p4_d = 0
 
-  u1:sub(p1, p0)
   local i = list_first
   while i do
-    local d = u1:cross(u2:sub(source[i], p0))
+    local p = source[i]
+    local d = v_x * (p[2] - p1_y) - v_y * (p[1] - p1_x)
     if d < 0 then
-      if p2_d > d then
-        p2_i = i
-        p2_d = d
-      end
-    else
-      if p3_d < d then
+      if p3_d > d then
         p3_i = i
         p3_d = d
+      end
+    else
+      if p4_d < d then
+        p4_i = i
+        p4_d = d
       end
     end
     i = list[i]
   end
 
-  local p2 = source[p2_i]
   local p3 = source[p3_i]
-
-  u1:sub(p0, p1)
-  u2:sub(p2, p0)
-  u3:sub(p1, p2)
+  local p4 = source[p4_i]
 
   local i = list_first
   local prev_i
   while i do
     local p = source[i]
-    if u1:cross(v1:sub(p, p1)) >= 0 and u2:cross(v2:sub(p, p0)) >= 0 and u3:cross(v3:sub(p, p2)) >= 0 then
-      local next_i = list[i]
-      if prev_i then
-        list[prev_i] = next_i
-      else
-        list_first = next_i
-      end
-      list[i] = nil
-      i = next_i
-    else
-      prev_i = i
-      i = list[i]
-    end
-  end
-
-  u1:sub(p1, p0)
-  u2:sub(p3, p1)
-  u3:sub(p0, p3)
-
-  local i = list_first
-  local prev_i
-  while i do
-    local p = source[i]
-    if u1:cross(v1:sub(p, p0)) >= 0 and u2:cross(v2:sub(p, p1)) >= 0 and u3:cross(v3:sub(p, p3)) >= 0 then
+    if in_triangle(p2, p1, p3, p) or in_triangle(p1, p2, p4, p) then
       local next_i = list[i]
       if prev_i then
         list[prev_i] = next_i
@@ -132,10 +113,10 @@ return function (source, result)
   end
 
   result.not_removed = not_removed
-  result[1] = p0
-  result[2] = p2
-  result[3] = p1
-  result[4] = p3
+  result[1] = p1
+  result[2] = p3
+  result[3] = p2
+  result[4] = p4
 
   return result
 end
