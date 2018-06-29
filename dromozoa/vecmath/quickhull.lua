@@ -98,7 +98,6 @@ return function (source, result)
     end
   end
 
-  -- 0 1 3 0
   u1:sub(p1, p0)
   u2:sub(p3, p1)
   u3:sub(p0, p3)
