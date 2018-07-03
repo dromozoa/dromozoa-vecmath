@@ -15,18 +15,22 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local function insert_after(after, prev_id, id)
-  local next_id = after[prev_id]
-  after[prev_id] = id
-  after[id] = next_id
+local function insert_after(after, a, b)
+  after[a], after[b] = b, after[a]
 end
 
-local function remove_after(after, prev_id)
-  local id = after[prev_id]
-  local next_id = after[id]
-  after[prev_id] = next_id
-  after[id] = nil
-  return next_id
+local function remove_after(after, a, b)
+  local c = after[b]
+  after[a] = c
+  after[b] = nil
+  return c
+end
+
+local function move_after(after, a, b, c)
+  local d = after[c]
+  after[a] = d
+  after[b], after[c] = c, after[b]
+  return d
 end
 
 local function visit(source, after, p1i, p3i, p2i)
@@ -70,19 +74,15 @@ local function visit(source, after, p1i, p3i, p2i)
     local d3 = vx * (y - p3y) - vy * (x - p3x)
 
     if d2 <= 0 and d3 <= 0 then
-      i = remove_after(after, prev_id)
+      i = remove_after(after, prev_id, i)
     else
       if d2 > 0 then
         if not p4d or p4d < d2 then
           p4i = i
           p4d = d2
-          local j = remove_after(after, prev_id)
-          insert_after(after, p1i, i)
-          i = j
+          i = move_after(after, prev_id, p1i, i)
         else
-          local j = remove_after(after, prev_id)
-          insert_after(after, p4i, i)
-          i = j
+          i = move_after(after, prev_id, p4i, i)
         end
       else
         if not p5d or p5d < d3 then
@@ -92,9 +92,7 @@ local function visit(source, after, p1i, p3i, p2i)
             prev_id = i
             i = after[i]
           else
-            local j = remove_after(after, prev_id)
-            insert_after(after, p3i, i)
-            i = j
+            i = move_after(after, prev_id, p3i, i)
           end
         else
           prev_id = i
