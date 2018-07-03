@@ -20,24 +20,20 @@ local function insert_after(after, a, b)
 end
 
 local function remove_after(after, a, b)
-  local c = after[b]
-  after[a] = c
+  local s = after[b]
+  after[a] = s
   after[b] = nil
-  return c
+  return s
 end
 
 local function move_after(after, a, b, c)
-  local d = after[c]
-  after[a] = d
+  local s = after[c]
+  after[a] = s
   after[b], after[c] = c, after[b]
-  return d
+  return s
 end
 
 local function visit(source, after, p1i, p3i, p2i)
-  assert(p3i ~= p1i)
-  assert(p3i == after[p1i])
-  assert(p3i ~= p2i)
-
   local i = after[p3i]
   if i == p2i then
     return
@@ -49,15 +45,13 @@ local function visit(source, after, p1i, p3i, p2i)
 
   local p1x = p1[1]
   local p1y = p1[2]
-  local p2x = p2[1]
-  local p2y = p2[2]
   local p3x = p3[1]
   local p3y = p3[2]
 
   local ux = p3x - p1x
   local uy = p3y - p1y
-  local vx = p2x - p3x
-  local vy = p2y - p3y
+  local vx = p2[1] - p3x
+  local vy = p2[2] - p3y
 
   local p4i
   local p4d
