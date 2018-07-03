@@ -40,56 +40,53 @@ local function visit(source, after, p1i, p3i, p2i)
   end
 
   local p1 = source[p1i]
-  local p2 = source[p2i]
-  local p3 = source[p3i]
-
   local p1x = p1[1]
   local p1y = p1[2]
+  local p2 = source[p2i]
+  local p3 = source[p3i]
   local p3x = p3[1]
   local p3y = p3[2]
 
-  local ux = p3x - p1x
-  local uy = p3y - p1y
-  local vx = p2[1] - p3x
-  local vy = p2[2] - p3y
+  local v13x = p3x - p1x
+  local v13y = p3y - p1y
+  local v32x = p2[1] - p3x
+  local v32y = p2[2] - p3y
 
   local p4i
   local p4d
   local p5d
   local p5i
 
-  local prev_id = p3i
+  local j = p3i
   repeat
     local p = source[i]
     local x = p[1]
     local y = p[2]
-
-    local d2 = ux * (y - p1y) - uy * (x - p1x)
-    local d3 = vx * (y - p3y) - vy * (x - p3x)
-
-    if d2 <= 0 and d3 <= 0 then
-      i = remove_after(after, prev_id, i)
+    local d13 = v13x * (y - p1y) - v13y * (x - p1x)
+    local d32 = v32x * (y - p3y) - v32y * (x - p3x)
+    if d13 <= 0 and d32 <= 0 then
+      i = remove_after(after, j, i)
     else
-      if d2 > 0 then
-        if not p4d or p4d < d2 then
+      if d13 > 0 then
+        if not p4d or p4d < d13 then
           p4i = i
-          p4d = d2
-          i = move_after(after, prev_id, p1i, i)
+          p4d = d13
+          i = move_after(after, j, p1i, i)
         else
-          i = move_after(after, prev_id, p4i, i)
+          i = move_after(after, j, p4i, i)
         end
       else
-        if not p5d or p5d < d3 then
-          p5d = d3
+        if not p5d or p5d < d32 then
           p5i = i
-          if prev_id == p3i then
-            prev_id = i
+          p5d = d32
+          if j == p3i then
+            j = i
             i = after[i]
           else
-            i = move_after(after, prev_id, p3i, i)
+            i = move_after(after, j, p3i, i)
           end
         else
-          prev_id = i
+          j = i
           i = after[i]
         end
       end
@@ -135,13 +132,13 @@ return function (source, result)
     return result
   end
 
-  local vx = p2x - p1x
-  local vy = p2y - p1y
-
   local after = {
     [p1i] = p2i;
     [p2i] = p1i;
   }
+
+  local vx = p2x - p1x
+  local vy = p2y - p1y
 
   local p3i
   local p3d
