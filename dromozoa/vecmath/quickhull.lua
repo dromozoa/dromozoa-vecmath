@@ -36,10 +36,10 @@ local function visit(source, after, p1i, p3i, p2i)
   local p3x = p3[1]
   local p3y = p3[2]
 
-  local v13x = p3x - p1x
-  local v13y = p3y - p1y
-  local v32x = p2[1] - p3x
-  local v32y = p2[2] - p3y
+  local ux = p3x - p1x
+  local uy = p3y - p1y
+  local vx = p2[1] - p3x
+  local vy = p2[2] - p3y
 
   local p4i
   local p4d
@@ -51,35 +51,29 @@ local function visit(source, after, p1i, p3i, p2i)
     local p = source[i]
     local x = p[1]
     local y = p[2]
-    local d13 = v13x * (y - p1y) - v13y * (x - p1x)
-    local d32 = v32x * (y - p3y) - v32y * (x - p3x)
-    if d13 <= 0 and d32 <= 0 then
-      -- i = remove_after(after, j, i)
-      local k = after[i]
-      after[j] = k
-      after[i] = nil
-      i = k
-    else
-      if d13 > 0 then
-        if not p4d or p4d < d13 then
-          p4i = i
-          p4d = d13
-          -- i = move_after(after, j, p1i, i)
-          local k = after[i]
-          after[j] = k
-          after[p1i], after[i] = i, after[p1i]
-          i = k
-        else
-          -- i = move_after(after, j, p4i, i)
-          local k = after[i]
-          after[j] = k
-          after[p4i], after[i] = i, after[p4i]
-          i = k
-        end
+    local d = ux * (y - p1y) - uy * (x - p1x)
+    if d > 0 then
+      if not p4d or p4d < d then
+        p4i = i
+        p4d = d
+        -- i = move_after(after, j, p1i, i)
+        local k = after[i]
+        after[j] = k
+        after[p1i], after[i] = i, after[p1i]
+        i = k
       else
-        if not p5d or p5d < d32 then
+        -- i = move_after(after, j, p4i, i)
+        local k = after[i]
+        after[j] = k
+        after[p4i], after[i] = i, after[p4i]
+        i = k
+      end
+    else
+      local d = vx * (y - p3y) - vy * (x - p3x)
+      if d > 0 then
+        if not p5d or p5d < d then
           p5i = i
-          p5d = d32
+          p5d = d
           if j == p3i then
             j = i
             i = after[i]
@@ -94,6 +88,12 @@ local function visit(source, after, p1i, p3i, p2i)
           j = i
           i = after[i]
         end
+      else
+        -- i = remove_after(after, j, i)
+        local k = after[i]
+        after[j] = k
+        after[i] = nil
+        i = k
       end
     end
   until i == p2i
