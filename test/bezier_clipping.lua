@@ -166,7 +166,7 @@ local function draw_td(node, P, Q, d_min, d_max)
   d:M(0, d1)
   for i = 1, 1024 do
     local t = i / 1024
-    local q = curve.cubic_bezier(q1, q2, q3, q4, t, point2())
+    local q = curve.cubic_bezier({ q1, q2, q3, q4 }, t, point2())
     d:L(320 * t, distance(v, vector2():sub(q, p1)))
   end
   node[#node + 1] = _"path" {
