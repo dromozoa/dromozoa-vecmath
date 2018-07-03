@@ -67,8 +67,6 @@ local function visit(source, before, after, p1i, p2i)
   local p5i
   local p5d
 
-  -- p1i, p4i, ..., p3i, p5i, ..., p2i
-
   repeat
     local p = source[i]
     local x = p[1]
@@ -80,7 +78,6 @@ local function visit(source, before, after, p1i, p2i)
     if d2 <= 0 and d3 <= 0 then
       i = remove(before, after, i)
     else
-      -- assert(not(d2 > 0 and d3 > 0))
       if d2 > 0 then
         if not p4d or p4d < d2 then
           p4i = i
@@ -101,11 +98,8 @@ local function visit(source, before, after, p1i, p2i)
           insert_after(before, after, p3i, i)
           i = j
         else
-          local j = remove(before, after, i)
-          insert_after(before, after, p5i, i)
-          i = j
+          i = after[i]
         end
-        -- i = after[i]
       end
     end
   until i == p2i
@@ -187,7 +181,6 @@ return function (source, result)
     end
   end
 
-  -- p1i, p3i, ..., p2i, p4i, ..., (p1i)
   visit(source, before, after, p1i, p2i)
   visit(source, before, after, p2i, p1i)
 

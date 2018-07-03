@@ -25,6 +25,8 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 
 local unpack = table.unpack or unpack
 
+local mode = ...
+
 local _ = element
 local point2 = vecmath.point2
 local vector2 = vecmath.vector2
@@ -32,8 +34,7 @@ local curve = vecmath.curve
 
 local P = {}
 
--- circle
-if true then
+if mode == "circle" then
   local m = 64
   local n = 8
   for i = 1, m do
@@ -47,8 +48,7 @@ if true then
   end
 end
 
--- square
-if false then
+if mode == "square" then
   local n = 30
   for i = -n, n do
     for j = -n, n do
@@ -59,8 +59,7 @@ if false then
   end
 end
 
--- square2
-if false then
+if mode == "square2" then
   local n = 28
   for i = -n, n do
     local m = n - math.abs(i)
