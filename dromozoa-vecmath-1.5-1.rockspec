@@ -1,8 +1,8 @@
 package = "dromozoa-vecmath"
-version = "1.4-1"
+version = "1.5-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.4.tar.gz";
-  file = "dromozoa-vecmath-1.4.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.5.tar.gz";
+  file = "dromozoa-vecmath-1.5.tar.gz";
 }
 description = {
   summary = "Pure-Lua implementation of javax.vecmath package";
