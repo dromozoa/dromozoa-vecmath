@@ -15,22 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local function insert_after(after, a, b)
-  after[a], after[b] = b, after[a]
-end
-
-local function remove_after(after, a, b)
-  local s = after[b]
-  after[a] = s
-  after[b] = nil
-  return s
-end
-
 local function move_after(after, a, b, c)
-  local s = after[c]
-  after[a] = s
+  local k = after[c]
+  after[a] = k
   after[b], after[c] = c, after[b]
-  return s
+  return k
 end
 
 local function visit(source, after, p1i, p3i, p2i)
@@ -65,15 +54,27 @@ local function visit(source, after, p1i, p3i, p2i)
     local d13 = v13x * (y - p1y) - v13y * (x - p1x)
     local d32 = v32x * (y - p3y) - v32y * (x - p3x)
     if d13 <= 0 and d32 <= 0 then
-      i = remove_after(after, j, i)
+      -- i = remove_after(after, j, i)
+      local k = after[i]
+      after[j] = k
+      after[i] = nil
+      i = k
     else
       if d13 > 0 then
         if not p4d or p4d < d13 then
           p4i = i
           p4d = d13
-          i = move_after(after, j, p1i, i)
+          -- i = move_after(after, j, p1i, i)
+          local k = after[i]
+          after[j] = k
+          after[p1i], after[i] = i, after[p1i]
+          i = k
         else
-          i = move_after(after, j, p4i, i)
+          -- i = move_after(after, j, p4i, i)
+          local k = after[i]
+          after[j] = k
+          after[p4i], after[i] = i, after[p4i]
+          i = k
         end
       else
         if not p5d or p5d < d32 then
@@ -83,7 +84,11 @@ local function visit(source, after, p1i, p3i, p2i)
             j = i
             i = after[i]
           else
-            i = move_after(after, j, p3i, i)
+            -- i = move_after(after, j, p3i, i)
+            local k = after[i]
+            after[j] = k
+            after[p3i], after[i] = i, after[p3i]
+            i = k
           end
         else
           j = i
@@ -153,17 +158,21 @@ return function (source, result)
         if not p3d or p3d < d then
           p3i = i
           p3d = d
-          insert_after(after, p1i, i)
+          -- insert_after(after, p1i, i)
+          after[p1i], after[i] = i, after[p1i]
         else
-          insert_after(after, p3i, i)
+          -- insert_after(after, p3i, i)
+          after[p3i], after[i] = i, after[p3i]
         end
       elseif d < 0 then
         if not p4d or p4d > d then
           p4i = i
           p4d = d
-          insert_after(after, p2i, i)
+          -- insert_after(after, p2i, i)
+          after[p2i], after[i] = i, after[p2i]
         else
-          insert_after(after, p4i, i)
+          -- insert_after(after, p4i, i)
+          after[p4i], after[i] = i, after[p4i]
         end
       end
     end
