@@ -15,48 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local function in_triangle(p1, p2, p3, q)
-  local p1x = p1[1]
-  local p1y = p1[2]
-  local p2x = p2[1]
-  local p2y = p2[2]
-  local p3x = p3[1]
-  local p3y = p3[2]
-  local qx = q[1]
-  local qy = q[2]
-  return (p2x - p1x) * (qy - p1y) >= (p2y - p1y) * (qx - p1x)
-      and (p3x - p2x) * (qy - p2y) >= (p3y - p2y) * (qx - p2x)
-      and (p1x - p3x) * (qy - p3y) >= (p1y - p3y) * (qx - p3x)
-end
-
---[[
-
--- ccw
-list1 = { p1, p2, X }
-list2 = { p1, ..., p_max, p2, ..., q_max, X }
-
-外積が現在のmaxよりも大きければ、maxの後に挿入する
-そうでなければ、p1の後に挿入する。
-めんどくさいから、双方向リンクリストにして、maxの前に挿入するとしたほうがよい。
-
-list2 = { p1, ..., p3, p2, ..., p4, X }
-
-list2 = { p1, [..., p3, ...], p2, ..., p4, X }
-
-list2 = { p1, ...p5, p3, ...p6, p2, ...p7, p4, ...p8, X }
-
-メモリ確保を伴わない再帰で実装できる。
-
-]]
-
-local function insert(before, after, next_id, id)
-  local prev_id = before[next_id]
-  before[next_id] = id
-  after[prev_id] = id
-  before[id] = prev_id
-  after[id] = next_id
-end
-
 local function insert_after(before, after, prev_id, id)
   local next_id = after[prev_id]
   before[next_id] = id
@@ -232,7 +190,6 @@ return function (source, result)
   -- p1i, p3i, ..., p2i, p4i, ..., (p1i)
   visit(source, before, after, p1i, p2i)
   visit(source, before, after, p2i, p1i)
-
 
   local j = 0
   local i = p1i

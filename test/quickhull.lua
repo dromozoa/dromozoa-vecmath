@@ -33,14 +33,16 @@ local curve = vecmath.curve
 local P = {}
 
 -- circle
-if false then
-  local m = 4
-  local n = 30
+if true then
+  local m = 64
+  local n = 8
   for i = 1, m do
-    local t = i / m * 300
+    local t = i / m * math.pi * 2
+    local c = math.cos(t)
+    local s = math.sin(t)
     for j = 1, n do
-      local u = j / n * math.pi * 2
-      P[#P + 1] = point2(math.cos(u) * t, math.sin(u) * t)
+      local u = j / n * 300
+      P[#P + 1] = point2(c * u, s * u)
     end
   end
 end
@@ -58,7 +60,7 @@ if false then
 end
 
 -- square2
-if true then
+if false then
   local n = 28
   for i = -n, n do
     local m = n - math.abs(i)
