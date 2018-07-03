@@ -16,107 +16,231 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local function in_triangle(p1, p2, p3, q)
-  local p1_x = p1[1]
-  local p1_y = p1[2]
-  local p2_x = p2[1]
-  local p2_y = p2[2]
-  local p3_x = p3[1]
-  local p3_y = p3[2]
-  local q_x = q[1]
-  local q_y = q[2]
-  return (p2_x - p1_x) * (q_y - p1_y) >= (p2_y - p1_y) * (q_x - p1_x)
-      and (p3_x - p2_x) * (q_y - p2_y) >= (p3_y - p2_y) * (q_x - p2_x)
-      and (p1_x - p3_x) * (q_y - p3_y) >= (p1_y - p3_y) * (q_x - p3_x)
+  local p1x = p1[1]
+  local p1y = p1[2]
+  local p2x = p2[1]
+  local p2y = p2[2]
+  local p3x = p3[1]
+  local p3y = p3[2]
+  local qx = q[1]
+  local qy = q[2]
+  return (p2x - p1x) * (qy - p1y) >= (p2y - p1y) * (qx - p1x)
+      and (p3x - p2x) * (qy - p2y) >= (p3y - p2y) * (qx - p2x)
+      and (p1x - p3x) * (qy - p3y) >= (p1y - p3y) * (qx - p3x)
+end
+
+--[[
+
+-- ccw
+list1 = { p1, p2, X }
+list2 = { p1, ..., p_max, p2, ..., q_max, X }
+
+外積が現在のmaxよりも大きければ、maxの後に挿入する
+そうでなければ、p1の後に挿入する。
+めんどくさいから、双方向リンクリストにして、maxの前に挿入するとしたほうがよい。
+
+list2 = { p1, ..., p3, p2, ..., p4, X }
+
+list2 = { p1, [..., p3, ...], p2, ..., p4, X }
+
+list2 = { p1, ...p5, p3, ...p6, p2, ...p7, p4, ...p8, X }
+
+メモリ確保を伴わない再帰で実装できる。
+
+]]
+
+local function insert(before, after, next_id, id)
+  local prev_id = before[next_id]
+  before[next_id] = id
+  after[prev_id] = id
+  before[id] = prev_id
+  after[id] = next_id
+end
+
+local function insert_after(before, after, prev_id, id)
+  local next_id = after[prev_id]
+  before[next_id] = id
+  after[prev_id] = id
+  before[id] = prev_id
+  after[id] = next_id
+end
+
+local function remove(before, after, id)
+  local prev_id = before[id]
+  local next_id = after[id]
+  before[next_id] = prev_id
+  after[prev_id] = next_id
+  before[id] = nil
+  after[id] = nil
+  return next_id
+end
+
+local function visit(source, before, after, p1i, p2i)
+  local p3i = after[p1i]
+  if p3i == p2i then
+    return
+  end
+
+  local i = after[p3i]
+  if i == p2i then
+    return
+  end
+
+  -- p1i, p3i, ..., p2i
+
+  local p1 = source[p1i]
+  local p2 = source[p2i]
+  local p3 = source[p3i]
+
+  local p1x = p1[1]
+  local p1y = p1[2]
+  local p2x = p2[1]
+  local p2y = p2[2]
+  local p3x = p3[1]
+  local p3y = p3[2]
+
+  local ux = p3x - p1x
+  local uy = p3y - p1y
+  local vx = p2x - p3x
+  local vy = p2y - p3y
+
+  local p4i
+  local p4d
+  local p5i
+  local p5d
+
+  -- p1i, p4i, ..., p3i, p5i, ..., p2i
+
+  repeat
+    local p = source[i]
+    local x = p[1]
+    local y = p[2]
+
+    local d2 = ux * (y - p1y) - uy * (x - p1x)
+    local d3 = vx * (y - p3y) - vy * (x - p3x)
+
+    if d2 <= 0 and d3 <= 0 then
+      i = remove(before, after, i)
+    else
+      -- assert(not(d2 > 0 and d3 > 0))
+      if d2 > 0 then
+        if not p4d or p4d < d2 then
+          p4i = i
+          p4d = d2
+          local j = remove(before, after, i)
+          insert_after(before, after, p1i, i)
+          i = j
+        else
+          local j = remove(before, after, i)
+          insert_after(before, after, p4i, i)
+          i = j
+        end
+      else
+        if not p5d or p5d < d3 then
+          p5i = i
+          p5d = d3
+          local j = remove(before, after, i)
+          insert_after(before, after, p3i, i)
+          i = j
+        else
+          local j = remove(before, after, i)
+          insert_after(before, after, p5i, i)
+          i = j
+        end
+        -- i = after[i]
+      end
+    end
+  until i == p2i
+
+  visit(source, before, after, p1i, p3i)
+  visit(source, before, after, p3i, p2i)
 end
 
 return function (source, result)
-  local list_first = 1
-  local list = {}
+  local n = #source
+  local p1 = source[1]
+  local p1i = 1
+  local p1x = p1[1]
+  local p1y = p1[2]
+  local p2i = p1i
+  local p2x = p1x
+  local p2y = p1y
 
-  local p1_i = 1
-  local p1_x = source[1][1]
-  local p2_i = p1_i
-  local p2_x = p1_x
-
-  for i = 2, #source do
-    list[i - 1] = i
-    local x = source[i][1]
-    if p1_x > x then
-      p1_i = i
-      p1_x = x
-    end
-    if p2_x < x then
-      p2_i = i
-      p2_x = x
-    end
-  end
-
-  local p1 = source[p1_i]
-  local p1_y = p1[2]
-  local p2 = source[p2_i]
-  local v_x = p2[1] - p1_x
-  local v_y = p2[2] - p1_y
-
-  local p3_i = p1_i
-  local p3_d = 0
-  local p4_i = p2_i
-  local p4_d = 0
-
-  local i = list_first
-  while i do
+  for i = 2, n do
     local p = source[i]
-    local d = v_x * (p[2] - p1_y) - v_y * (p[1] - p1_x)
-    if d < 0 then
-      if p3_d > d then
-        p3_i = i
-        p3_d = d
-      end
-    else
-      if p4_d < d then
-        p4_i = i
-        p4_d = d
-      end
+    local x = p[1]
+    local y = p[2]
+    if p1x > x or p1x == x and p1y > y then
+      p1i = i
+      p1x = x
+      p1y = y
     end
-    i = list[i]
-  end
-
-  local p3 = source[p3_i]
-  local p4 = source[p4_i]
-
-  local i = list_first
-  local prev_i
-  while i do
-    local p = source[i]
-    if in_triangle(p2, p1, p3, p) or in_triangle(p1, p2, p4, p) then
-      local next_i = list[i]
-      if prev_i then
-        list[prev_i] = next_i
-      else
-        list_first = next_i
-      end
-      list[i] = nil
-      i = next_i
-    else
-      prev_i = i
-      i = list[i]
+    if p2x < x or p2x == x and p2y < y then
+      p2i = i
+      p2x = x
+      p2y = y
     end
   end
 
-  -- debug section
-
-  local not_removed = {}
-
-  local i = list_first
-  while i do
-    not_removed[i] = true
-    i = list[i]
+  if p1i == p2i then
+    result[1] = source[p1i]
+    return result
   end
 
-  result.not_removed = not_removed
-  result[1] = p1
-  result[2] = p3
-  result[3] = p2
-  result[4] = p4
+  local vx = p2x - p1x
+  local vy = p2y - p1y
+
+  local before = {
+    [p1i] = p2i;
+    [p2i] = p1i;
+  }
+
+  local after = {
+    [p1i] = p2i;
+    [p2i] = p1i;
+  }
+
+  local p3i
+  local p3d
+  local p4i
+  local p4d
+
+  for i = 1, n do
+    if i ~= p1i and i ~= p2i then
+      local p = source[i]
+      local d = vx * (p[2] - p1y) - vy * (p[1] - p1x)
+      if d > 0 then
+        if not p3d or p3d < d then
+          p3i = i
+          p3d = d
+          insert_after(before, after, p1i, i)
+        else
+          insert_after(before, after, p3i, i)
+        end
+      elseif d < 0 then
+        if not p4d or p4d > d then
+          p4i = i
+          p4d = d
+          insert_after(before, after, p2i, i)
+        else
+          insert_after(before, after, p4i, i)
+        end
+      end
+    end
+  end
+
+  -- p1i, p3i, ..., p2i, p4i, ..., (p1i)
+  visit(source, before, after, p1i, p2i)
+  visit(source, before, after, p2i, p1i)
+
+
+  local j = 0
+  local i = p1i
+  repeat
+    j = j + 1
+    result[j] = source[i]
+    i = after[i]
+  until i == p1i
 
   return result
 end

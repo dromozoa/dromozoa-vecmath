@@ -30,15 +30,42 @@ local point2 = vecmath.point2
 local vector2 = vecmath.vector2
 local curve = vecmath.curve
 
-local m = 4
-local n = 30
-
 local P = {}
-for i = 1, m do
-  local t = i / m * 300
-  for j = 1, n do
-    local u = j / n * math.pi * 2
-    P[#P + 1] = point2(math.cos(u) * t, math.sin(u) * t)
+
+-- circle
+if false then
+  local m = 4
+  local n = 30
+  for i = 1, m do
+    local t = i / m * 300
+    for j = 1, n do
+      local u = j / n * math.pi * 2
+      P[#P + 1] = point2(math.cos(u) * t, math.sin(u) * t)
+    end
+  end
+end
+
+-- square
+if false then
+  local n = 30
+  for i = -n, n do
+    for j = -n, n do
+      if math.abs(i) ~= math.abs(j) then
+        P[#P + 1] = point2(i * 10, j * 10)
+      end
+    end
+  end
+end
+
+-- square2
+if true then
+  local n = 28
+  for i = -n, n do
+    local m = n - math.abs(i)
+    m = math.floor((m + 2) / 4) * 4
+    for j = -m, m do
+      P[#P + 1] = point2(i * 10, j * 10)
+    end
   end
 end
 
@@ -50,15 +77,11 @@ local R = quickhull(P, {})
 
 for i = 1, #P do
   local p = P[i]
-  local fill = "#333"
-  if R.not_removed[i] then
-    fill = "#F33"
-  end
   root[#root + 1] = _"circle" {
     cx = p.x;
     cy = p.y;
     r = 2;
-    fill = fill;
+    fill = "#333";
   }
 end
 
