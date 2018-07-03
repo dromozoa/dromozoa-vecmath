@@ -23,8 +23,8 @@ local function insert_after(before, after, prev_id, id)
   after[id] = next_id
 end
 
-local function remove(before, after, id)
-  local prev_id = before[id]
+local function remove_after(before, after, prev_id)
+  local id = after[prev_id]
   local next_id = after[id]
   before[next_id] = prev_id
   after[prev_id] = next_id
@@ -43,8 +43,6 @@ local function visit(source, before, after, p1i, p2i)
   if i == p2i then
     return
   end
-
-  -- p1i, p3i, ..., p2i
 
   local p1 = source[p1i]
   local p2 = source[p2i]
@@ -67,6 +65,7 @@ local function visit(source, before, after, p1i, p2i)
   local p5i
   local p5d
 
+  local prev_id = p3i
   repeat
     local p = source[i]
     local x = p[1]
@@ -76,17 +75,20 @@ local function visit(source, before, after, p1i, p2i)
     local d3 = vx * (y - p3y) - vy * (x - p3x)
 
     if d2 <= 0 and d3 <= 0 then
-      i = remove(before, after, i)
+      -- prev_id not changed
+      i = remove_after(before, after, prev_id)
     else
       if d2 > 0 then
         if not p4d or p4d < d2 then
           p4i = i
           p4d = d2
-          local j = remove(before, after, i)
+          -- prev_id not changed
+          local j = remove_after(before, after, prev_id)
           insert_after(before, after, p1i, i)
           i = j
         else
-          local j = remove(before, after, i)
+          -- prev_id not changed
+          local j = remove_after(before, after, prev_id)
           insert_after(before, after, p4i, i)
           i = j
         end
@@ -94,10 +96,14 @@ local function visit(source, before, after, p1i, p2i)
         if not p5d or p5d < d3 then
           p5i = i
           p5d = d3
-          local j = remove(before, after, i)
+          local j = remove_after(before, after, prev_id)
+          if prev_id == p3i then
+            prev_id = i
+          end
           insert_after(before, after, p3i, i)
           i = j
         else
+          prev_id = i
           i = after[i]
         end
       end
