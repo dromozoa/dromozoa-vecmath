@@ -29,11 +29,10 @@ local function remove_after(after, prev_id)
   return next_id
 end
 
-local function visit(source, after, p1i, p2i)
-  local p3i = after[p1i]
-  if p3i == p2i then
-    return
-  end
+local function visit(source, after, p1i, p3i, p2i)
+  assert(p3i ~= p1i)
+  assert(p3i == after[p1i])
+  assert(p3i ~= p2i)
 
   local i = after[p3i]
   if i == p2i then
@@ -58,8 +57,8 @@ local function visit(source, after, p1i, p2i)
 
   local p4i
   local p4d
-  local p5i
   local p5d
+  local p5i
 
   local prev_id = p3i
   repeat
@@ -71,33 +70,32 @@ local function visit(source, after, p1i, p2i)
     local d3 = vx * (y - p3y) - vy * (x - p3x)
 
     if d2 <= 0 and d3 <= 0 then
-      -- prev_id not changed
       i = remove_after(after, prev_id)
     else
       if d2 > 0 then
         if not p4d or p4d < d2 then
           p4i = i
           p4d = d2
-          -- prev_id not changed
           local j = remove_after(after, prev_id)
           insert_after(after, p1i, i)
           i = j
         else
-          -- prev_id not changed
           local j = remove_after(after, prev_id)
           insert_after(after, p4i, i)
           i = j
         end
       else
         if not p5d or p5d < d3 then
-          p5i = i
           p5d = d3
-          local j = remove_after(after, prev_id)
+          p5i = i
           if prev_id == p3i then
             prev_id = i
+            i = after[i]
+          else
+            local j = remove_after(after, prev_id)
+            insert_after(after, p3i, i)
+            i = j
           end
-          insert_after(after, p3i, i)
-          i = j
         else
           prev_id = i
           i = after[i]
@@ -106,8 +104,12 @@ local function visit(source, after, p1i, p2i)
     end
   until i == p2i
 
-  visit(source, after, p1i, p3i)
-  visit(source, after, p3i, p2i)
+  if p4i then
+    visit(source, after, p1i, p4i, p3i)
+  end
+  if p5i then
+    visit(source, after, p3i, p5i, p2i)
+  end
 end
 
 return function (source, result)
@@ -178,8 +180,12 @@ return function (source, result)
     end
   end
 
-  visit(source, after, p1i, p2i)
-  visit(source, after, p2i, p1i)
+  if p3d then
+    visit(source, after, p1i, p3i, p2i)
+  end
+  if p4d then
+    visit(source, after, p2i, p4i, p1i)
+  end
 
   local j = 0
   local i = p1i
