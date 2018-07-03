@@ -25,6 +25,7 @@ build = {
     ["dromozoa.vecmath.point3"] = "dromozoa/vecmath/point3.lua";
     ["dromozoa.vecmath.point4"] = "dromozoa/vecmath/point4.lua";
     ["dromozoa.vecmath.quat4"] = "dromozoa/vecmath/quat4.lua";
+    ["dromozoa.vecmath.quickhull"] = "dromozoa/vecmath/quickhull.lua";
     ["dromozoa.vecmath.svd2"] = "dromozoa/vecmath/svd2.lua";
     ["dromozoa.vecmath.svd3"] = "dromozoa/vecmath/svd3.lua";
     ["dromozoa.vecmath.tex_coord2"] = "dromozoa/vecmath/tex_coord2.lua";
