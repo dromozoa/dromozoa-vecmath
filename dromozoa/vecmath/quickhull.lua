@@ -15,13 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local function move_after(after, a, b, c)
-  local k = after[c]
-  after[a] = k
-  after[b], after[c] = c, after[b]
-  return k
-end
-
 local function visit(source, after, p1i, p3i, p2i)
   local i = after[p3i]
   if i == p2i then
@@ -134,6 +127,9 @@ return function (source, result)
 
   if p1i == p2i then
     result[1] = source[p1i]
+    for i = 2, #result do
+      result[i] = nil
+    end
     return result
   end
 
@@ -185,13 +181,15 @@ return function (source, result)
     visit(source, after, p2i, p4i, p1i)
   end
 
-  local j = 0
+  local n = 0
   local i = p1i
   repeat
-    j = j + 1
-    result[j] = source[i]
+    n = n + 1
+    result[n] = source[i]
     i = after[i]
   until i == p1i
-
+  for i = n + 1, #result do
+    result[i] = nil
+  end
   return result
 end
