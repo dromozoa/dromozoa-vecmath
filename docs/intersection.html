@@ -33,6 +33,7 @@
       <li><a href="http://nishitalab.org/user/nis/cdrom/cad/CAGD90Curve.pdf">Curve intersection using B&eacute;zier clipping</a></li>
     </ul>
   </li>
+  <li><a href="https://www.cise.ufl.edu/~ungor/courses/fall06/papers/QuickHull.pdf">The Quickhull Algorithm for Convex Hulls</a></li>
 </ul>
 
 <h2>プリミティブ</h2>
@@ -73,6 +74,68 @@
 が存在する。交点を求める必要がなければ除算は不要である。
 </p>
 
+<h2>三角形の内外判定</h2>
+
+<p>
+三角形\((\V{p_1}, \V{p_2}, \V{p_3})\)の内部に点\(\V{q}\)が存在するかを判定する。
+\begin{align}
+  \V{u_1} &amp;= \V{p_2} - \V{p_1} \\
+  \V{u_2} &amp;= \V{p_3} - \V{p_2} \\
+  \V{u_3} &amp;= \V{p_1} - \V{p_3} \\
+  \V{v_1} &amp;= \V{q} - \V{p_1} \\
+  \V{v_2} &amp;= \V{q} - \V{p_2} \\
+  \V{v_3} &amp;= \V{q} - \V{p_3}
+\end{align}
+それぞれの外積
+\begin{align}
+  \V{u_1} &amp;\times \V{v_1} \\
+  \V{u_2} &amp;\times \V{v_2} \\
+  \V{u_3} &amp;\times \V{v_3}
+\end{align}
+の符号が一致すれば三角形の内部に存在する。
+三角形を時計回りと反時計回りのどちらに回るかによって外積の符号が定まる。
+外積が0の場合、対応する三角形の辺上に点\(\V{q}\)が存在する。
+</p>
+
+<h2>Quickfull</h2>
+
+<p>
+前回のイテレーションで点列に対して外積を計算した結果、
+線分\((\V{p_1}, \V{p_2})\)の左側に存在する点列\(\V{P}\)が得られている。
+また、線分と点\(\V{p}\)の距離が判っている。
+最大の距離を持つ\(\V{p_3}\)によって、\(\V{P}\)は
+</p>
+
+<ol>
+  <li>線分\((\V{p_1}, \V{p_3})\)の左側に存在する</li>
+  <li>線分\((\V{p_3}, \V{p_2})\)の左側に存在する</li>
+  <li>三角形\((\V{p_3}, \V{p_2}, \V{p_1})\)の内側に存在する</li>
+</ol>
+
+<p>
+の3通りに分類される。
+線分の左側に点が存在しなくなるまで再帰的にイテレーションを続ける。
+点列は単方向リンクリストで保持すれば充分である。
+</p>
+
+<pre>
+# 0-origin
+0                                       0               0
+0                   1                   0               1
+0         2         1         3         0         2           3
+0    4    2    5    1    6    3    7    0      4     5     6     7
+0  8 4 9  2 10 5 11 1 12 6 13 3 14 7 15 0     8 9  10 11 12 13 14 15
+</pre>
+
+<pre>
+# 1-origin
+1                                       1               1
+1                   2                   1               2
+1         3         2         4         1         3           4
+1    5    3    6    2    7    4    8    1      5     6     7     8
+1  9 5 10 3 11 6 12 2 13 7 14 4 15 8 16 1     9 10 11 12 13 14 15 16
+</pre>
+
 <h2>Bezier Clipping</h2>
 
 <h3>Collinear normal theorem</h3>
@@ -101,24 +164,24 @@
 \]
 次に
 \[
-  c(t) = c_0 (1 - t) + c_1 t
+  c(t) = c_1 (1 - t) + c_2 t
 \]
-と与え、\(\V{F}(0) = \V{F}(1)\)になるような\(c_0, c_1\)を求める。
+と与え、\(\V{F}(0) = \V{F}(1)\)になるような\(c_1, c_2\)を求める。
 Cubic Bezierの場合を考えると
 \begin{align}
   \V{F}(0)
-  &amp;= \V{P}(0) + c_0 \begin{pmatrix}
+  &amp;= \V{P}(0) + c_1 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} \V{P}'(0) \\
-  &amp;= \V{p_1} + 3 c_0 \begin{pmatrix}
+  &amp;= \V{p_1} + 3 c_1 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} (\V{p_2} - \V{p_1}) \\
   &amp;= \begin{pmatrix}
     x_1 \\
     y_1
-  \end{pmatrix} + 3 c_0 \begin{pmatrix}
+  \end{pmatrix} + 3 c_1 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} \begin{pmatrix}
@@ -128,24 +191,24 @@ Cubic Bezierの場合を考えると
   &amp;= \begin{pmatrix}
     x_1 \\
     y_1
-  \end{pmatrix} + 3 c_0 \begin{pmatrix}
+  \end{pmatrix} + 3 c_1 \begin{pmatrix}
     y_1 - y_2 \\
     x_2 - x_1
   \end{pmatrix} \\
 
   \V{F}(1)
-  &amp;= \V{P}(1) + c_1 \begin{pmatrix}
+  &amp;= \V{P}(1) + c_2 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} \V{P}'(1) \\
-  &amp;= \V{p_4} + 3 c_1 \begin{pmatrix}
+  &amp;= \V{p_4} + 3 c_2 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} (\V{p_4} - \V{p_3}) \\
   &amp;= \begin{pmatrix}
     x_4 \\
     y_4
-  \end{pmatrix} + 3c_1 \begin{pmatrix}
+  \end{pmatrix} + 3c_2 \begin{pmatrix}
     0 &amp; -1 \\
     1 &amp;  0
   \end{pmatrix} \begin{pmatrix}
@@ -155,7 +218,7 @@ Cubic Bezierの場合を考えると
   &amp;= \begin{pmatrix}
     x_4 \\
     y_4
-  \end{pmatrix} + 3c_1 \begin{pmatrix}
+  \end{pmatrix} + 3c_2 \begin{pmatrix}
     y_3 - y_4 \\
     x_4 - x_3
   \end{pmatrix} \\
@@ -165,12 +228,12 @@ Cubic Bezierの場合を考えると
     y_4 - y_1
   \end{pmatrix}
   &amp;=
-  3 c_0 \begin{pmatrix}
+  3 c_1 \begin{pmatrix}
     y_1 - y_2 \\
     x_2 - x_1
   \end{pmatrix}
   -
-  3c_1 \begin{pmatrix}
+  3c_2 \begin{pmatrix}
     y_3 - y_4 \\
     x_4 - x_3
   \end{pmatrix} \\
@@ -181,14 +244,14 @@ Cubic Bezierの場合を考えると
     x_2 - x_1 &amp; x_3 - x_4
   \end{pmatrix}
   \begin{pmatrix}
-    c_0 \\
-    c_1
+    c_1 \\
+    c_2
   \end{pmatrix} \\
 
   3
   \begin{pmatrix}
-    c_0 \\
-    c_1
+    c_1 \\
+    c_2
   \end{pmatrix}
   &amp;=
   \begin{pmatrix}
@@ -201,7 +264,7 @@ Cubic Bezierの場合を考えると
   \end{pmatrix}
 \end{align}
 両端点の接線ベクトルが平行の場合は行列式が\(0\)になるので、\(\V{F}(0) = \V{F}(1)\)は成立しない。
-このような場合も含めて、\(c_0, c_1\)の上限を定めておくことで対処するらしい。
+このような場合も含めて、\(c_1, c_2\)の上限を定めておくことで対処するらしい。
 （焦点曲線が大きくなるような場合は通常のBezier Clippingによって収束するのだろうと想像する）
 </p>
 
@@ -238,76 +301,6 @@ Bezier曲線\(\V{Q}(u)\)の焦点は\(\V{F_Q}(u)\)である。
 これにより、Collinear Normalが存在しそうな\(t,u\)の範囲を絞る。
 </p>
 
-<h3>non-parametric</h3>
-
-<p>
-Cubic Bezierでは制御点を\((t, d) = (0, d_1), (1/3, d_2), (2/3, d_3), (1, d_4)\)として
-\begin{align}
-  u &amp;= 1 - t \\
-  d(t) &amp;= u^3 d_1 + 3u^2t d_2 + 3ut^2 d_3 + t^3 d_4 \\
-  d(0) &amp;= d_1 \\
-  d(1) &amp;= d_4 \\
-  27 d(1/3) &amp; = 8d_1 + 12d_2 + 6d_3 + d_4 \\
-  27 d(2/3) &amp; = d_1 + 6d_2 + 12d_3 + 8d_4 \\
-  \begin{pmatrix}
-    d_2 \\
-    d_3
-  \end{pmatrix} &amp;= \begin{pmatrix}
-    12 &amp;  6 \\
-     6 &amp; 12
-  \end{pmatrix}^{-1}
-  \begin{pmatrix}
-    27 d(1/3) - 8 d(0) - d(1) \\
-    27 d(2/3) - d(0) - 8 d(4)
-  \end{pmatrix} \\
-  &amp;= \frac{1}{18} \begin{pmatrix}
-     2 &amp; -1 \\
-    -1 &amp;  2
-  \end{pmatrix}
-  \begin{pmatrix}
-    27 d(1/3) - 8 d(0) - d(1) \\
-    27 d(2/3) - d(0) - 8 d(4)
-  \end{pmatrix}
-\end{align}
-5次のBezier曲線では制御点を\((t, d) = (0, d_1), (1/5, d_2), (2/5, d_3), (3/5, d_4), (4/5, d_5), (1, d_6)\)として
-\begin{align}
-  d(t) &amp;= u^5 d_1 + 5u^4t d_2 + 10u^3t^2 d_3 + 10u^2t^3 d_4 + 5ut^4 d_5 + t^5 d_6 \\
-  d(0) &amp;= d_1 \\
-  d(1) &amp;= d_6 \\
-  3125 d(1/5) &amp;= 1024d_1 + 1280d_2 +  640d_3 +  160d_4 +   20d_5 +     d_6 \\
-  3125 d(2/5) &amp;=  243d_1 +  810d_2 + 1080d_3 +  720d_4 +  240d_5 +   32d_6 \\
-  3125 d(3/5) &amp;=   32d_1 +  240d_2 +  720d_3 + 1080d_4 +  810d_5 +  243d_6 \\
-  3125 d(4/5) &amp;=     d_1 +   20d_2 +  160d_3 +  640d_4 + 1280d_5 + 1024d_6 \\
-  \begin{pmatrix}
-    d_2 \\
-    d_3 \\
-    d_4 \\
-    d_5
-  \end{pmatrix} &amp;= \begin{pmatrix}
-    1280 &amp;  640 &amp;  160 &amp;   20 \\
-     810 &amp; 1080 &amp;  720 &amp;  240 \\
-     240 &amp;  720 &amp; 1080 &amp;  810 \\
-      20 &amp;  160 &amp;  640 &amp; 1280
-  \end{pmatrix}^{-1} \begin{pmatrix}
-    3125 d(1/5) - 1024 d(0) -      d(1) \\
-    3125 d(2/5) -  243 d(0) -   32 d(1) \\
-    3125 d(3/5) -   32 d(0) -  243 d(1) \\
-    3125 d(4/5) -      d(0) - 1024 d(1)
-  \end{pmatrix} \\
- &amp;= \frac{1}{30000} \begin{pmatrix}
-     48 &amp; -48 &amp;  32 &amp; -12 \\
-    -58 &amp; 118 &amp; -92 &amp;  37 \\
-     37 &amp; -92 &amp; 118 &amp; -58 \\
-    -12 &amp;  32 &amp; -48 &amp;  48
-  \end{pmatrix} \begin{pmatrix}
-    3125 d(1/5) - 1024 d(0) -      d(1) \\
-    3125 d(2/5) -  243 d(0) -   32 d(1) \\
-    3125 d(3/5) -   32 d(0) -  243 d(1) \\
-    3125 d(4/5) -      d(0) - 1024 d(1)
-  \end{pmatrix}
-\end{align}
-</p>
-
 </div>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -316,6 +309,7 @@ MathJax.Hub.Config({
   },
   TeX: {
     Macros: {
+      R: [ "\\mathrm{#1}", 1 ],
       V: [ "\\boldsymbol{#1}", 1 ]
     }
   }

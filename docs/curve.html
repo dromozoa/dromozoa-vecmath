@@ -41,7 +41,16 @@
 \]
 </p>
 
-<h2>Quadratic Bezier</h2>
+<h2>Linear Bezier（1次）</h2>
+
+<p>
+\begin{align}
+  \V{p} &amp;= u\V{p_1} + t\V{p_2} \\
+  \V{p}' &amp; = \V{p_2} - \V{p_1}
+\end{align}
+</p>
+
+<h2>Quadratic Bezier（2次）</h2>
 
 <p>
 \begin{align}
@@ -50,13 +59,21 @@
 
   \V{p} &amp;= u \V{p_4} + t \V{p_5} \\
   &amp;= u^2 \V{p_1} + 2ut \V{p_2} + t^2 \V{p_3} \\
-  &amp;= t^2 ((\V{p_3} - \V{p_2}) - (\V{p_2} - \V{p_1}))
-    + 2t (\V{p_2} - \V{p_1})
-    + \V{p_1}
+  \V{p}' &amp;= 2 (t \V{p3} - 2 (t - \frac{1}{2}) \V{p_2} - u \V{p_1}) \\
+  &amp;= 2 (t \V{p3} + (1 - 2t) \V{p_2} - u \V{p_1}) \\
+  &amp;= 2t \V{p3} + (2 - 4t) \V{p_2} - 2u \V{p_1} \\
+  &amp;= 2\V{p_5} - 2\V{p_4}
+\end{align}
+関数から制御点を決定する。
+\begin{align}
+  \V{p_1} &amp;= \V{p}(0) \\
+  \V{p_3} &amp;= \V{p}(1) \\
+  4 \V{p}(1/2) &amp; = \V{p_1} + 2\V{p_2} + \V{p_3} \\
+  \V{p_2} &amp;= \frac{1}{2} (4\V{p}(1/2) - \V{p}(0) - \V{p}(1))
 \end{align}
 </p>
 
-<h2>Cubic Bezier</h2>
+<h2>Cubic Bezier（3次）</h2>
 
 <p>
 \(\V{p_1}, \V{p_5}, \V{p_8}, \V{p}\)と\(\V{p}, \V{p_9}, \V{p_7}, \V{p_4}\)に分割する。
@@ -73,28 +90,190 @@
 
   \V{p} &amp;= u \V{p_8} + t \V{p_9} \\
   &amp;= u^3 \V{p_1} + 3u^2t \V{p_2} + 3ut^2 \V{p_3} + t^3 \V{p_4} \\
-  &amp;= t^3 (\V{p_4}-3\V{p_3}+3\V{p_2}-\V{p_1})
-    + t^2 (3\V{p_3}-6\V{p_2}+3\V{p_1})
-    + t (3\V{p_2} - 3\V{p_1})
-    + \V{p_1} \\
 
-  \V{p}' &amp;= 3t^2 (\V{p_4}-3\V{p_3}+3\V{p_2}-\V{p_1})
-    + 2t (3\V{p_3}-6\V{p_2}+3\V{p_1})
-    + (3\V{p_2} - 3\V{p_1}) \\
-  &amp;= 3t^2\V{p_4}
-    + 3(2t-3t^2)\V{p_3}
-    + 3(1-4t+3t^2)\V{p_2}
-    - 3(1-2t+t^2)\V{p_1} \\
-  &amp;= 3t^2 \V{p_4}
-    + 9t (\frac{2}{3} - t) \V{p_3}
-    + 9 (\frac{1}{3} - t) (1 - t) \V{p_2}
-    - 3 (1-t)^2 \V{p_1} \\
+  \V{p}' &amp;= 3 (
+    t^2 \V{p_4}
+    - 3t(t - \frac{2}{3}) \V{p_3}
+    - 3u(t - \frac{1}{3}) \V{p_2}
+    - u^2 \V{p_1}
+  ) \\
   &amp;= 3 (
     t^2 \V{p_4}
-    + 3 t (u - \frac{1}{3}) \V{p_3}
-    - 3 (t - \frac{1}{3}) u \V{p_2}
+    + t(2 - 3t) \V{p_3}
+    + u(1 - 3t) \V{p_2}
     - u^2 \V{p_1}
+  ) \\
+  &amp;=
+    3t^2 \V{p_4}
+    + t(6 - 9t) \V{p_3}
+    + u(3 - 9t) \V{p_2}
+    - 3u^2 \V{p_1} \\
+
+  &amp;= 3\V{p_9} - 3\V{p_8}
+\end{align}
+関数から制御点を決定する。
+\begin{align}
+  \V{p_1} &amp;= \V{p}(0) \\
+  \V{p_4} &amp;= \V{p}(1) \\
+
+  27 \V{p}(1/3) &amp; = 8\V{p_1} + 12\V{p_2} +  6\V{p_3} +  \V{p_4} \\
+  27 \V{p}(2/3) &amp; =  \V{p_1} +  6\V{p_2} + 12\V{p_3} + 8\V{p_4} \\
+
+  \begin{pmatrix}
+    \V{p_2} \\
+    \V{p_3}
+  \end{pmatrix}
+  &amp;= \begin{pmatrix}
+    12 &amp;  6 \\
+     6 &amp; 12
+  \end{pmatrix}^{-1}
+  \begin{pmatrix}
+    27 \V{p}(1/3) - 8\V{p}(0) -  \V{p}(1) \\
+    27 \V{p}(2/3) -  \V{p}(0) - 8\V{p}(0)
+  \end{pmatrix} \\
+  &amp;= \frac{1}{18} \begin{pmatrix}
+     2 &amp; -1 \\
+    -1 &amp;  2
+  \end{pmatrix}
+  \begin{pmatrix}
+    27 \V{p}(1/3) - 8\V{p}(0) -  \V{p}(1) \\
+    27 \V{p}(2/3) -  \V{p}(0) - 8\V{p}(0)
+  \end{pmatrix}
+\end{align}
+</p>
+
+
+<h2>Quartic Bezier（4次）</h2>
+
+<p>
+\begin{align}
+  \V{p} &amp;=
+    u^4\V{p_1} + 4u^3t\V{p_2} + 6u^2t^2\V{p_3}
+    + 4ut^3\V{p_4} + t^4\V{p_5} \\
+  \V{p}' &amp;= 4 (
+    t^3 \V{p_5}
+    - 4t^2(t - \frac{3}{4}) \V{p_4}
+    - 6tu(t-\frac{1}{2}) \V{p_3}
+    - 4u^2(t - \frac{1}{4}) \V{p_2}
+    - u^3 \V{p_1}
+  ) \\
+  &amp;= 4 (
+    t^3 \V{p_5}
+    + t^2(3 - 4t) \V{p_4}
+    + 3tu(1 - 2t) \V{p_3}
+    + u^2(1 - 4t) \V{p_2}
+    - u^3 \V{p_1}
+  ) \\
+  &amp;=
+    4t^3 \V{p_5}
+    + t^2(12 - 16t) \V{p_4}
+    + tu(12 - 24t) \V{p_3}
+    + u^2(4 - 16t) \V{p_2}
+    - 4u^3 \V{p_1}
+\end{align}
+関数から制御点を決定する。
+\begin{align}
+  \V{p_1} &amp;= \V{p}(0) \\
+  \V{p_5} &amp;= \V{p}(1) \\
+
+  256\V{p}(1/4) &amp;= 81\V{p_1} + 108\V{p_2} +  54\V{p_3} +  12\V{p_4} +    \V{p_5} \\
+   16\V{p}(1/2) &amp;=   \V{p_1} +   4\V{p_2} +   6\V{p_3} +   4\V{p_4} +    \V{p_5} \\
+  256\V{p}(3/4) &amp;=   \V{p_1} +  12\V{p_2} +  54\V{p_3} + 108\V{p_4} +  81\V{p_5} \\
+
+  \begin{pmatrix}
+    \V{p_2} \\
+    \V{p_3} \\
+    \V{p_4}
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    108 &amp; 54 &amp;  12 \\
+      4 &amp;  6 &amp;   4 \\
+     12 &amp; 54 &amp; 108
+  \end{pmatrix}^{-1} \begin{pmatrix}
+    256\V{p}(1/4) - 81\V{p}(0) -   \V{p}(1) \\
+     16\V{p}(1/2) -   \V{p}(0) -   \V{p}(1) \\
+    256\V{p}(3/4) -   \V{p}(0) - 81\V{p}(1)
+  \end{pmatrix} \\
+ &amp;= \frac{1}{576} \begin{pmatrix}
+     9 &amp; -108 &amp;  3 \\
+    -8 &amp;  240 &amp; -8 \\
+     3 &amp; -108 &amp;  9
+  \end{pmatrix} \begin{pmatrix}
+    256\V{p}(1/4) - 81\V{p}(0) -   \V{p}(1) \\
+     16\V{p}(1/2) -   \V{p}(0) -   \V{p}(1) \\
+    256\V{p}(3/4) -   \V{p}(0) - 81\V{p}(1)
+  \end{pmatrix}
+\end{align}
+</p>
+
+<h2>Quintic Bezier（5次）</h2>
+
+<p>
+\begin{align}
+  \V{p} &amp;=
+    u^5\V{p_1} + 5u^4t\V{p_2} + 10u^3t^2\V{p_3}
+    + 10u^2t^3\V{p_4} + 5ut^4\V{p_5} + t^5\V{p_6} \\
+  \V{p}' &amp;= 5 (
+    t^4 \V{p_6}
+    - 5 t^3 (t - \frac{4}{5}) \V{p_5}
+    - 10 t^2u (t - \frac{3}{5}) \V{p_4}
+    - 10 tu^2 (t - \frac{2}{5}) \V{p_3}
+    - 5 u^3 (t - \frac{1}{5}) \V{p_2}
+    - u^4 \V{p_1}
+  ) \\
+  &amp;= 5 (
+    t^4 \V{p_6}
+    + t^3 (4 - 5t) \V{p_5}
+    + 2 t^2u (3 - 5t) \V{p_4}
+    + 2 tu^2 (2 - 5t) \V{p_3}
+    + u^3 (1 - 5t) \V{p_2}
+    - u^4 \V{p_1}
+  ) \\
+  &amp;=
+    5t^4 \V{p_6}
+    + t^3 (20 - 25t) \V{p_5}
+    + t^2u (30 - 50t) \V{p_4}
+    + tu^2 (20 - 50t) \V{p_3}
+    + u^3 (5 - 25t) \V{p_2}
+    - 5u^4 \V{p_1}
   )
+\end{align}
+関数から制御点を決定する。
+\begin{align}
+  \V{p_1} &amp;= \V{p}(0) \\
+  \V{p_6} &amp;= \V{p}(1) \\
+
+  3125 \V{p}(1/5) &amp;= 1024\V{p_1} + 1280\V{p_2} +  640\V{p_3} +  160\V{p_4} +   20\V{p_5} +     \V{p_6} \\
+  3125 \V{p}(2/5) &amp;=  243\V{p_1} +  810\V{p_2} + 1080\V{p_3} +  720\V{p_4} +  240\V{p_5} +   32\V{p_6} \\
+  3125 \V{p}(3/5) &amp;=   32\V{p_1} +  240\V{p_2} +  720\V{p_3} + 1080\V{p_4} +  810\V{p_5} +  243\V{p_6} \\
+  3125 \V{p}(4/5) &amp;=     \V{p_1} +   20\V{p_2} +  160\V{p_3} +  640\V{p_4} + 1280\V{p_5} + 1024\V{p_6} \\
+
+  \begin{pmatrix}
+    \V{p_2} \\
+    \V{p_3} \\
+    \V{p_4} \\
+    \V{p_5}
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    1280 &amp;  640 &amp;  160 &amp;   20 \\
+     810 &amp; 1080 &amp;  720 &amp;  240 \\
+     240 &amp;  720 &amp; 1080 &amp;  810 \\
+      20 &amp;  160 &amp;  640 &amp; 1280
+  \end{pmatrix}^{-1} \begin{pmatrix}
+    3125\V{p}(1/5) - 1024\V{p}(0) -     \V{p}(1) \\
+    3125\V{p}(2/5) -  243\V{p}(0) -   32\V{p}(1) \\
+    3125\V{p}(3/5) -   32\V{p}(0) -  243\V{p}(1) \\
+    3125\V{p}(4/5) -     \V{p}(0) - 1024\V{p}(1)
+  \end{pmatrix} \\
+ &amp;= \frac{1}{30000} \begin{pmatrix}
+     48 &amp; -48 &amp;  32 &amp; -12 \\
+    -58 &amp; 118 &amp; -92 &amp;  37 \\
+     37 &amp; -92 &amp; 118 &amp; -58 \\
+    -12 &amp;  32 &amp; -48 &amp;  48
+  \end{pmatrix} \begin{pmatrix}
+    3125\V{p}(1/5) - 1024\V{p}(0) -     \V{p}(1) \\
+    3125\V{p}(2/5) -  243\V{p}(0) -   32\V{p}(1) \\
+    3125\V{p}(3/5) -   32\V{p}(0) -  243\V{p}(1) \\
+    3125\V{p}(4/5) -     \V{p}(0) - 1024\V{p}(1)
+  \end{pmatrix}
 \end{align}
 </p>
 

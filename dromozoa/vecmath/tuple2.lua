@@ -37,11 +37,12 @@ function class.set(a, b, y)
       a[1] = b[1]
       a[2] = b[2]
     end
+    return a
   else
     a[1] = 0
     a[2] = 0
+    return a
   end
-  return a
 end
 
 -- a:get(tuple2 b)
@@ -140,13 +141,14 @@ function class.clamp(a, min, max, b)
     local y = b[2]
     if x < min then a[1] = min elseif x > max then a[1] = max else a[1] = x end
     if y < min then a[2] = min elseif y > max then a[2] = max else a[2] = y end
+    return a
   else
     local x = a[1]
     local y = a[2]
     if x < min then a[1] = min elseif x > max then a[1] = max end
     if y < min then a[2] = min elseif y > max then a[2] = max end
+    return a
   end
-  return a
 end
 
 -- a:clamp_min(number min, tuple2 b)
@@ -157,11 +159,12 @@ function class.clamp_min(a, min, b)
     local y = b[2]
     if x < min then a[1] = min else a[1] = x end
     if y < min then a[2] = min else a[2] = y end
+    return a
   else
     if a[1] < min then a[1] = min end
     if a[2] < min then a[2] = min end
+    return a
   end
-  return a
 end
 
 -- a:clamp_max(number max, tuple2 b)
@@ -172,11 +175,12 @@ function class.clamp_max(a, max, b)
     local y = b[2]
     if x > max then a[1] = max else a[1] = x end
     if y > max then a[2] = max else a[2] = y end
+    return a
   else
     if a[1] > max then a[1] = max end
     if a[2] > max then a[2] = max end
+    return a
   end
-  return a
 end
 
 -- a:absolute(tuple2 b)
@@ -187,13 +191,14 @@ function class.absolute(a, b)
     local y = b[2]
     if x < 0 then a[1] = -x else a[1] = x end
     if y < 0 then a[2] = -y else a[2] = y end
+    return a
   else
     local x = a[1]
     local y = a[2]
     if x < 0 then a[1] = -x end
     if y < 0 then a[2] = -y end
+    return a
   end
-  return a
 end
 
 -- a:interpolate(tuple2 b, tuple2 c, number d)

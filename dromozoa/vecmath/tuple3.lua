@@ -155,6 +155,7 @@ function class.clamp(a, min, max, b)
     if x < min then a[1] = min elseif x > max then a[1] = max else a[1] = x end
     if y < min then a[2] = min elseif y > max then a[2] = max else a[2] = y end
     if z < min then a[3] = min elseif z > max then a[3] = max else a[3] = z end
+    return a
   else
     local x = a[1]
     local y = a[2]
@@ -162,8 +163,8 @@ function class.clamp(a, min, max, b)
     if x < min then a[1] = min elseif x > max then a[1] = max end
     if y < min then a[2] = min elseif y > max then a[2] = max end
     if z < min then a[3] = min elseif z > max then a[3] = max end
+    return a
   end
-  return a
 end
 
 -- a:clamp_min(number min, tuple3 b)
@@ -176,12 +177,13 @@ function class.clamp_min(a, min, b)
     if x < min then a[1] = min else a[1] = x end
     if y < min then a[2] = min else a[2] = y end
     if z < min then a[3] = min else a[3] = z end
+    return a
   else
     if a[1] < min then a[1] = min end
     if a[2] < min then a[2] = min end
     if a[3] < min then a[3] = min end
+    return a
   end
-  return a
 end
 
 -- a:clamp_max(number max, tuple3 b)
@@ -194,12 +196,13 @@ function class.clamp_max(a, max, b)
     if x > max then a[1] = max else a[1] = x end
     if y > max then a[2] = max else a[2] = y end
     if z > max then a[3] = max else a[3] = z end
+    return a
   else
     if a[1] > max then a[1] = max end
     if a[2] > max then a[2] = max end
     if a[3] > max then a[3] = max end
+    return a
   end
-  return a
 end
 
 -- a:absolute(tuple3 b)
@@ -212,6 +215,7 @@ function class.absolute(a, b)
     if x < 0 then a[1] = -x else a[1] = x end
     if y < 0 then a[2] = -y else a[2] = y end
     if z < 0 then a[3] = -z else a[3] = z end
+    return a
   else
     local x = a[1]
     local y = a[2]
@@ -219,8 +223,8 @@ function class.absolute(a, b)
     if x < 0 then a[1] = -x end
     if y < 0 then a[2] = -y end
     if z < 0 then a[3] = -z end
+    return a
   end
-  return a
 end
 
 -- a:interpolate(tuple3 b, tuple3 c, number d)
