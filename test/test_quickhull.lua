@@ -73,3 +73,26 @@ local P = { {0,0}, {0,0}, {0,0} }
 local Q = quickhull(P, {})
 assert(#Q == 1)
 assert(point2.equals(Q[1], {0,0}))
+
+-- two points
+local P = { {0,0}, {1,1} }
+local Q = quickhull(P, {})
+assert(#Q == 2)
+assert(point2.equals(Q[1], {0,0}))
+assert(point2.equals(Q[2], {1,1}))
+
+-- triangle1
+local P = { {0,0}, {1,1}, {1,0} }
+local Q = quickhull(P, {})
+assert(#Q == 3)
+assert(point2.equals(Q[1], {0,0}))
+assert(point2.equals(Q[2], {1,1}))
+assert(point2.equals(Q[3], {1,0}))
+
+-- triangle2
+local P = { {0,0}, {1,1}, {0,1} }
+local Q = quickhull(P, {})
+assert(#Q == 3)
+assert(point2.equals(Q[1], {0,0}))
+assert(point2.equals(Q[2], {0,1}))
+assert(point2.equals(Q[3], {1,1}))

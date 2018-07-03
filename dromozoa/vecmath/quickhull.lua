@@ -15,25 +15,21 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local function insert_after(before, after, prev_id, id)
+local function insert_after(after, prev_id, id)
   local next_id = after[prev_id]
-  before[next_id] = id
   after[prev_id] = id
-  before[id] = prev_id
   after[id] = next_id
 end
 
-local function remove_after(before, after, prev_id)
+local function remove_after(after, prev_id)
   local id = after[prev_id]
   local next_id = after[id]
-  before[next_id] = prev_id
   after[prev_id] = next_id
-  before[id] = nil
   after[id] = nil
   return next_id
 end
 
-local function visit(source, before, after, p1i, p2i)
+local function visit(source, after, p1i, p2i)
   local p3i = after[p1i]
   if p3i == p2i then
     return
@@ -76,31 +72,31 @@ local function visit(source, before, after, p1i, p2i)
 
     if d2 <= 0 and d3 <= 0 then
       -- prev_id not changed
-      i = remove_after(before, after, prev_id)
+      i = remove_after(after, prev_id)
     else
       if d2 > 0 then
         if not p4d or p4d < d2 then
           p4i = i
           p4d = d2
           -- prev_id not changed
-          local j = remove_after(before, after, prev_id)
-          insert_after(before, after, p1i, i)
+          local j = remove_after(after, prev_id)
+          insert_after(after, p1i, i)
           i = j
         else
           -- prev_id not changed
-          local j = remove_after(before, after, prev_id)
-          insert_after(before, after, p4i, i)
+          local j = remove_after(after, prev_id)
+          insert_after(after, p4i, i)
           i = j
         end
       else
         if not p5d or p5d < d3 then
           p5i = i
           p5d = d3
-          local j = remove_after(before, after, prev_id)
+          local j = remove_after(after, prev_id)
           if prev_id == p3i then
             prev_id = i
           end
-          insert_after(before, after, p3i, i)
+          insert_after(after, p3i, i)
           i = j
         else
           prev_id = i
@@ -110,8 +106,8 @@ local function visit(source, before, after, p1i, p2i)
     end
   until i == p2i
 
-  visit(source, before, after, p1i, p3i)
-  visit(source, before, after, p3i, p2i)
+  visit(source, after, p1i, p3i)
+  visit(source, after, p3i, p2i)
 end
 
 return function (source, result)
@@ -148,11 +144,6 @@ return function (source, result)
   local vx = p2x - p1x
   local vy = p2y - p1y
 
-  local before = {
-    [p1i] = p2i;
-    [p2i] = p1i;
-  }
-
   local after = {
     [p1i] = p2i;
     [p2i] = p1i;
@@ -171,24 +162,24 @@ return function (source, result)
         if not p3d or p3d < d then
           p3i = i
           p3d = d
-          insert_after(before, after, p1i, i)
+          insert_after(after, p1i, i)
         else
-          insert_after(before, after, p3i, i)
+          insert_after(after, p3i, i)
         end
       elseif d < 0 then
         if not p4d or p4d > d then
           p4i = i
           p4d = d
-          insert_after(before, after, p2i, i)
+          insert_after(after, p2i, i)
         else
-          insert_after(before, after, p4i, i)
+          insert_after(after, p4i, i)
         end
       end
     end
   end
 
-  visit(source, before, after, p1i, p2i)
-  visit(source, before, after, p2i, p1i)
+  visit(source, after, p1i, p2i)
+  visit(source, after, p2i, p1i)
 
   local j = 0
   local i = p1i
