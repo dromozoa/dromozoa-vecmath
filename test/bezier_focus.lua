@@ -180,6 +180,13 @@ local Q = {
   point2(250, -100);
 }
 
+-- local Q = {
+--   point2(-100,    0);
+--   point2( -50, -100);
+--   point2(  50, -100);
+--   point2( 100,    0);
+-- }
+
 local F = point2(100, -50)
 
 local root = _"g" {
