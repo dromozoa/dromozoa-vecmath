@@ -72,10 +72,16 @@ root[#root + 1] = _"path" {
   ["stroke-width"] = 2;
 }
 
+-- rational_quadratic_bezier(root, {
+--   point3(300,   0, 1);
+--   point3(300, 300, math.cos(math.pi / 4));
+--   point3(  0, 300, 1);
+-- })
+
 rational_quadratic_bezier(root, {
   point3(300,   0, 1);
-  point3(300, 300, math.cos(math.pi / 4));
-  point3(  0, 300, 1);
+  point3(300, 300, 1);
+  point3(  0, 300, 2);
 })
 
 local svg = _"svg" {
