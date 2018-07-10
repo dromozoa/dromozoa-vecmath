@@ -19,12 +19,21 @@
     padding: 15px;
   }
 }
+.note {
+  color: #999;
+}
 </style>
 </head>
 <body>
 <div class="markdown-body">
 
 <h1>曲線</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="http://cagd.cs.byu.edu/~557/text/cagd.pdf">Computer Aided Geometric Design</a></li>
+</ul>
 
 <h2>Bernstein Polynominal</h2>
 
@@ -287,6 +296,45 @@ define(L3_2(t,w0,w1,w2,w3),
   B_{4,5}'(t) &amp;=  5 t^3         (4-5t) \\
   B_{5,5}'(t) &amp;=  5 t^4                \\
 \end{aligned}\]
+</p>
+
+<h2>Explicit B&eacute;zier (non-parameteric)</h2>
+
+<p>
+Explicitな\(n\)次のB&eacute;zier曲線は、制御点
+\[
+  \bm{p_i} = \left(\frac{1}{n},y_i\right) \quad i = 0, \dots, n
+\]
+を持つ。
+\[\begin{aligned}
+  x &amp;= t \\
+  y &amp;= f(t) \\
+\end{aligned}\]
+ExplicitなRational B&eacute;zier曲線では次数上げする必要がある。
+\[\begin{aligned}
+  x
+  &amp;= t \\
+  &amp;= \frac{
+    t \sum_{i=0}^n w_i B_i^n(t)
+  }{
+    \sum_{i=0}^n w_i B_i^n(t)
+  } \\
+
+  y
+  &amp;= \frac{
+    \sum_{i=0}^n w_i y_i B_i^n(t)
+  }{
+    \sum_{i=0}^n w_i B_i^n(t)
+  } \\
+\end{aligned}\]
+</p>
+
+<p class="note">
+よくわからない。
+</p>
+
+<p class="note">
+B&eacute;zier曲線と直線の距離\(d(t)\)はExplicitなB&eacute;zier曲線になる。
 </p>
 
 </div>
