@@ -117,6 +117,59 @@ CAGDにおける基礎的な問題は多項式の基底変換である。
   p_i = \frac{B^{(i)}(0)}{i!}, \quad i = 0, \dots, n
 \]
 \(B^{(i)}(0)\)は差分表を求めることで見つけられる。
+\[\begin{aligned}
+  B'(0) &amp;= n (b_1 - b_0) \\
+  B''(0) &amp;= n (n-1) (b_2-2b_1+ b_0) \\
+  B^{(i)}(0) &amp;= n (n-1) \cdots (n-i+1)
+  \sum_{j=0}^i (-1)^{(i-j+1)} \binom{i}{j} b_j
+\end{aligned}\]
+再帰
+\[\begin{aligned}
+  b_i^j &amp;= b_{i+1}^{j-1} - b_i^{j-1} \\
+  b_i^0 &amp;\equiv b_i \\
+\end{aligned}\]
+を用いると
+\[\begin{aligned}
+  B^{(i)}(0) &amp;= \frac{n!}{(n-i)!} b_0^i \\
+  p_i &amp;= \frac{n!}{(n-i)!i!} b_0^i \\
+  &amp;= \binom{n}{i} b_0^i
+\end{aligned}\]
+\(b_0^i\)の値は、差分表を用いて簡単に決められる。
+\[\begin{aligned}
+  b_0^0 &amp;= b_0 = p_0
+  &amp; b_1^0 &amp;= b_1
+  &amp; \dots &amp;
+  &amp; b_n^0 &amp;= b_n \\
+
+  b_0^1 &amp;= b_1^0 - b_0^0 = p_1 / \binom{n}{1}
+  &amp; b_1^1 &amp;= b_2^0 - b_1^0
+  &amp; \dots &amp;
+  &amp; b_n^1 &amp;= b_n^0 - b_{n-1}^0 \\
+
+  b_0^2 &amp;= b_2^0 - b_1^0 = p_2 / \binom{n}{2}
+  &amp; b_1^2 &amp;= b_2^1 - b_1^1
+  &amp; \dots &amp;
+  &amp; b_n^2 &amp;= b_n^1 - b_{n-1}^1 \\
+
+  \dots &amp; &amp;
+  \dots &amp; &amp;
+  \dots &amp; &amp;
+  \dots \\
+
+  b_0^{n-1} &amp;= b_1^{n-2} - b_0^{n-2} = p_{n-1} / \binom{n}{n-1}
+  &amp; b_1^{n-1} &amp;= b_2^{n-2} - b_1^{n-2} \\
+
+  b_0^{n} &amp;= b_1^{n-1} - b_0^{n-1} = p_n \\
+\end{aligned}\]
+</p>
+
+<h3>Closed Form Expression</h3>
+
+<p>
+バーンスタイン基底から冪乗基底への変換は下記のように簡潔に書ける。
+\[
+  p_i = \sum_{k=0}^{i} b_k \binom{n}{i} \binom{i}{k} (-1)^{i-k}
+\]
 </p>
 
 </div>
