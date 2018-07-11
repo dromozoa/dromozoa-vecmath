@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>曲線</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="http://cagd.cs.byu.edu/~557/text/cagd.pdf">Computer Aided Geometric Design</a></li>
+</ul>
+
+<h2>Polynominal Evaluation and Basis Conversion</h2>
+
+<h3>Horner's Algorithm in Power Basis</h3>
+
+<p>
+<a href="https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%BC%E3%83%8A%E3%83%BC%E6%B3%95">ホーナーのアルゴリズム</a>は冪乗基底の多項式
+\[
+  y(t) = \sum_{i=0}^n p_i t^i
+\]
+を\(n\)の積和を用いて評価することができる。
+多項式を入れ子形式
+\[
+  y(t) = (\cdots((p_nt + p_{n-1})t + p_{n-2})t + \cdots + p_1)t + p_0
+\]
+で書きなおすことで実現される。
+\[\begin{aligned}
+  h_n &amp;= p_n \\
+  h_{i-1} &amp;= t \cdot h_i + p_{i-1}, \quad i = n, \dots, 1 \\
+  y(t) &amp;= h_0
+\end{aligned}\]
+のように書くことができ、
+冪乗基底の多項式をある一点で評価する場合に最速のアルゴリズムである。
+</p>
+
+<h3>Horner's Algorithm in Bernstein Basis</h3>
+
+<p>
+二項係数の再帰的な関係
+\[
+  \binom{n}{i} = \frac{n-i+1}{i} \binom{n}{i-1}
+\]
+を、入れ子になった乗算を導出するためために利用できる。
+</p>
+
+<h3>Basis Conversion</h3>
+
+<p>
+CAGDにおける基礎的な問題は多項式の基底変換である。
+よくある例として、冪乗基底とバーンスタイン基底の変換を考える。
+たとえば、任意の次数のベジェ曲線が与えられたとき、
+等価な冪乗基底の方程式を見つけたい（逆もまた同様に）。
+</p>
+
+<p>
+バーンスタイン形式の多項式は
+\[
+  B(t) = \sum_{i=0}^n b_i \binom{n}{i} (1-t)^{n-1} t^i
+\]
+冪乗形式の多項式は
+\[
+  P(t) = \sum_{i=0}^n p_i t^i
+\]
+</p>
+
+<p>
+\(B(t)\)を<a href="https://ja.wikipedia.org/wiki/%E3%83%86%E3%82%A4%E3%83%A9%E3%83%BC%E5%B1%95%E9%96%8B">テイラー展開</a>すると
+\[
+  B(t) \equiv B(0)
+  + \frac{B'(0)t}{1!}
+  + \frac{B''(0)t^2}{2!}
+  + \dots
+  + \frac{B^{(i)}(0)t^i}{i!}
+  + \dots
+\]
+冪乗基底の多項式がバーンスタイン基底の多項式と等価であるのは
+\[
+  \frac{P^{(i)}(0)t^i}{i!}
+  \equiv
+  \frac{B^{(i)}(0)t^i}{i!},
+  \quad
+  i = 0, \dots, n
+\]
+の時かつその時に限る。
+しかし、冪乗基底については
+\[
+  \frac{P^{(i)}(0)}{i!} = p_i
+\]
+なので
+\[
+  p_i = \frac{B^{(i)}(0)}{i!}, \quad i = 0, \dots, n
+\]
+\(B^{(i)}(0)\)は差分表を求めることで見つけられる。
+</p>
+
+</div>
+<script>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>
