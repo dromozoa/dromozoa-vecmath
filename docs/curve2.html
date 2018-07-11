@@ -35,273 +35,84 @@
   <li><a href="http://cagd.cs.byu.edu/~557/text/cagd.pdf">Computer Aided Geometric Design</a></li>
 </ul>
 
-<h2>Bernstein Polynominal</h2>
+<h2>B&eacute;zier Curves</h2>
+
+<h3>The Equation of a B&eacute;zier Curve</h3>
 
 <p>
 \(n\)次のバーンスタイン基底関数は
 \[\begin{aligned}
-  B_{i,n}(t)
+  B_i^n(t)
   &amp;=
   \binom{n}{i}
-  t^i (1-t)^{n-i}, \quad i = 0, \dots, n \\
+  (1-t)^{n-i} t^i, \quad i = 0, \dots, n \\
 
   \binom{n}{i}
   &amp;=
   \frac{n!}{i! (n-i)!} \\
 \end{aligned}\]
-\(n\)次のバーンスタイン基底関数を微分すると
-\[
-  B_{i,n}'(t)
-  =
-  \binom{n}{i}
-  \frac{
-    t^i (1-t)^{n-i} (i - nt)
-  }{
-    t(1-t)
-  }
-\]
-</p>
-
-<h3>Maxima</h3>
-
-<pre>
-define(B(i,n,t), binomial(n,i) * t^i * (1-t)^(n-i));
-</pre>
-
-<h2>B&eacute;zier Curve</h2>
-
-<p>
-\(n\)次のB&eacute;zier曲線は
+\(n\)次のベジェ曲線は
 \[\begin{aligned}
-  \bm{P}(t) = \sum_{i=0}^n B_{i,n}(t) \bm{p_i}
+  \bm{P}(t) = \sum_{i=0}^n \binom{n}{i} (1-t)^{n-i} t^i \bm{P}_i
 \end{aligned}\]
-\(n\)次のB&eacute;zier曲線を微分すると
-\[
-  \bm{P}'(t) = n \sum_{i=0}^{n-1} B_{i,n-1}(t) (\bm{p_{i+1}} - \bm{p_i})
-\]
-<p>
+</p>
 
-<h2>Rational B&eacute;zier</h2>
+<h3>Degree Elevation</h3>
+
+<p>
+\[\begin{aligned}
+  (1-t) B_i^n(t) &amp;= \frac{n+1-i}{n+1} B_i^{n+1}(t) \\
+  t B_i^n(t) &amp;= \frac{i+1}{n+1} B_{i+1}^{n+1}(t) \\
+  \bm{P}(t)
+  &amp;= [(1-t) + t] \sum_{i=0}^n \bm{P}_i B_i^n(t) \\
+  &amp;= \sum_{i=0}^{n+1} \bm{P}_i^* B_i^{n+1}(t) \\
+
+  \bm{P}_i^* &amp;= \alpha_i \bm{P}_{i-1} + (1-\alpha_i) \bm{P}_i,
+  \quad \alpha_i = \frac{i}{n+1} \\
+\end{aligned}\]
+</p>
+
+<h3>Derivatives</h3>
+
+<p>
+制御点\(\bm{P}_i\)を持つ\(n\)次のベジェ曲線の一次微分係数は、
+制御点\(\bm{D}_i\)を持つ\(n-1\)次のベジェ曲線で表される。
+\[
+  \bm{D}_i = n (\bm{P}_{i+1} - \bm{P}_i)
+\]
+一次微分係数の曲線はホドグラフとして知られている。
+</p>
+
+<h3>Rational B&eacute;zier Curves</h3>
 
 </p>
-\(n\)次のRational B&eacute;zier曲線は
+\(n\)次の有理ベジェ曲線は
 \[\begin{aligned}
   \bm{P}(t) = \frac{
-    \sum_{i=0}^n B_{i,n}(t) w_i \bm{p_i}
+    \sum_{i=0}^n B_i^n(t) w_i \bm{P}_i
   }{
-    \sum_{i=0}^n B_{i,n}(t) w_i
+    \sum_{i=0}^n B_i^n(t) w_i
   }
 \end{aligned}\]
-\(n\)次のRational B&eacute;zier曲線を微分すると
-\[\begin{aligned}
-  \bm{P}'(t)
-  &amp;=
-  \sum_{i=0}^{n-1} \lambda_i(t) (\bm{p_{i+1}} - \bm{p_i}) \\
-
-  \lambda_i(t)
-  &amp;=
-  \frac{1}{t(1-t) w_{0,n}^2(t)}
-  \sum_{j=0}^i \sum_{k=i+1}^n (k-j) B_{j,n}(t) B_{k,n}(t) w_j w_k \\
-
-  w_{i,k}(t)
-  &amp;=
-  \sum_{j=0}^k B_{j,k}(t) w_{i+j} \\
-
-  w_{0,n}(t)
-  &amp;=
-  \sum_{j=0}^n B_{j,n}(t) w_{j} \\
-\end{aligned}\]
 </p>
 
-<h2>1次 (Linear) B&eacute;zier</h2>
-
 <p>
-\[\begin{aligned}
-  B_{0,1}(t) &amp;=   1-t \\
-  B_{0,1}(t) &amp;= t     \\
-\end{aligned}\]
-\[\begin{aligned}
-  B_{0,1}'(t) &amp;= -1 \\
-  B_{1,1}'(t) &amp;=  1 \\
-\end{aligned}\]
+二次元の有理ベジェ曲線が制御点\((x_i, y_i)\)と重み\(w_i\)を持つとき、
+三次元制御点の同次座標\((X,Y,Z)\)は
+\(w_i (x_i, y_i, 1) = (x_i w_i, y_i w_i, w_i)\)である。
+三次元曲線を大文字の変数\((X(t), Y(t), Z(t))\)で、
+二次元曲線を小文字の変数\((x(t), y(t))\)で表す。
+二次元の有理ベジェ曲線上の任意の点は、
+三次元曲線の対応する点を平面\(z=1\)に投影することで計算できる。
+\[
+  x(t) = \frac{X(t)}{Z(t)}, \quad y(t) = \frac{Y(t)}{Z(t)}
+\]
 </p>
 
-<h2>2次 (Quadratic) B&eacute;zier</h2>
+<h3>Explicit B&eacute;zier Curves</h3>
 
 <p>
-\[\begin{aligned}
-  B_{0,2}(t) &amp;=       (1-t)^2 \\
-  B_{1,2}(t) &amp;= 2 t   (1-t)   \\
-  B_{2,2}(t) &amp;=   t^2         \\
-\end{aligned}\]
-\[\begin{aligned}
-  B_{0,2}'(t) &amp;= -2 (1-t)  \\
-  B_{1,2}'(t) &amp;=  2 (1-2t) \\
-  B_{2,2}'(t) &amp;=  2 t      \\
-\end{aligned}\]
-\(w_0 = w_2 = 1\)のとき
-\[\begin{aligned}
-  \lambda_0(t) &amp;= \frac{
-    B_{0,2}(t) B_{1,2}(t) w_1 + 2 B_{0,2}(t) B_{2,2}(t)
-  }{
-    t (1-t) (B_{0,2}(t) + B_{1,2}(t) w_1 + B_{2,2}(t))
-  } \\
-
-  \lambda_1(t) &amp;= \frac{
-    2 B_{0,2}(t) B_{2,2}(t) + B_{1,2}(t) B_{2,2}(t) w_1
-  }{
-    t (1-t) (B_{0,2}(t) + B_{1,2}(t) w_1 + B_{2,2}(t))
-  } \\
-
-\end{aligned}\]
-</p>
-
-<h3>Maxima</h3>
-
-<pre>
-define(P2(t), B(0,2,t)*p0 + B(1,2,t)*p1 + B(2,2,t)*p2);
-</pre>
-
-<pre>
-define(W2(t,w0,w1,w2), B(0,2,t)*w0 + B(1,2,t)*w1 + B(2,2,t)*w2);
-</pre>
-
-<pre>
-define(R2(t,w0,w1,w2),
-  (B(0,2,t)*w0*p0 + B(1,2,t)*w1*p1 + B(2,2,t)*w2*p2)
-  /
-  W2(t,w0,w1,w2)
-);
-</pre>
-
-<pre>
-/* n=2, i=0, (j,k)=(0,1),(0,2) */
-define(L2_0(t,w0,w1,w2),
-  1 / (t * (1-t) * W2(t,w0,w1,w2)^2) * (
-    1 * B(0,2,t) * B(1,2,t) * w0 * w1 +
-    2 * B(0,2,t) * B(2,2,t) * w0 * w2 )
-);
-</pre>
-
-<pre>
-/* n=2, i=1, (j,k)=(0,2),(1,2) */
-define(L2_1(t,w0,w1,w2),
-  1 / (t * (1-t) * W2(t,w0,w1,w2)^2) * (
-    2 * B(0,2,t) * B(2,2,t) * w0 * w2 +
-    1 * B(1,2,t) * B(2,2,t) * w0 * w1 )
-);
-</pre>
-
-<h2>3次 (Cubic) B&eacute;zier</h2>
-
-<p>
-\[\begin{aligned}
-  B_{0,3}(t) &amp;=       (1-t)^3 \\
-  B_{1,3}(t) &amp;= 3 t   (1-t)^2 \\
-  B_{2,3}(t) &amp;= 3 t^2 (1-t)   \\
-  B_{3,3}(t) &amp;=   t^3         \\
-\end{aligned}\]
-\[\begin{aligned}
-  B_{0,3}'(t) &amp;= -3     (1-t)^2        \\
-  B_{1,3}'(t) &amp;=  3     (1-t)   (1-3t) \\
-  B_{2,3}'(t) &amp;=  3 t           (2-3t) \\
-  B_{3,3}'(t) &amp;=  3 t^2                \\
-\end{aligned}\]
-</p>
-
-<h3>Maxima</h3>
-
-<pre>
-define(P3(t), B(0,3,t)*p0 + B(1,3,t)*p1 + B(2,3,t)*p2 + B(3,3,t)*p3);
-</pre>
-
-<pre>
-define(W3(t,w0,w1,w2,w3), B(0,3,t)*w0 + B(1,3,t)*w1 + B(2,3,t)*w2 + B(3,3,t)*w3);
-</pre>
-
-<pre>
-define(R3(t,w0,w1,w2,w3),
-  (B(0,3,t)*w0*p0 + B(1,3,t)*w1*p1 + B(2,3,t)*w2*p2 + B(3,3,t)*w3*p3)
-  /
-  W3(t,w0,w1,w2,w3)
-);
-</pre>
-
-<pre>
-/* n=3, i=0, (j,k)=(0,1),(0,2),(0,3) */
-define(L3_0(t,w0,w1,w2,w3),
-  1 / (t * (1-t) * W3(t,w0,w1,w2,w3)^2) * (
-    1 * B(0,3,t) * B(1,3,t) * w0 * w1 +
-    2 * B(0,3,t) * B(2,3,t) * w0 * w2 +
-    3 * B(0,3,t) * B(3,3,t) * w0 * w3 )
-);
-</pre>
-
-<pre>
-/* n=3, i=1, (j,k)=(0,2),(0,3),(1,2),(1,3) */
-define(L3_1(t,w0,w1,w2,w3),
-  1 / (t * (1-t) * W3(t,w0,w1,w2,w3)^2) * (
-    2 * B(0,3,t) * B(2,3,t) * w0 * w2 +
-    3 * B(0,3,t) * B(3,3,t) * w0 * w3 +
-    1 * B(1,3,t) * B(2,3,t) * w1 * w2 +
-    2 * B(1,3,t) * B(3,3,t) * w1 * w3 )
-);
-</pre>
-
-<pre>
-/* n=3, i=2, (j,k)=(0,3),(1,3),(2,3) */
-define(L3_2(t,w0,w1,w2,w3),
-  1 / (t * (1-t) * W3(t,w0,w1,w2,w3)^2) * (
-    3 * B(0,3,t) * B(3,3,t) * w0 * w3 +
-    2 * B(1,3,t) * B(3,3,t) * w1 * w3 +
-    1 * B(2,3,t) * B(3,3,t) * w2 * w3 )
-);
-</pre>
-
-<h2>4次 (Quartic) B&eacute;zier</h2>
-
-<p>
-\[\begin{aligned}
-  B_{0,4}(t) &amp;=       (1-t)^4 \\
-  B_{1,4}(t) &amp;= 4 t   (1-t)^3 \\
-  B_{2,4}(t) &amp;= 6 t^2 (1-t)^2 \\
-  B_{3,4}(t) &amp;= 4 t^3 (1-t)   \\
-  B_{4,4}(t) &amp;=   t^4         \\
-\end{aligned}\]
-\[\begin{aligned}
-  B_{0,4}'(t) &amp;= -4     (1-t)^3        \\
-  B_{1,4}'(t) &amp;=  4     (1-t)^2 (1-4t) \\
-  B_{2,4}'(t) &amp;=  6 t   (1-t)   (2-4t) \\
-  B_{3,4}'(t) &amp;=  4 t^2         (3-4t) \\
-  B_{4,4}'(t) &amp;=  4 t^3                \\
-\end{aligned}\]
-</p>
-
-<h2>5次 (Quintic) B&eacute;zier</h2>
-
-<p>
-\[\begin{aligned}
-  B_{0,5}(t) &amp;=        (1-t)^5 \\
-  B_{1,5}(t) &amp;=  5 t   (1-t)^4 \\
-  B_{2,5}(t) &amp;= 10 t^2 (1-t)^3 \\
-  B_{3,5}(t) &amp;= 10 t^3 (1-t)^2 \\
-  B_{4,5}(t) &amp;=  5 t^4 (1-t)   \\
-  B_{5,5}(t) &amp;=    t^5         \\
-\end{aligned}\]
-\[\begin{aligned}
-  B_{0,5}'(t) &amp;= -5     (1-t)^4        \\
-  B_{1,5}'(t) &amp;=  5     (1-t)^3 (1-5t) \\
-  B_{2,5}'(t) &amp;= 10 t   (1-t)^2 (2-5t) \\
-  B_{3,5}'(t) &amp;= 10 t^2 (1-t)   (3-5t) \\
-  B_{4,5}'(t) &amp;=  5 t^3         (4-5t) \\
-  B_{5,5}'(t) &amp;=  5 t^4                \\
-\end{aligned}\]
-</p>
-
-<h2>Explicit B&eacute;zier (non-parameteric)</h2>
-
-<p>
-Explicitな\(n\)次のB&eacute;zier曲線は、制御点
+陽な\(n\)次のベジェ曲線は、制御点
 \[
   \bm{p_i} = \left(\frac{1}{n},y_i\right) \quad i = 0, \dots, n
 \]
@@ -310,11 +121,9 @@ Explicitな\(n\)次のB&eacute;zier曲線は、制御点
   x &amp;= t \\
   y &amp;= f(t) \\
 \end{aligned}\]
-ExplicitなRational B&eacute;zier曲線では次数上げする必要がある。
+陽な有理ベジェ曲線では次数上げする必要がある。
 \[\begin{aligned}
-  x
-  &amp;= t \\
-  &amp;= \frac{
+  x &amp;= t = \frac{
     t \sum_{i=0}^n w_i B_i^n(t)
   }{
     \sum_{i=0}^n w_i B_i^n(t)
@@ -330,12 +139,161 @@ ExplicitなRational B&eacute;zier曲線では次数上げする必要がある�
 </p>
 
 <p class="note">
-よくわからない。
+次数上げすると基底変換を使えるから？
 </p>
 
-<p class="note">
-B&eacute;zier曲線と直線の距離\(d(t)\)はExplicitなB&eacute;zier曲線になる。
+<h3>Integrating Bernstein Polynominals</h3>
+
+<p>
+ホドグラフ（一次導関数）と同様にバーンスタイン多項式の積分も簡単に計算できる。
+バーンスタイン形式
+\[
+  p(t) = \sum_{i=0}^n p_i B_i^n(t)
+\]
+の多項式は、\(p(t)\)を導関数とする多項式の積分である。
+バーンスタイン形式
+\[
+  q(t) = \sum_{i=0}^{n+1} q_i B_i^{n+1}(t)
+\]
+の\(n+1\)次多項式が求めたい積分であるならば
+\[\begin{aligned}
+  p_i &amp;= (n+1) (q_{i+1} - qi) \\
+  q_0 &amp;= 0 \\
+  q_i &amp;= \frac{\sum_{j=0}^{i-1} p_j}{n+1}, \quad i=1, \dots, n+1 \\
+\end{aligned}\]
+\(p(t)\)が陽なベジェ曲線であるならば、
+\(q(t)\)は直線\(x=0\)と\(x=t\)のあいだの\(p(t)\)の面積になる。
+つまり、陽なベジェ曲線の全部の面積は制御点の平均で簡単に計算できる！
+\[
+  q(1) = q_{n+1} = \frac{\sum_{j=0}^n p_j}{n+1}
+\]
 </p>
+
+<div class="note">
+
+<h2>おぼえがき</h2>
+
+<p>
+\(n\)次のバーンスタイン基底関数を微分すると
+\[
+  B_i^{n\prime}(t)
+  =
+  \binom{n}{i}
+  \frac{
+    t^i (1-t)^{n-i} (i - nt)
+  }{
+    t(1-t)
+  }
+\]
+</p>
+
+<p>
+\(n\)次のベジェ曲線を微分すると
+\[
+  \bm{P}'(t) = n \sum_{i=0}^{n-1} B_i^{n-1}(t) (\bm{P}_{i+1} - \bm{P}_i)
+\]
+<p>
+
+<p>
+\(n\)次のRational B&eacute;zier曲線を微分すると
+\[\begin{aligned}
+  \bm{P}'(t)
+  &amp;=
+  \sum_{i=0}^{n-1} \lambda_i(t) (\bm{P}_{i+1} - \bm{P}_i) \\
+
+  \lambda_i(t)
+  &amp;=
+  \frac{1}{(1-t)t (\sum_{j=0}^n B_j^n(t) w_j)^2}
+  \sum_{j=0}^i \sum_{k=i+1}^n (k-j) B_j^n(t) B_k^n(t) w_j w_k \\
+\end{aligned}\]
+</p>
+
+<h2>Linear B&eacute;zier Curves</h2>
+
+<p>
+\[\begin{aligned}
+  B_0^1(t) &amp;=   1-t \\
+  B_1^1(t) &amp;= t     \\
+\end{aligned}\]
+\[\begin{aligned}
+  B_0^{1\prime}(t) &amp;= -1 \\
+  B_1^{1\prime}(t) &amp;=  1 \\
+\end{aligned}\]
+</p>
+
+<h2>Quadratic B&eacute;zier Curves</h2>
+
+<p>
+\[\begin{aligned}
+  B_0^2(t) &amp;=       (1-t)^2 \\
+  B_1^2(t) &amp;= 2 t   (1-t)   \\
+  B_2^2(t) &amp;=   t^2         \\
+\end{aligned}\]
+\[\begin{aligned}
+  B_0^{2\prime}(t) &amp;= -2 (1-t)  \\
+  B_1^{2\prime}(t) &amp;=  2 (1-2t) \\
+  B_2^{2\prime}(t) &amp;=  2 t      \\
+\end{aligned}\]
+</p>
+
+<h2>Cubic B&eacute;zier Curves</h2>
+
+<p>
+\[\begin{aligned}
+  B_0^3(t) &amp;=       (1-t)^3 \\
+  B_1^3(t) &amp;= 3 t   (1-t)^2 \\
+  B_2^3(t) &amp;= 3 t^2 (1-t)   \\
+  B_3^3(t) &amp;=   t^3         \\
+\end{aligned}\]
+\[\begin{aligned}
+  B_0^{3\prime}(t) &amp;= -3     (1-t)^2        \\
+  B_1^{3\prime}(t) &amp;=  3     (1-t)   (1-3t) \\
+  B_2^{3\prime}(t) &amp;=  3 t           (2-3t) \\
+  B_3^{3\prime}(t) &amp;=  3 t^2                \\
+\end{aligned}\]
+</p>
+
+<h2>Quartic B&eacute;zier Curves</h2>
+
+<p>
+\[\begin{aligned}
+  B_0^4(t) &amp;=       (1-t)^4 \\
+  B_1^4(t) &amp;= 4 t   (1-t)^3 \\
+  B_2^4(t) &amp;= 6 t^2 (1-t)^2 \\
+  B_3^4(t) &amp;= 4 t^3 (1-t)   \\
+  B_4^4(t) &amp;=   t^4         \\
+\end{aligned}\]
+\[\begin{aligned}
+  B_0^{4\prime}(t) &amp;= -4     (1-t)^3        \\
+  B_1^{4\prime}(t) &amp;=  4     (1-t)^2 (1-4t) \\
+  B_2^{4\prime}(t) &amp;=  6 t   (1-t)   (2-4t) \\
+  B_3^{4\prime}(t) &amp;=  4 t^2         (3-4t) \\
+  B_4^{4\prime}(t) &amp;=  4 t^3                \\
+\end{aligned}\]
+</p>
+
+<h2>Quintic B&eacute;zier Curves</h2>
+
+<p>
+\[\begin{aligned}
+  B_0^5(t) &amp;=        (1-t)^5 \\
+  B_1^5(t) &amp;=  5 t   (1-t)^4 \\
+  B_2^5(t) &amp;= 10 t^2 (1-t)^3 \\
+  B_3^5(t) &amp;= 10 t^3 (1-t)^2 \\
+  B_4^5(t) &amp;=  5 t^4 (1-t)   \\
+  B_5^5(t) &amp;=    t^5         \\
+\end{aligned}\]
+\[\begin{aligned}
+  B_0^{5\prime}(t) &amp;= -5     (1-t)^4        \\
+  B_1^{5\prime}(t) &amp;=  5     (1-t)^3 (1-5t) \\
+  B_2^{5\prime}(t) &amp;= 10 t   (1-t)^2 (2-5t) \\
+  B_3^{5\prime}(t) &amp;= 10 t^2 (1-t)   (3-5t) \\
+  B_4^{5\prime}(t) &amp;=  5 t^3         (4-5t) \\
+  B_5^{5\prime}(t) &amp;=  5 t^4                \\
+\end{aligned}\]
+</p>
+
+</div>
 
 </div>
 <script>
