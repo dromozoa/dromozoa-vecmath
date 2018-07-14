@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>交差判定</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="http://nishitalab.org/user/nis/cdrom/cad/CAGD90Curve.pdf">Curve intersection using B&eacute;zier clipping</a></li>
+  <li><a href="http://cagd.cs.byu.edu/~557/text/cagd.pdf">Computer Aided Geometric Design</a></li>
+</ul>
+
+<h2>Planer Curve Intersection</h2>
+
+<h3>Bezout's Theorem</h3>
+
+<p>
+<a href="https://ja.wikipedia.org/wiki/%E3%83%99%E3%82%BA%E3%83%BC%E3%81%AE%E5%AE%9A%E7%90%86">ベズーの定理</a>は、
+\(n\)次の平面代数曲線と\(m\)次の平面代数曲線は\(mn\)個の点で交差すると述べている
+（複雑な交差や無限遠での交差、重複度を適切に扱う限りにおいて）。
+曲線が\(mn\)個よりも多くの点で交差するとき、無限個の点で交差する。
+たとえば、これはふたつの曲線が同一であるときに発生する。
+</p>
+
+<h3>B&eacute;zier Clipping method</h3>
+
+<h4>Fat Lines</h4>
+
+<p>
+直線\(\bm{P}_0 - \bm{P}_1\)を\(\overline{L}\)で表す。
+\(\overline{L}\)が正規化された陰な方程式
+\[
+  ax + by + c = 0 \quad (a^2 + b^2 = 1)
+\]
+で定義されるとき、
+任意の点\((x,y)\)から\(\overline{L}\)への距離\(d(x,y)\)は
+\[
+  d(x,y) = ax + by + c
+\]
+</p>
+
+<h4>Rational Curves</h4>
+
+<p>
+制御点\(\bm{P}_i = (x_i, y_i)\)と非負の重み\(w_i\)を持つ有理ベジェ曲線
+\[
+  \bm{P}(t) = \frac{
+    \sum_{i=0}^n w_i \bm{P}_i B_i^n(t)
+  }{
+    \sum_{i=0}^n w_i B_i^n(t)
+  }
+\]
+に対して
+\[
+  d(t) = \sum_{i=0}^n d_i B_i^n(t), \quad d_i = w_i (a x_i + b y_i + c)
+\]
+式\(d(t) = 0\)は\(\bm{P}(t)\)と直線\(ax + by + c = 0\)の交差を表現する。
+しかし、非有理の場合とちがい、
+\(\bm{P}(t)\)と太線の交差は
+\(\{(x,y) = \bm{P}(t) | d_{\rm{min}} \le d(t) \le d_{\rm{max}}\}\)
+と表現できない。
+かわりに、太線の境界のふたつの直線それぞれについて、
+\(\bm{P}\)を独立にクリップしなければならない。
+\[\begin{aligned}
+  \sum_{i=0}^n w_i (a x_i + b y_i + c - d_{\rm{max}}) B_i^n(t) &amp;\gt 0 \\
+  \sum_{i=0}^n w_i (a x_i + b y_i + c + d_{\rm{min}}) B_i^n(t) &amp;\lt 0 \\
+\end{aligned}\]
+</p>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>

@@ -28,6 +28,7 @@ local point2 = vecmath.point2
 local vector2 = vecmath.vector2
 local matrix2 = vecmath.matrix2
 local curve = vecmath.curve
+local quickhull = vecmath.quickhull
 
 local n = 16
 
@@ -94,6 +95,33 @@ local function draw_td(node, P, F)
   local x = 640
   local y = 1/640
 
+  local m = 12
+  local n = 16
+
+  for j = 0, m do
+    local u = j / m
+
+    local d = path_data()
+    for k = 0, n do
+      local t = k / n
+      local a = curve.diff_cubic_bezier(P, t, vector2())
+      local b = curve.cubic_bezier(P, t, vector2()):sub(curve.cubic_bezier(F, u, vector2()))
+      if k == 0 then
+        d:M(t * x, a:dot(b) * y)
+      end
+        d:L(t * x, a:dot(b) * y)
+    end
+
+    node[#node + 1] = _"path" {
+      d = d;
+      fill = "none";
+      stroke = "#F33";
+      ["stroke-opacity"] = 0.5;
+    }
+  end
+
+  local G = {}
+
   for j = 0, 3 do
     local u = j / 3
     local d = path_data()
@@ -105,19 +133,37 @@ local function draw_td(node, P, F)
       return q:set(t, a:dot(b))
     end, Q)
 
+    for i = 1, #Q do
+      G[#G + 1] = Q[i]
+    end
+
     local d = path_data()
     d:M(Q[1].x * x, Q[1].y * y)
     for i = 2, 6 do
       d:L(Q[i].x * x, Q[i].y * y)
     end
 
-    node[#node + 1] = _"path" {
-      d = d;
-      fill = "none";
-      stroke = "#F33";
-      ["stroke-opacity"] = 0.5;
-    }
+    -- node[#node + 1] = _"path" {
+    --   d = d;
+    --   fill = "none";
+    --   stroke = "#F33";
+    --   ["stroke-opacity"] = 0.5;
+    -- }
   end
+
+  local H = quickhull(G, {})
+  local d = path_data():M(H[1].x * x, H[1].y * y)
+  for i = 2, #H do
+    d:L(H[i].x * x, H[i].y * y)
+  end
+  d:Z()
+
+  node[#node + 1] = _"path" {
+    d = d;
+    fill = "#333";
+    ["fill-opacity"] = 0.25;
+    stroke = "none";
+  }
 end
 
 local P = {
@@ -133,6 +179,13 @@ local Q = {
   point2(100,    0);
   point2(250, -100);
 }
+
+-- local Q = {
+--   point2(-100,    0);
+--   point2( -50, -100);
+--   point2(  50, -100);
+--   point2( 100,    0);
+-- }
 
 local F = point2(100, -50)
 

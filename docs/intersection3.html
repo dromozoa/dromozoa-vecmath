@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>交差判定</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="http://nishitalab.org/user/nis/cdrom/cad/CAGD90Curve.pdf">Curve intersection using B&eacute;zier clipping</a></li>
+  <li><a href="http://cagd.cs.byu.edu/~557/text/cagd.pdf">Computer Aided Geometric Design</a></li>
+</ul>
+
+<h2>垂線と点の距離</h2>
+
+<p>
+曲線\(\bm{P}(t)\)の垂線が点\(\bm{F}\)を通らないような\(t\)の区間を考える。
+垂線が点\(\bm{F}\)を通るならば
+\[
+  d(t) = \bm{P}'(t) \cdot (\bm{P}(t) - \bm{F}) = 0
+\]
+\(\bm{P}(t)\)が\(n\)次の有理ベジェ曲線であるとき
+\[\begin{aligned}
+  \bm{P}(t) &amp;= \frac{
+    \sum_{i=0}^n B_i^n(t) w_i \bm{P}_i
+  }{
+    \sum_{i=0}^n B_i^n(t) w_i
+  } \\
+
+  \bm{Q}(t)
+  &amp;= \bm{P}(t) - \bm{F} \\
+  &amp;= \frac{
+    \sum_{i=0}^n B_i^n(t) w_i \bm{Q}_i
+  }{
+    \sum_{i=0}^n B_i^n(t) w_i
+  } \\
+
+  \bm{Q}_i &amp;= \bm{P}_i - F \\
+
+  d(t) &amp;= \bm{P}'(t) \cdot \bm{Q}(t) \\
+
+  \bm{R}(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \bm{P}_i \\
+
+  W(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \\
+
+  \bm{P}(t) &amp;= \frac{
+    \bm{R}(t)
+  }{
+    W(t)
+  } \\
+
+  \bm{P}'(t) &amp;= \frac{
+    \bm{R}'(t) W(t) - \bm{R}(t) W'(t)
+  }{
+    W^2(t)
+  } \\
+
+  \bm{R}'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) \bm{D}_i \\
+
+  \bm{D}_i &amp;= w_{i+1} \bm{P}_{i+1} - w_i \bm{P}_i \\
+
+  W'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) d_i \\
+
+  d_i &amp;= w_{i+1} - w_i \\
+
+  \bm{R}'(t) W(t)
+  &amp;= n \sum_{j=0}^{n-1} B_j^{n-1}(t) \bm{D}_j \sum_{i=0}^n B_i^n(t) w_i \\
+  &amp;= n \sum_{i=0}^n \sum_{j=0}^{n-1} B_i^n(t) B_j^{n-1}(t) w_i \bm{D}_j \\
+
+  \bm{R}(t) W'(t)
+  &amp;= n \sum_{i=0}^n B_i^n(t) w_i \bm{P}_i \sum_{j=0}^{n-1} B_j^{n-1}(t) d_j \\
+  &amp;= n \sum_{i=0}^n \sum_{j=0}^{n-1} B_i^n(t) B_j^{n-1}(t) w_i \bm{P}_i d_j \\
+
+  \bm{R}'(t) W(t) - \bm{R}(t) W'(t)
+  &amp;= n \sum_{i=0}^n \sum_{j=0}^{n-1} B_i^n(t) B_j^{n-1}(t)
+    w_i (\bm{D}_j - \bm{P}_i d_j) \\
+
+  \bm{D}_j - \bm{P}_i d_j
+  &amp;= w_{j+1} \bm{P}_{j+1} - w_j \bm{P}_j - w_{j+1} \bm{P}_i + w_j \bm{P}_i \\
+  &amp;= w_{j+1} (\bm{P}_{j+1} - \bm{P}_i) - w_j (\bm{P}_j - \bm{P}_i) \\
+
+  \bm{R}'(t) W(t) - \bm{R}(t) W'(t)
+  &amp;= n \sum_{i=0}^n \sum_{j=0}^{n-1} B_i^n(t) B_j^{n-1}(t)
+    w_i (w_{j+1} (\bm{P}_{j+1} - \bm{P}_i) - w_j (\bm{P}_j - \bm{P}_i)) \\
+\end{aligned}\]
+</p>
+
+<p>
+同時座標で考える。
+\[\begin{aligned}
+  x(t) &amp;= \frac{X(t)}{Z(t)} \\
+  y(t) &amp;= \frac{Y(t)}{Z(t)} \\
+  X(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i x_i \\
+  Y(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i y_i \\
+  Z(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \\
+  x'(t) &amp;= \frac{
+    X'(t) Z(t) - X(t) Z'(t)
+  }{
+    Z^2(t)
+  } \\
+  y'(t) &amp;= \frac{
+    Y'(t) Z(t) - Y(t) Z'(t)
+  }{
+    Z^2(t)
+  } \\
+  X'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} x_{i+1} - w_i x_i) \\
+  Y'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} y_{i+1} - w_i y_i) \\
+  Z'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} - w_i) \\
+\end{aligned}\]
+</p>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>
