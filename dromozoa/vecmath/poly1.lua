@@ -23,10 +23,11 @@ local type = type
 
 -- a:set(poly1 b)
 function class.set(a, b)
-  for i = 1, #b do
+  local n = #b
+  for i = 1, n do
     a[i] = b[i]
   end
-  for i = #b + 1, #a do
+  for i = n + 1, #a do
     a[i] = nil
   end
   return a
