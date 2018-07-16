@@ -90,6 +90,12 @@ assert(p[3] == 7)
 assert(p[4] == 9)
 assert(p[5] == 11)
 
+local p = poly1(p1):add(p1)
+assert(#p == 3)
+assert(p[1] == 2)
+assert(p[2] == 4)
+assert(p[3] == 6)
+
 -- https://docs.scipy.org/doc/numpy/reference/generated/numpy.polyder.html#numpy.polyder
 local p = poly1(1,1,1,1):deriv()
 assert(#p == 3)

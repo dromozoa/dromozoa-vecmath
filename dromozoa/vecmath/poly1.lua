@@ -46,16 +46,22 @@ end
 -- a:deriv()
 function class.deriv(a, b)
   if not b then
-    b = a
+    local n = #a
+    for i = 1, n - 1 do
+      a[i] = a[i] * (n - i)
+    end
+    a[n] = nil
+    return a
+  else
+    local n = #b
+    for i = 1, n - 1 do
+      a[i] = b[i] * (n - i)
+    end
+    for i = n, #a do
+      a[i] = nil
+    end
+    return a
   end
-  local n = #b
-  for i = 1, n - 1 do
-    a[i] = b[i] * (n - i)
-  end
-  for i = n, #a do
-    a[i] = nil
-  end
-  return a
 end
 
 -- a:integ(poly1 b, number c)
@@ -89,6 +95,27 @@ end
 -- a:add(poly1 b, poly1 c)
 -- a:add(poly1 b)
 function class.add(a, b, c)
+  if not c then
+    local n = #a
+    local m = #b
+    if n < m then
+      local t = m - n
+      for i = m, t + 1, -1 do
+        a[i] = a[i - t] + b[i]
+      end
+      for i = 1, t do
+        a[i] = b[i]
+      end
+      return a
+    else
+      local t = n - m
+      for i = t + 1, n do
+        a[i] = a[i] + b[i - t]
+      end
+      return a
+    end
+  end
+
   if not c then
     local m = #a
     local n = #b
