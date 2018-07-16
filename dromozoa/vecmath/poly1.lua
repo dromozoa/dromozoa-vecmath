@@ -70,26 +70,46 @@ end
 -- a:integ()
 function class.integ(a, b, c)
   if not b then
-    b = a
-    c = 0
+    local n = #a
+    local m = n + 1
+    for i = 1, n do
+      a[i] = a[i] / (m - i)
+    end
+    a[m] = 0
+    return a
   elseif not c then
     if type(b) == "number" then
-      c = b
-      b = a
+      local n = #a
+      local m = n + 1
+      for i = 1, n do
+        a[i] = a[i] / (m - i)
+      end
+      a[m] = b
+      return a
     else
-      c = 0
+      local n = #b
+      local m = n + 1
+      for i = 1, n do
+        a[i] = b[i] / (m - i)
+      end
+      a[m] = 0
+      for i = m + 1, #a do
+        a[i] = nil
+      end
+      return a
     end
+  else
+    local n = #b
+    local m = n + 1
+    for i = 1, n do
+      a[i] = b[i] / (m - i)
+    end
+    a[m] = c
+    for i = m + 1, #a do
+      a[i] = nil
+    end
+    return a
   end
-  local n = #b
-  local m = n + 1
-  for i = 1, n do
-    a[i] = b[i] / (m - i)
-  end
-  a[m] = c
-  for i = m + 1, #a do
-    a[i] = nil
-  end
-  return a
 end
 
 -- a:add(poly1 b, poly1 c)
