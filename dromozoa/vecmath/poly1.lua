@@ -90,7 +90,44 @@ end
 -- a:add(poly1 b)
 function class.add(a, b, c)
   if not c then
+    local m = #a
+    local n = #b
+    -- a, b, c, d / m=4
+    -- n = 6
+    -- 0, 0, a, b, c, d
+    if m < n then
+      for i = n, n - m + 1, -1 do
+        a[i] = a[i - (n - m)]
+      end
+      for i = 1, n - m do
+        a[i] = 0
+      end
+    end
+    c = b
+    b = a
   end
+  local m = #b
+  local n = #c
+  if m == n then
+    for i = 1, m do
+      a[i] = b[i] + c[i]
+    end
+  else
+    if m > n then
+      m, n = n, m
+      b, c = c, b
+    end
+    -- m < n
+    --         b1, b2, b3 / m=3
+    -- c1, c2, c3, c4, c5 / n=5
+    for i = 1, n - m do
+      a[i] = c[i]
+    end
+    for i = n - m + 1, n do
+      a[i] = c[i] + b[i - (n - m)]
+    end
+  end
+  return a
 end
 
 -- class(number b, ...)
