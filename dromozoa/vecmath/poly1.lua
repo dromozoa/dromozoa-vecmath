@@ -52,7 +52,9 @@ function class.deriv(a, b)
   for i = 1, n - 1 do
     a[i] = b[i] * (n - i)
   end
-  a[n] = nil
+  for i = n, #a do
+    a[i] = nil
+  end
   return a
 end
 
@@ -72,11 +74,15 @@ function class.integ(a, b, c)
       c = 0
     end
   end
-  local n = #b + 1
-  for i = 1, n - 1 do
-    a[i] = b[i] / (n - i)
+  local n = #b
+  local m = n + 1
+  for i = 1, n do
+    a[i] = b[i] / (m - i)
   end
-  a[n] = c
+  a[m] = c
+  for i = m + 1, #a do
+    a[i] = nil
+  end
   return a
 end
 
