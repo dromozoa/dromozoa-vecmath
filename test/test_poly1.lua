@@ -51,6 +51,10 @@ assert(i[2] == -3/2)
 assert(i[3] ==  2)
 assert(i[4] ==  42)
 
+local p = poly1(1,1,1,1,1,1,1,1)
+p:set{1,-2,1}
+assert(#p == 3)
+
 -- https://docs.scipy.org/doc/numpy/reference/generated/numpy.polyder.html#numpy.polyder
 local p = poly1(1,1,1,1):deriv()
 assert(#p == 3)

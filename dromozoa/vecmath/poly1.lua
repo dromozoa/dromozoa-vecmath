@@ -26,6 +26,9 @@ function class.set(a, b)
   for i = 1, #b do
     a[i] = b[i]
   end
+  for i = #b + 1, #a do
+    a[i] = nil
+  end
   return a
 end
 
@@ -74,6 +77,13 @@ function class.integ(a, b, c)
   end
   a[n] = c
   return a
+end
+
+-- a:add(poly1 b, poly1 c)
+-- a:add(poly1 b)
+function class.add(a, b, c)
+  if not c then
+  end
 end
 
 -- class(number b, ...)
