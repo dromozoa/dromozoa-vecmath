@@ -69,42 +69,21 @@ end
 -- a:integ(number b)
 -- a:integ()
 function class.integ(a, b, c)
-  if not b then
+  if not b or type(b) == "number" then
     local n = #a
     local m = n + 1
     for i = 1, n do
       a[i] = a[i] / (m - i)
     end
-    a[m] = 0
+    a[m] = b or 0
     return a
-  elseif not c then
-    if type(b) == "number" then
-      local n = #a
-      local m = n + 1
-      for i = 1, n do
-        a[i] = a[i] / (m - i)
-      end
-      a[m] = b
-      return a
-    else
-      local n = #b
-      local m = n + 1
-      for i = 1, n do
-        a[i] = b[i] / (m - i)
-      end
-      a[m] = 0
-      for i = m + 1, #a do
-        a[i] = nil
-      end
-      return a
-    end
   else
     local n = #b
     local m = n + 1
     for i = 1, n do
       a[i] = b[i] / (m - i)
     end
-    a[m] = c
+    a[m] = c or 0
     for i = m + 1, #a do
       a[i] = nil
     end
