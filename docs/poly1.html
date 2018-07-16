@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>多項式</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="https://www.gnu.org/software/gsl/doc/html/poly.html">GSL - Polynomials</a></li>
+  <li><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.poly1d.html">numpy.poly1d</a></li>
+</ul>
+
+<h2>実装</h2>
+
+<p>
+高次から低次に向かって配列に係数を格納する。
+\[
+  P(x) = c_1 x^{n-1} + c_2 x^{n-2} + \cdots + c_{n-1} x + c_n
+\]
+ホーナー法を使って評価する。
+\[
+  P(x) = (\cdots((c_1 x + c_2) x + c_3) x + \cdots + c_{n-1}) x + c_n
+\]
+微分は
+\[
+  P'(x) = c_1 (n-1) x^{n-2} + c_2 (n-2) x^{n-3} + \cdots + c_{n-1}
+\]
+不定積分は
+\[
+  \int P(x) dx
+    = \frac{c_1}{n} x^n
+    + \frac{c_2}{n-1} x^{n-1}
+    + \cdots
+    + \frac{c_{n-1}}{2} x^2
+    + c_n x
+    + C
+\]
+</p>
+
+
+
+</div>
+<script>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>
