@@ -117,5 +117,12 @@ assert(p[1] == 1)
 assert(p[2] == 1)
 assert(p[3] == 1)
 
+-- https://docs.scipy.org/doc/numpy/reference/generated/numpy.polyadd.html#numpy.polyadd
+local p = poly1():add({1,2}, {9,5,4})
+assert(#p == 3)
+assert(p[1] == 9)
+assert(p[2] == 6)
+assert(p[3] == 6)
+
 
 
