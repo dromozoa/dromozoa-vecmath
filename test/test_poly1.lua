@@ -59,5 +59,18 @@ assert(p[2] == 2)
 assert(p[3] == 1)
 assert(p:eval(2) == 17)
 
+-- https://docs.scipy.org/doc/numpy/reference/generated/numpy.polyint.html#numpy.polyint
+local p = poly1(1,1,1):integ()
+assert(#p == 4)
+assert(p[1] == 1/3)
+assert(p[2] == 1/2)
+assert(p[3] == 1)
+assert(p[4] == 0)
+p:deriv()
+assert(#p == 3)
+assert(p[1] == 1)
+assert(p[2] == 1)
+assert(p[3] == 1)
+
 
 
