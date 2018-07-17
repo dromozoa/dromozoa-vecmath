@@ -144,6 +144,59 @@ function class.add(a, b, c)
   end
 end
 
+-- a:sub(poly1 b, poly1 c)
+-- a:sub(poly1 b)
+function class.sub(a, b, c)
+  if not c then
+    local n = #a
+    local m = #b
+    if n < m then
+      local t = m - n
+      for i = m, t + 1, -1 do
+        a[i] = a[i - t] - b[i]
+      end
+      for i = t, 1, -1 do
+        a[i] = -b[i]
+      end
+      return a
+    else
+      local t = n - m
+      for i = n, t + 1, -1 do
+        a[i] = a[i] - b[i - t]
+      end
+      return a
+    end
+  else
+    local n = #b
+    local m = #c
+    if n < m then
+      local t = m - n
+      for i = m, t + 1, -1 do
+        a[i] = b[i - t] - c[i]
+      end
+      for i = t, 1, -1 do
+        a[i] = -c[i]
+      end
+      for i = m + 1, #a do
+        a[i] = nil
+      end
+      return a
+    else
+      local t = n - m
+      for i = n, t + 1, -1 do
+        a[i] = b[i] - c[i - t]
+      end
+      for i = t, 1, -1 do
+        a[i] = b[i]
+      end
+      for i = n + 1, #a do
+        a[i] = nil
+      end
+      return a
+    end
+  end
+end
+
 -- class(number b, ...)
 -- class(poly1 b)
 -- class()

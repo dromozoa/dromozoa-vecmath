@@ -96,6 +96,44 @@ assert(p[1] == 2)
 assert(p[2] == 4)
 assert(p[3] == 6)
 
+local p = poly1():sub(p1, p2)
+assert(#p == 5)
+assert(p[1] == -4)
+assert(p[2] == -5)
+assert(p[3] == -5)
+assert(p[4] == -5)
+assert(p[5] == -5)
+
+local p = poly1():sub(p2, p1)
+assert(#p == 5)
+assert(p[1] == 4)
+assert(p[2] == 5)
+assert(p[3] == 5)
+assert(p[4] == 5)
+assert(p[5] == 5)
+
+local p = poly1(p1):sub(p2)
+assert(#p == 5)
+assert(p[1] == -4)
+assert(p[2] == -5)
+assert(p[3] == -5)
+assert(p[4] == -5)
+assert(p[5] == -5)
+
+local p = poly1(p2):sub(p1)
+assert(#p == 5)
+assert(p[1] == 4)
+assert(p[2] == 5)
+assert(p[3] == 5)
+assert(p[4] == 5)
+assert(p[5] == 5)
+
+local p = poly1(p1):sub(p1)
+assert(#p == 3)
+assert(p[1] == 0)
+assert(p[2] == 0)
+assert(p[3] == 0)
+
 -- https://docs.scipy.org/doc/numpy/reference/generated/numpy.polyder.html#numpy.polyder
 local p = poly1(1,1,1,1):deriv()
 assert(#p == 3)
@@ -124,5 +162,9 @@ assert(p[1] == 9)
 assert(p[2] == 6)
 assert(p[3] == 6)
 
-
-
+-- https://docs.scipy.org/doc/numpy/reference/generated/numpy.polysub.html#numpy.polysub
+local p = poly1():sub({2,10,-2}, {3,10,-4})
+assert(#p == 3)
+assert(p[1] == -1)
+assert(p[2] == 0)
+assert(p[3] == 2)
