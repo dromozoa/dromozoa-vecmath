@@ -197,6 +197,34 @@ function class.sub(a, b, c)
   end
 end
 
+-- a:mul(poly1 b, poly1 c)
+-- a:mul(poly1 b)
+function class.mul(a, b, c)
+  if not c then
+    c = b
+    b = a
+  end
+  local n = #b
+  local m = #c
+
+  local t = {}
+  local u = b[1]
+  for j = 1, m do
+    t[j] = u * c[j]
+  end
+
+  for i = 1, n - 1 do
+    local u = b[i + 1]
+    for j = 1, m - 1 do
+      local k = i + j
+      t[k] = t[k] + u * c[j]
+    end
+    t[i + m] = u * c[m]
+  end
+
+  return class.set(a, t)
+end
+
 -- class(number b, ...)
 -- class(poly1 b)
 -- class()

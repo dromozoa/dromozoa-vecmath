@@ -22,6 +22,9 @@
 .note {
   color: #999;
 }
+table.matrix td {
+  text-align: center;
+}
 </style>
 </head>
 <body>
@@ -61,9 +64,47 @@
     + c_n x
     + C
 \]
+積算は
+\[\begin{aligned}
+  P(x) &amp;= \sum_{i=1}^n c_i x^{n-i} \\
+  Q(x) &amp;= \sum_{j=1}^m d_j x^{m-j} \\
+  P(x) Q(x) &amp;= \sum_{i=1}^n \sum_{j=1}^m c_i d_j x^{(n+m)-(i+j)} \\
+\end{aligned}\]
 </p>
 
-
+<table class="matrix">
+  <tr>
+    <td>\(c_1 d_1\)</td>
+    <td>\(c_1 d_2\)</td>
+    <td rowspan="2">\(\cdots\)</td>
+    <td>\(c_1 d_{m-1}\)</td>
+    <td>\(c_1 d_m\)</td>
+  </tr>
+  <tr>
+    <td>\(c_2 d_1\)</td>
+    <td>\(c_2 d_2\)</td>
+    <td>\(c_2 d_{m-1}\)</td>
+    <td>\(c_2 d_m\)</td>
+  </tr>
+  <tr>
+    <td colspan="2">\(\vdots\)</td>
+    <td>\(\ddots\)</td>
+    <td colspan="2">\(\vdots\)</td>
+  </tr>
+  <tr>
+    <td>\(c_{n-1} d_1\)</td>
+    <td>\(c_{n-1} d_2\)</td>
+    <td rowspan="2">\(\cdots\)</td>
+    <td>\(c_{n-1} d_{m-1}\)</td>
+    <td>\(c_{n-1} d_m\)</td>
+  </tr>
+  <tr>
+    <td>\(c_n d_1\)</td>
+    <td>\(c_n d_2\)</td>
+    <td>\(c_n d_{m-1}\)</td>
+    <td>\(c_n d_m\)</td>
+  </tr>
+</table>
 
 </div>
 <script>

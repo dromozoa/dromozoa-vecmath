@@ -168,3 +168,12 @@ assert(#p == 3)
 assert(p[1] == -1)
 assert(p[2] == 0)
 assert(p[3] == 2)
+
+-- https://docs.scipy.org/doc/numpy/reference/generated/numpy.polymul.html#numpy.polymul
+local p = poly1():mul({1,2,3}, {9,5,1})
+assert(#p == 5)
+assert(p[1] == 9)
+assert(p[2] == 23)
+assert(p[3] == 38)
+assert(p[4] == 17)
+assert(p[5] == 3)
