@@ -58,7 +58,7 @@ table.matrix td {
 \]
 微分は
 \[
-  P'(x) = c_2 + \dots + c_{n-1} (n-2) x^{n-3} + c_n (n-1) x^{n-2}
+  P'(x) = c_2 + c_3 2 x + \dots + c_{n-1} (n-2) x^{n-3} + c_n (n-1) x^{n-2}
 \]
 不定積分は
 \[
@@ -72,9 +72,9 @@ table.matrix td {
 \]
 積算は
 \[\begin{aligned}
-  P(x) &amp;= \sum_{i=1}^n c_i x^{i-1} \\
-  Q(x) &amp;= \sum_{j=1}^m d_j x^{j-1} \\
-  P(x) Q(x) &amp;= \sum_{i=1}^n \sum_{j=1}^m c_i d_j x^{i+j-2} \\
+  P(x) &amp;= \sum_{i=1}^m c_i x^{i-1} \\
+  Q(x) &amp;= \sum_{j=1}^n d_j x^{j-1} \\
+  P(x) Q(x) &amp;= \sum_{i=1}^m \sum_{j=1}^n c_i d_j x^{i+j-2} \\
 \end{aligned}\]
 </p>
 
@@ -83,14 +83,14 @@ table.matrix td {
     <td>\(c_1 d_1\)</td>
     <td>\(c_1 d_2\)</td>
     <td rowspan="2">\(\cdots\)</td>
-    <td>\(c_1 d_{m-1}\)</td>
-    <td>\(c_1 d_m\)</td>
+    <td>\(c_1 d_{n-1}\)</td>
+    <td>\(c_1 d_n\)</td>
   </tr>
   <tr>
     <td>\(c_2 d_1\)</td>
     <td>\(c_2 d_2\)</td>
-    <td>\(c_2 d_{m-1}\)</td>
-    <td>\(c_2 d_m\)</td>
+    <td>\(c_2 d_{n-1}\)</td>
+    <td>\(c_2 d_n\)</td>
   </tr>
   <tr>
     <td colspan="2">\(\vdots\)</td>
@@ -98,17 +98,17 @@ table.matrix td {
     <td colspan="2">\(\vdots\)</td>
   </tr>
   <tr>
-    <td>\(c_{n-1} d_1\)</td>
-    <td>\(c_{n-1} d_2\)</td>
+    <td>\(c_{m-1} d_1\)</td>
+    <td>\(c_{m-1} d_2\)</td>
     <td rowspan="2">\(\cdots\)</td>
-    <td>\(c_{n-1} d_{m-1}\)</td>
-    <td>\(c_{n-1} d_m\)</td>
+    <td>\(c_{m-1} d_{n-1}\)</td>
+    <td>\(c_{m-1} d_n\)</td>
   </tr>
   <tr>
-    <td>\(c_n d_1\)</td>
-    <td>\(c_n d_2\)</td>
-    <td>\(c_n d_{m-1}\)</td>
-    <td>\(c_n d_m\)</td>
+    <td>\(c_m d_1\)</td>
+    <td>\(c_m d_2\)</td>
+    <td>\(c_m d_{n-1}\)</td>
+    <td>\(c_m d_n\)</td>
   </tr>
 </table>
 
