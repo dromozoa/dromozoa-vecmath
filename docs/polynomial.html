@@ -48,33 +48,33 @@ table.matrix td {
 <h2>実装</h2>
 
 <p>
-高次から低次に向かって配列に係数を格納する。
+低次から高次に向かってテーブルに係数を格納する。
 \[
-  P(x) = c_1 x^{n-1} + c_2 x^{n-2} + \cdots + c_{n-1} x + c_n
+  P(x) = c_1 + c_2 x + \dots + c_{n-1} x^{n-2} + c_n x^{n-1}
 \]
 ホーナー法を使って評価する。
 \[
-  P(x) = (\cdots((c_1 x + c_2) x + c_3) x + \cdots + c_{n-1}) x + c_n
+  P(x) = c_1 + x (c2 + \dots + x (c_{n-2} + x (c_{n-1} + x c_n))\dots)
 \]
 微分は
 \[
-  P'(x) = c_1 (n-1) x^{n-2} + c_2 (n-2) x^{n-3} + \cdots + c_{n-1}
+  P'(x) = c_2 + \dots + c_{n-1} (n-2) x^{n-3} + c_n (n-1) x^{n-2}
 \]
 不定積分は
 \[
   \int P(x) dx
-    = \frac{c_1}{n} x^n
-    + \frac{c_2}{n-1} x^{n-1}
-    + \cdots
-    + \frac{c_{n-1}}{2} x^2
-    + c_n x
-    + C
+    = C
+    + c_1 x
+    + \frac{c_2}{2} x^2
+    + \dots
+    + \frac{c_{n-1}}{n-1} x^{n-1}
+    + \frac{c_n}{n} x^{n}
 \]
 積算は
 \[\begin{aligned}
-  P(x) &amp;= \sum_{i=1}^n c_i x^{n-i} \\
-  Q(x) &amp;= \sum_{j=1}^m d_j x^{m-j} \\
-  P(x) Q(x) &amp;= \sum_{i=1}^n \sum_{j=1}^m c_i d_j x^{(n+m)-(i+j)} \\
+  P(x) &amp;= \sum_{i=1}^n c_i x^{i-1} \\
+  Q(x) &amp;= \sum_{j=1}^m d_j x^{j-1} \\
+  P(x) Q(x) &amp;= \sum_{i=1}^n \sum_{j=1}^m c_i d_j x^{i+j-2} \\
 \end{aligned}\]
 </p>
 
