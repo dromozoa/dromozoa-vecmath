@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local class = {}
+local class = { is_polynomial = true }
 local metatable = { __index = class }
 
 local setmetatable = setmetatable

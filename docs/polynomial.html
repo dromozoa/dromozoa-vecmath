@@ -45,7 +45,7 @@ table.matrix td {
   </li>
 </ul>
 
-<h2>実装</h2>
+<h2>Power</h2>
 
 <p>
 低次から高次に向かってテーブルに係数を格納する。
@@ -111,6 +111,27 @@ table.matrix td {
     <td>\(c_m d_n\)</td>
   </tr>
 </table>
+
+<h2>Bernstein</h2>
+
+<p>
+\(t=0\)のとき\(b_1\)に、\(t=1\)のとき\(b_n\)になるように
+テーブルに係数を格納する。
+\[\begin{aligned}
+  B(t)
+  &amp;= b_1 \binom{n-1}{0} (1-t)^{n-1}
+    + b_2 \binom{n-1}{1} (1-t)^{n-2} t
+    + \dots
+    + b_n \binom{n-1}{n-1} t^{n-1}
+    \\
+  &amp;= \sum_{i=1}^n b_i \binom{n-1}{i-1} (1-t)^{n-i} t^{i-1} \\
+\end{aligned}\]
+ド・カステリョのアルゴリズムで評価する。
+\[\begin{aligned}
+  b_i^1 &amp;= b_i \\
+  b_i^j &amp;= (1-t) b_i^{j-1} + t b_{i+1}^{j-1} \\
+\end{aligned}\]
+</p>
 
 </div>
 <script>
