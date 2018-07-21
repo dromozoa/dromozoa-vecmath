@@ -24,16 +24,14 @@ local type = type
 local function eval(n, a, b, c)
   if n > 2 then
     local m = n - 1
-
-    local u = (1 - b) * a[1]
+    local t = (1 - b) * a[1]
     for i = 2, m do
-      local v = a[i]
-      local t = b * v
-      c[i - 1] = u + t
-      u = v - t
+      local u = a[i]
+      local v = b * u
+      c[i - 1] = t + v
+      t = u - v
     end
-    c[m] = u + b * a[n]
-
+    c[m] = t + b * a[n]
     return eval(m, c, b, c)
   elseif n == 2 then
     return (1 - b) * a[1] + b * a[2]
