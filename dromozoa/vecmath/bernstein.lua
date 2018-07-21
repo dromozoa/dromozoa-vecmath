@@ -22,34 +22,25 @@ local setmetatable = setmetatable
 local type = type
 
 local function eval(n, a, b, c)
-  if n < 3 then
-    if n == 0 then
-      return 0
-    elseif n == 1 then
-      return a[1]
-    elseif n == 2 then
-      return (1 - b) * a[1] + b * a[2]
-    end
-  else
-    local v = a[1]
-    local t = b * v
-    local u = v - t
-    c[1] = u
+  if n > 2 then
+    local m = n - 1
 
-    for i = 2, n - 1 do
+    local u = (1 - b) * a[1]
+    for i = 2, m do
       local v = a[i]
       local t = b * v
-      local u = v - t
-      c[i - 1] = c[i - 1] + t
-      c[i] = u
+      c[i - 1] = u + t
+      u = v - t
     end
+    c[m] = u + b * a[n]
 
-    local v = a[n]
-    local t = b * v
-    local u = v - t
-    c[n - 1] = c[n - 1] + t
-
-    return eval(n - 1, c, b, c)
+    return eval(m, c, b, c)
+  elseif n == 2 then
+    return (1 - b) * a[1] + b * a[2]
+  elseif n == 1 then
+    return a[1]
+  elseif n == 0 then
+      return 0
   end
 end
 
