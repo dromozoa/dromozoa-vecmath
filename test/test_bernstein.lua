@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local bernstein = require "dromozoa.vecmath.bernstein"
+local polynomial = require "dromozoa.vecmath.polynomial"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
@@ -42,3 +43,36 @@ assert(b:eval(0.5)  == 12.25)
 assert(b:eval(0.75) == 15.15625)
 assert(b:eval(1)    == 19)
 assert(b:eval(2)    == 55)
+
+local b = bernstein(1,3,4,6,8)
+local p = b:get(polynomial(1,1,1,1,1,1,1,1))
+assert(#p == 5)
+assert(p[1] ==  1)
+assert(p[2] ==  8)
+assert(p[3] == -6)
+assert(p[4] ==  8)
+assert(p[5] == -3)
+
+local b = bernstein(polynomial(1,24,-39,20))
+assert(#b == 4)
+assert(b[1] == 1)
+assert(b[2] == 9)
+assert(b[3] == 4)
+assert(b[4] == 6)
+
+local b = bernstein(polynomial(2,30,-57,27))
+assert(#b == 4)
+assert(b[1] ==  2)
+assert(b[2] == 12)
+assert(b[3] ==  3)
+assert(b[4] ==  2)
+
+local b = bernstein(polynomial(1,6,-12,7))
+assert(#b == 4)
+assert(b[1] == 1)
+assert(b[2] == 3)
+assert(b[3] == 1)
+assert(b[4] == 2)
+
+
+

@@ -15,11 +15,54 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local class = { is_bernstein = true }
-local metatable = { __index = class }
-
 local setmetatable = setmetatable
 local type = type
+
+-- a:set_polynomial(polynomial b)
+local function set_polynomial(a, b)
+  local n = #b
+  local c = 1
+  for i = 1, n do
+    a[i] = b[i] / c
+    c = c * (n - i) / i
+  end
+  for i = n + 1, #a do
+    a[i] = nil
+  end
+
+  for i = 2, n do
+    for j = n, i, -1 do
+      a[j] = a[j] + a[j - 1]
+    end
+  end
+
+  return a
+end
+
+-- a:get(polynomial b)
+local function get(a, b)
+  local n = #a
+  for i = 1, n do
+    b[i] = a[i]
+  end
+  for i = n + 1, #b do
+    b[i] = nil
+  end
+
+  for i = 2, n do
+    for j = n, i, -1 do
+      b[j] = b[j] - b[j - 1]
+    end
+  end
+
+  local c = 1
+  for i = 1, n do
+    b[i] = c * b[i]
+    c = c * (n - i) / i
+  end
+
+  return b
+end
 
 local function eval(n, a, b, c)
   if n > 2 then
@@ -38,16 +81,27 @@ local function eval(n, a, b, c)
   end
 end
 
+local class = {
+  is_bernstein = true;
+  set = set_polynomial;
+  get = get;
+}
+local metatable = { __index = class }
+
 -- a:set(bernstein b)
 function class.set(a, b)
-  local n = #b
-  for i = 1, n do
-    a[i] = b[i]
+  if b.is_polynomial then
+    return set_polynomial(a, b)
+  else
+    local n = #b
+    for i = 1, n do
+      a[i] = b[i]
+    end
+    for i = n + 1, #a do
+      a[i] = nil
+    end
+    return a
   end
-  for i = n + 1, #a do
-    a[i] = nil
-  end
-  return a
 end
 
 -- a:eval(number b)
