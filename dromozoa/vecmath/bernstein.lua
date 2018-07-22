@@ -48,8 +48,48 @@ local function set_polynomial(a, b)
   return a
 end
 
+local function eval(n, a, b, c)
+  if n > 2 then
+    local m = n - 1
+    local t = (1 - b) * a[1]
+    for i = 2, m do
+      local u = a[i]
+      local v = b * u
+      c[i - 1] = t + v
+      t = u - v
+    end
+    c[m] = t + b * a[n]
+    return eval(m, c, b, c)
+  else
+    return (1 - b) * a[1] + b * a[2]
+  end
+end
+
+local class = {
+  is_bernstein = true;
+  set = set_polynomial;
+}
+local metatable = { __index = class }
+
+-- a:set(polynomial b)
+-- a:set(bernstein b)
+function class.set(a, b)
+  if b.is_polynomial then
+    return set_polynomial(a, b)
+  else
+    local n = #b
+    for i = 1, n do
+      a[i] = b[i]
+    end
+    for i = n + 1, #a do
+      a[i] = nil
+    end
+    return a
+  end
+end
+
 -- a:get(polynomial b)
-local function get(a, b)
+function class.get(a, b)
   local n = #a
   local m = n -1
 
@@ -77,46 +117,6 @@ local function get(a, b)
   b[m] = b[m] * c
 
   return b
-end
-
-local function eval(n, a, b, c)
-  if n > 2 then
-    local m = n - 1
-    local t = (1 - b) * a[1]
-    for i = 2, m do
-      local u = a[i]
-      local v = b * u
-      c[i - 1] = t + v
-      t = u - v
-    end
-    c[m] = t + b * a[n]
-    return eval(m, c, b, c)
-  else
-    return (1 - b) * a[1] + b * a[2]
-  end
-end
-
-local class = {
-  is_bernstein = true;
-  set = set_polynomial;
-  get = get;
-}
-local metatable = { __index = class }
-
--- a:set(bernstein b)
-function class.set(a, b)
-  if b.is_polynomial then
-    return set_polynomial(a, b)
-  else
-    local n = #b
-    for i = 1, n do
-      a[i] = b[i]
-    end
-    for i = n + 1, #a do
-      a[i] = nil
-    end
-    return a
-  end
 end
 
 -- a:eval(number b)

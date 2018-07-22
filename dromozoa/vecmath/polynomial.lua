@@ -15,22 +15,41 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local class = { is_polynomial = true }
-local metatable = { __index = class }
+local bernstein = require "dromozoa.vecmath.bernstein"
 
 local setmetatable = setmetatable
 local type = type
 
+local function set_bernstein(a, b)
+  return bernstein.get(b, a)
+end
+
+local class = {
+  is_polynomial = true;
+  set = set_bernstein;
+}
+local metatable = { __index = class }
+
+-- a:set(bernstein b)
 -- a:set(polynomial b)
 function class.set(a, b)
-  local n = #b
-  for i = 1, n do
-    a[i] = b[i]
+  if b.is_bernstein then
+    return set_bernstein(a, b)
+  else
+    local n = #b
+    for i = 1, n do
+      a[i] = b[i]
+    end
+    for i = n + 1, #a do
+      a[i] = nil
+    end
+    return a
   end
-  for i = n + 1, #a do
-    a[i] = nil
-  end
-  return a
+end
+
+-- a:get(bernstein b)
+function class.get(a, b)
+  return bernstein.set(b, a)
 end
 
 -- a:eval(number b)
