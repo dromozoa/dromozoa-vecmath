@@ -236,6 +236,7 @@ function class.mul(a, b, c)
 end
 
 -- class(number b, ...)
+-- class(bernstein b)
 -- class(polynomial b)
 -- class()
 return setmetatable(class, {
