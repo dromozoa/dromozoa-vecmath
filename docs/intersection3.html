@@ -131,7 +131,17 @@
   X'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} x_{i+1} - w_i x_i) \\
   Y'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} y_{i+1} - w_i y_i) \\
   Z'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} - w_i) \\
+
+  Q_x(t)
+  &amp;= \frac{X(t)}{Z(t)} - F_x \\
+  &amp;= \frac{X(t) - F_x Z(t)}{Z(t)} \\
+  Q_y(t)
+  &amp;= \frac{Y(t)}{Z(t)} - F_y \\
+  &amp;= \frac{Y(t) - F_y Z(t)}{Z(t)} \\
+
+  d(t) &amp;= x'(t) Q_x(t) + y'(t) Q_y(t) = 0 \\
 \end{aligned}\]
+\(d(t)\)は分子が\(3n-1\)次、分母が\(3n\)次の多項式になる。
 </p>
 
 </div>

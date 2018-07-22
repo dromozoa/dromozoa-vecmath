@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+table.matrix td {
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>多項式</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="https://www.gnu.org/software/gsl/doc/html/poly.html">GSL - Polynomials</a></li>
+  <li><a href="https://github.com/numpy/numpy">numpy</a>
+    <ul>
+      <li><a href="https://docs.scipy.org/doc/numpy/reference/routines.polynomials.html">polynomials</a>
+      <li><a href="https://docs.scipy.org/doc/numpy/reference/routines.polynomials.polynomial.html">polynomial</a>
+      <li><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.poly1d.html">poly1d</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Power</h2>
+
+<p>
+低次から高次に向かってテーブルに係数を格納する。
+\[
+  P(x) = c_1 + c_2 x + \dots + c_{n-1} x^{n-2} + c_n x^{n-1}
+\]
+ホーナー法を使って評価する。
+\[
+  P(x) = c_1 + x (c2 + \dots + x (c_{n-2} + x (c_{n-1} + x c_n))\dots)
+\]
+微分は
+\[
+  P'(x) = c_2 + c_3 2 x + \dots + c_{n-1} (n-2) x^{n-3} + c_n (n-1) x^{n-2}
+\]
+不定積分は
+\[
+  \int P(x) dx
+    = C
+    + c_1 x
+    + \frac{c_2}{2} x^2
+    + \dots
+    + \frac{c_{n-1}}{n-1} x^{n-1}
+    + \frac{c_n}{n} x^{n}
+\]
+積算は
+\[\begin{aligned}
+  P(x) &amp;= \sum_{i=1}^m c_i x^{i-1} \\
+  Q(x) &amp;= \sum_{j=1}^n d_j x^{j-1} \\
+  P(x) Q(x) &amp;= \sum_{i=1}^m \sum_{j=1}^n c_i d_j x^{i+j-2} \\
+\end{aligned}\]
+</p>
+
+<table class="matrix">
+  <tr>
+    <td>\(c_1 d_1\)</td>
+    <td>\(c_1 d_2\)</td>
+    <td rowspan="2">\(\cdots\)</td>
+    <td>\(c_1 d_{n-1}\)</td>
+    <td>\(c_1 d_n\)</td>
+  </tr>
+  <tr>
+    <td>\(c_2 d_1\)</td>
+    <td>\(c_2 d_2\)</td>
+    <td>\(c_2 d_{n-1}\)</td>
+    <td>\(c_2 d_n\)</td>
+  </tr>
+  <tr>
+    <td colspan="2">\(\vdots\)</td>
+    <td>\(\ddots\)</td>
+    <td colspan="2">\(\vdots\)</td>
+  </tr>
+  <tr>
+    <td>\(c_{m-1} d_1\)</td>
+    <td>\(c_{m-1} d_2\)</td>
+    <td rowspan="2">\(\cdots\)</td>
+    <td>\(c_{m-1} d_{n-1}\)</td>
+    <td>\(c_{m-1} d_n\)</td>
+  </tr>
+  <tr>
+    <td>\(c_m d_1\)</td>
+    <td>\(c_m d_2\)</td>
+    <td>\(c_m d_{n-1}\)</td>
+    <td>\(c_m d_n\)</td>
+  </tr>
+</table>
+
+<h2>Bernstein</h2>
+
+<p>
+\(t=0\)のとき\(b_1\)に、\(t=1\)のとき\(b_n\)になるように
+テーブルに係数を格納する。
+\[\begin{aligned}
+  B(t)
+  &amp;= b_1 \binom{n-1}{0} (1-t)^{n-1}
+    + b_2 \binom{n-1}{1} (1-t)^{n-2} t
+    + \dots
+    + b_n \binom{n-1}{n-1} t^{n-1}
+    \\
+  &amp;= \sum_{i=1}^n b_i \binom{n-1}{i-1} (1-t)^{n-i} t^{i-1} \\
+\end{aligned}\]
+ド・カステリョのアルゴリズムで評価する。
+\[\begin{aligned}
+  b_i^1 &amp;= b_i \\
+  b_i^j &amp;= (1-t) b_i^{j-1} + t b_{i+1}^{j-1} \\
+\end{aligned}\]
+</p>
+
+</div>
+<script>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>
