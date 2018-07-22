@@ -21,18 +21,27 @@ local type = type
 -- a:set_polynomial(polynomial b)
 local function set_polynomial(a, b)
   local n = #b
-  local c = 1
-  for i = 1, n do
+  local m = n - 1
+
+  local c = m
+  a[1] = b[1]
+  for i = 2, n - 2 do
     a[i] = b[i] / c
     c = c * (n - i) / i
   end
+  a[m] = b[m] / c
+  a[n] = b[n]
+
   for i = n + 1, #a do
     a[i] = nil
   end
 
   for i = 2, n do
-    for j = n, i, -1 do
-      a[j] = a[j] + a[j - 1]
+    local u = a[i - 1]
+    for j = i, n do
+      local v = a[j]
+      a[j] = v + u
+      u = v
     end
   end
 
@@ -42,6 +51,8 @@ end
 -- a:get(polynomial b)
 local function get(a, b)
   local n = #a
+  local m = n -1
+
   for i = 1, n do
     b[i] = a[i]
   end
@@ -50,16 +61,20 @@ local function get(a, b)
   end
 
   for i = 2, n do
-    for j = n, i, -1 do
-      b[j] = b[j] - b[j - 1]
+    local u = b[i - 1]
+    for j = i, n do
+      local v = b[j]
+      b[j] = v - u
+      u = v
     end
   end
 
-  local c = 1
-  for i = 1, n do
-    b[i] = c * b[i]
+  local c = m
+  for i = 2, n - 2 do
+    b[i] = b[i] * c
     c = c * (n - i) / i
   end
+  b[m] = b[m] * c
 
   return b
 end
