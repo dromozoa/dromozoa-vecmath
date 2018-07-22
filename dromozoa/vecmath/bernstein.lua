@@ -33,12 +33,8 @@ local function eval(n, a, b, c)
     end
     c[m] = t + b * a[n]
     return eval(m, c, b, c)
-  elseif n == 2 then
+  else
     return (1 - b) * a[1] + b * a[2]
-  elseif n == 1 then
-    return a[1]
-  elseif n == 0 then
-      return 0
   end
 end
 
@@ -57,10 +53,14 @@ end
 -- a:eval(number b)
 function class.eval(a, b)
   local n = #a
-  if n < 3 then
-    return eval(n, a, b)
-  else
+  if n > 2 then
     return eval(n, a, b, {})
+  elseif n == 2 then
+    return (1 - b) * a[1] + b * a[2]
+  elseif n == 1 then
+    return a[1]
+  elseif n == 0 then
+    return 0
   end
 end
 
