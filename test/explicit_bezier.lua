@@ -23,6 +23,7 @@ local path_data = require "dromozoa.svg.path_data"
 local vecmath = require "dromozoa.vecmath"
 local bernstein = require "dromozoa.vecmath.bernstein"
 local polynomial = require "dromozoa.vecmath.polynomial"
+local quickhull = require "dromozoa.vecmath.quickhull"
 
 local _ = element
 local point2 = vecmath.point2
@@ -104,6 +105,32 @@ local function draw_distance_polynomial(node, points, q)
   local h = math.max(math.abs(min), math.abs(max))
   print(min, max)
 
+  local b = bernstein(d)
+  local bp = {}
+  for i = 1, #b do
+    local t = (i - 1) / (#b - 1)
+    bp[i] = point2(t, b[i])
+  end
+  local br = quickhull(bp, {})
+  local pd = path_data()
+
+  for i = 1, #br do
+    local p = br[i]
+    if i == 1 then
+      pd:M(p.x * 320, p.y / h * 320)
+    else
+      pd:L(p.x * 320, p.y / h * 320)
+    end
+  end
+  pd:Z()
+
+  node[#node + 1] = _"path" {
+    d = pd;
+    fill = "#ccc";
+    ["fill-opacity"] = 0.5;
+    stroke = "none";
+  }
+
   local pd = path_data()
   for i = 0, N do
     local t = i / N
@@ -131,12 +158,20 @@ local ex_root = _"g" {
 }
 
 local q = point2(200, -200)
+local q = point2(100, 100)
 
 -- local points = {
 --   point3(-200, -200, 1);
 --   point3( 200, -200, 1);
 --   point3( 400,  400, 2);
 -- }
+
+root[#root + 1] = _"circle" {
+  cx = q.x;
+  cy = q.y;
+  r = 2;
+  fill = "#333";
+}
 
 local z = math.cos(math.pi / 4)
 local points = {
