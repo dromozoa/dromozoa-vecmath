@@ -207,32 +207,52 @@ function class.sub(a, b, c)
   end
 end
 
+-- a:mul(number b, polynomial c)
 -- a:mul(polynomial b, polynomial c)
+-- a:mul(number b)
 -- a:mul(polynomial b)
 function class.mul(a, b, c)
-  if not c then
-    c = b
-    b = a
-  end
-  local m = #b
-  local n = #c
-
-  local u = {}
-  local v = b[1]
-  for j = 1, n do
-    u[j] = v * c[j]
-  end
-
-  for i = 1, m - 1 do
-    local v = b[i + 1]
-    for j = 1, n - 1 do
-      local k = i + j
-      u[k] = u[k] + v * c[j]
+  if type(b) == "number" then
+    if not c then
+      for i = 1, #a do
+        a[i] = b * a[i]
+      end
+      return a
+    else
+      local n = #c
+      for i = 1, n do
+        a[i] = b * c[i]
+      end
+      for i = n + 1, #a do
+        a[i] = nil
+      end
+      return a
     end
-    u[i + n] = v * c[n]
-  end
+  else
+    if not c then
+      c = b
+      b = a
+    end
+    local m = #b
+    local n = #c
 
-  return class.set(a, u)
+    local u = {}
+    local v = b[1]
+    for j = 1, n do
+      u[j] = v * c[j]
+    end
+
+    for i = 1, m - 1 do
+      local v = b[i + 1]
+      for j = 1, n - 1 do
+        local k = i + j
+        u[k] = u[k] + v * c[j]
+      end
+      u[i + n] = v * c[n]
+    end
+
+    return class.set(a, u)
+  end
 end
 
 -- class(number b, ...)

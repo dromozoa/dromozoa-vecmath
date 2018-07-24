@@ -46,100 +46,38 @@
 \]
 \(\bm{P}(t)\)が\(n\)次の有理ベジェ曲線であるとき
 \[\begin{aligned}
-  \bm{P}(t) &amp;= \frac{
-    \sum_{i=0}^n B_i^n(t) w_i \bm{P}_i
+  P(t) &amp;= (P_x(t), P_y(t)) \\
+  P_x(t) &amp;= \frac{p_x(t)}{p_z(t)} \\
+  P_y(t) &amp;= \frac{p_y(t)}{p_z(t)} \\
+  p_x(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i x_i \\
+  p_y(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i y_i \\
+  p_z(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \\
+
+  P'(t) &amp;= (P_x'(t), P_y'(t)) \\
+  P_x'(t) &amp;= \frac{
+    p_x'(t) p_z(t) - p_x(t) p_z'(t)
   }{
-    \sum_{i=0}^n B_i^n(t) w_i
+    p_z^2(t)
+  } \\
+  P_y'(t) &amp;= \frac{
+    p_y'(t) p_z(t) - p_y(t) p_z'(t)
+  }{
+    p_z^2(t)
   } \\
 
-  \bm{Q}(t)
-  &amp;= \bm{P}(t) - \bm{F} \\
-  &amp;= \frac{
-    \sum_{i=0}^n B_i^n(t) w_i \bm{Q}_i
-  }{
-    \sum_{i=0}^n B_i^n(t) w_i
-  } \\
-
-  \bm{Q}_i &amp;= \bm{P}_i - F \\
-
-  d(t) &amp;= \bm{P}'(t) \cdot \bm{Q}(t) \\
-
-  \bm{R}(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \bm{P}_i \\
-
-  W(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \\
-
-  \bm{P}(t) &amp;= \frac{
-    \bm{R}(t)
-  }{
-    W(t)
-  } \\
-
-  \bm{P}'(t) &amp;= \frac{
-    \bm{R}'(t) W(t) - \bm{R}(t) W'(t)
-  }{
-    W^2(t)
-  } \\
-
-  \bm{R}'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) \bm{D}_i \\
-
-  \bm{D}_i &amp;= w_{i+1} \bm{P}_{i+1} - w_i \bm{P}_i \\
-
-  W'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) d_i \\
-
-  d_i &amp;= w_{i+1} - w_i \\
-
-  \bm{R}'(t) W(t)
-  &amp;= n \sum_{j=0}^{n-1} B_j^{n-1}(t) \bm{D}_j \sum_{i=0}^n B_i^n(t) w_i \\
-  &amp;= n \sum_{i=0}^n \sum_{j=0}^{n-1} B_i^n(t) B_j^{n-1}(t) w_i \bm{D}_j \\
-
-  \bm{R}(t) W'(t)
-  &amp;= n \sum_{i=0}^n B_i^n(t) w_i \bm{P}_i \sum_{j=0}^{n-1} B_j^{n-1}(t) d_j \\
-  &amp;= n \sum_{i=0}^n \sum_{j=0}^{n-1} B_i^n(t) B_j^{n-1}(t) w_i \bm{P}_i d_j \\
-
-  \bm{R}'(t) W(t) - \bm{R}(t) W'(t)
-  &amp;= n \sum_{i=0}^n \sum_{j=0}^{n-1} B_i^n(t) B_j^{n-1}(t)
-    w_i (\bm{D}_j - \bm{P}_i d_j) \\
-
-  \bm{D}_j - \bm{P}_i d_j
-  &amp;= w_{j+1} \bm{P}_{j+1} - w_j \bm{P}_j - w_{j+1} \bm{P}_i + w_j \bm{P}_i \\
-  &amp;= w_{j+1} (\bm{P}_{j+1} - \bm{P}_i) - w_j (\bm{P}_j - \bm{P}_i) \\
-
-  \bm{R}'(t) W(t) - \bm{R}(t) W'(t)
-  &amp;= n \sum_{i=0}^n \sum_{j=0}^{n-1} B_i^n(t) B_j^{n-1}(t)
-    w_i (w_{j+1} (\bm{P}_{j+1} - \bm{P}_i) - w_j (\bm{P}_j - \bm{P}_i)) \\
-\end{aligned}\]
-</p>
-
-<p>
-同時座標で考える。
-\[\begin{aligned}
-  x(t) &amp;= \frac{X(t)}{Z(t)} \\
-  y(t) &amp;= \frac{Y(t)}{Z(t)} \\
-  X(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i x_i \\
-  Y(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i y_i \\
-  Z(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \\
-  x'(t) &amp;= \frac{
-    X'(t) Z(t) - X(t) Z'(t)
-  }{
-    Z^2(t)
-  } \\
-  y'(t) &amp;= \frac{
-    Y'(t) Z(t) - Y(t) Z'(t)
-  }{
-    Z^2(t)
-  } \\
-  X'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} x_{i+1} - w_i x_i) \\
-  Y'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} y_{i+1} - w_i y_i) \\
-  Z'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} - w_i) \\
+  p_x'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} x_{i+1} - w_i x_i) \\
+  p_y'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} y_{i+1} - w_i y_i) \\
+  p_z'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} - w_i) \\
 
   Q_x(t)
-  &amp;= \frac{X(t)}{Z(t)} - F_x \\
-  &amp;= \frac{X(t) - F_x Z(t)}{Z(t)} \\
+  &amp;= \frac{p_x(t)}{p_z(t)} - F_x \\
+  &amp;= \frac{p_x(t) - F_x p_z(t)}{p_z(t)} \\
   Q_y(t)
-  &amp;= \frac{Y(t)}{Z(t)} - F_y \\
-  &amp;= \frac{Y(t) - F_y Z(t)}{Z(t)} \\
+  &amp;= \frac{p_y(t)}{p_z(t)} - F_y \\
+  &amp;= \frac{p_y(t) - F_y p_z(t)}{p_z(t)} \\
 
-  d(t) &amp;= x'(t) Q_x(t) + y'(t) Q_y(t) = 0 \\
+  d(t)
+  &amp;= P_x'(t) Q_x(t) + P_y'(t) Q_y(t) = 0 \\
 \end{aligned}\]
 \(d(t)\)は分子が\(3n-1\)次、分母が\(3n\)次の多項式になる。
 </p>

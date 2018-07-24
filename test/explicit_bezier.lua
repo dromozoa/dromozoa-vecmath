@@ -21,7 +21,8 @@ local xml_document = require "dromozoa.dom.xml_document"
 local path_data = require "dromozoa.svg.path_data"
 
 local vecmath = require "dromozoa.vecmath"
-local poly1 = require "dromozoa.vecmath.poly1"
+local bernstein = require "dromozoa.vecmath.bernstein"
+local polynomial = require "dromozoa.vecmath.polynomial"
 
 local _ = element
 local point2 = vecmath.point2
@@ -61,6 +62,66 @@ local function draw_rational_quadratic_bezier(node, points)
   }
 end
 
+local function draw_distance_polynomial(node, points, q)
+  local p1 = points[1]
+  local p2 = points[2]
+  local p3 = points[3]
+  local pd = path_data()
+
+  local px = polynomial(bernstein(p1.x, p2.x, p3.x))
+  local py = polynomial(bernstein(p1.y, p2.y, p3.y))
+  local pz = polynomial(bernstein(p1.z, p2.z, p3.z))
+
+  local dx = polynomial():deriv(px)
+  local dy = polynomial():deriv(py)
+  local dz = polynomial():deriv(pz)
+
+  local dpx = polynomial():mul(dx, pz)
+  dpx:sub(polynomial():mul(px, dz))
+
+  local dpy = polynomial():mul(dy, pz)
+  dpy:sub(polynomial():mul(py, dz))
+
+  local qx = polynomial():sub(px, polynomial():mul(q.x, pz))
+  local qy = polynomial():sub(py, polynomial():mul(q.y, pz))
+
+  local d = dpx:mul(qx):add(dpy:mul(qy))
+
+  local min
+  local max
+
+  for i = 0, N do
+    local t = i / N
+    local v = d:eval(t)
+    if not min or min > v then
+      min = v
+    end
+    if not max or max < v then
+      max = v
+    end
+  end
+
+  local h = math.max(math.abs(min), math.abs(max))
+  print(min, max)
+
+  local pd = path_data()
+  for i = 0, N do
+    local t = i / N
+    local v = d:eval(t) / h
+    if i == 0 then
+      pd:M(t * 320, v * 320)
+    else
+      pd:L(t * 320, v * 320)
+    end
+  end
+
+  node[#node + 1] = _"path" {
+    d = pd;
+    fill = "none";
+    stroke = "#333";
+  }
+end
+
 local root = _"g" {
   transform = "translate(320, 320)";
 }
@@ -68,6 +129,8 @@ local root = _"g" {
 local ex_root = _"g" {
   transform = "translate(640, 320)";
 }
+
+local q = point2(200, -200)
 
 -- local points = {
 --   point3(-200, -200, 1);
@@ -89,6 +152,7 @@ root[#root + 1] = _"path" {
 }
 
 draw_rational_quadratic_bezier(root, points)
+draw_distance_polynomial(ex_root, points, q)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
