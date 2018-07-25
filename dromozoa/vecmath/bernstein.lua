@@ -134,6 +134,7 @@ function class.eval(a, b)
 end
 
 -- class(number b, ...)
+-- class(polynomial b)
 -- class(bernstein b)
 -- class()
 return setmetatable(class, {
