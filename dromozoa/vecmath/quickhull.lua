@@ -127,6 +127,9 @@ return function (source, result)
 
   if p1i == p2i then
     result[1] = source[p1i]
+    for i = 2, #result do
+      result[i] = nil
+    end
     return result, 1
   end
 
@@ -185,5 +188,8 @@ return function (source, result)
     result[n] = source[i]
     i = after[i]
   until i == p1i
-  return result, n
+  for i = n + 1, #result do
+    result[i] = nil
+  end
+  return result
 end
