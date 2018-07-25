@@ -70,9 +70,8 @@ assert(point2.equals(Q[2], {0,4}))
 
 -- same points
 local P = { {0,0}, {0,0}, {0,0} }
-local Q, n = quickhull(P, { true, true, true, true })
-assert(#Q == 4)
-assert(n == 1)
+local Q = quickhull(P, { true, true, true, true })
+assert(#Q == 1)
 assert(point2.equals(Q[1], {0,0}))
 
 -- two points
@@ -92,9 +91,8 @@ assert(point2.equals(Q[3], {1,0}))
 
 -- triangle2
 local P = { {0,0}, {1,1}, {0,1} }
-local Q, n = quickhull(P, {})
+local Q = quickhull(P, { true, true, true, true })
 assert(#Q == 3)
-assert(n == 3)
 assert(point2.equals(Q[1], {0,0}))
 assert(point2.equals(Q[2], {0,1}))
 assert(point2.equals(Q[3], {1,1}))

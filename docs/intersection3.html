@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>交差判定</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="http://nishitalab.org/user/nis/cdrom/cad/CAGD90Curve.pdf">Curve intersection using B&eacute;zier clipping</a></li>
+  <li><a href="http://cagd.cs.byu.edu/~557/text/cagd.pdf">Computer Aided Geometric Design</a></li>
+</ul>
+
+<h2>垂線と点の距離</h2>
+
+<p>
+曲線\(\bm{P}(t)\)の垂線が点\(\bm{F}\)を通らないような\(t\)の区間を考える。
+垂線が点\(\bm{F}\)を通るならば
+\[
+  d(t) = \bm{P}'(t) \cdot (\bm{P}(t) - \bm{F}) = 0
+\]
+\(\bm{P}(t)\)が\(n\)次の有理ベジェ曲線であるとき
+\[\begin{aligned}
+  P(t) &amp;= (P_x(t), P_y(t)) \\
+  P_x(t) &amp;= \frac{p_x(t)}{p_z(t)} \\
+  P_y(t) &amp;= \frac{p_y(t)}{p_z(t)} \\
+  p_x(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i x_i \\
+  p_y(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i y_i \\
+  p_z(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \\
+
+  P'(t) &amp;= (P_x'(t), P_y'(t)) \\
+  P_x'(t) &amp;= \frac{
+    p_x'(t) p_z(t) - p_x(t) p_z'(t)
+  }{
+    p_z^2(t)
+  } \\
+  P_y'(t) &amp;= \frac{
+    p_y'(t) p_z(t) - p_y(t) p_z'(t)
+  }{
+    p_z^2(t)
+  } \\
+
+  p_x'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} x_{i+1} - w_i x_i) \\
+  p_y'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} y_{i+1} - w_i y_i) \\
+  p_z'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} - w_i) \\
+
+  Q_x(t)
+  &amp;= \frac{p_x(t)}{p_z(t)} - F_x \\
+  &amp;= \frac{p_x(t) - F_x p_z(t)}{p_z(t)} \\
+  Q_y(t)
+  &amp;= \frac{p_y(t)}{p_z(t)} - F_y \\
+  &amp;= \frac{p_y(t) - F_y p_z(t)}{p_z(t)} \\
+
+  d(t)
+  &amp;= P_x'(t) Q_x(t) + P_y'(t) Q_y(t) = 0 \\
+\end{aligned}\]
+\(d(t)\)は分子が\(3n-1\)次、分母が\(3n\)次の多項式になる。
+</p>
+
+<h2>インターフェース</h2>
+
+<p>
+パラメーターで交点を指定する。
+曲線\(P\)と曲線\(Q\)が\(n\)個の交点で交差するとき
+\[\begin{aligned}
+  \bm{t} &amp;= (t_1, \dots, t_n) \\
+  \bm{u} &amp;= (u_1, \dots, u_n) \\
+\end{aligned}\]
+\(n\)の上限はベズーの定理で計算できる。
+収束計算の都合上、非常に近接した交点はひとつにまとまってしまうかもしれない。
+</p>
+
+<p>
+曲線\(P\)と曲線\(Q\)が一致する場合、一致した曲線の端点のパラメーターで表現する。
+このとき、Luaのテーブルに<code>is_identical</code>というフラグを与える。
+</p>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>

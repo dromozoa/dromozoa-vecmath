@@ -35,8 +35,10 @@ return {
   vector3 = require "dromozoa.vecmath.vector3";
   vector4 = require "dromozoa.vecmath.vector4";
 
+  bernstein = require "dromozoa.vecmath.bernstein";
   curve = require "dromozoa.vecmath.curve";
   matrix2 = require "dromozoa.vecmath.matrix2";
+  polynomial = require "dromozoa.vecmath.polynomial";
   quickhull = require "dromozoa.vecmath.quickhull";
   svd2 = require "dromozoa.vecmath.svd2";
   svd3 = require "dromozoa.vecmath.svd3";
