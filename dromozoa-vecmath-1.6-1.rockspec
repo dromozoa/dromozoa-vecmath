@@ -1,3 +1,4 @@
+rockspec_format = "3.0"
 package = "dromozoa-vecmath"
 version = "1.6-1"
 source = {
@@ -9,6 +10,10 @@ description = {
   license = "GPL-3";
   homepage = "https://github.com/dromozoa/dromozoa-vecmath/";
   maintainer = "Tomoyuki Fujimori <moyu@dromozoa.com>";
+}
+test = {
+  type = "command";
+  command = "./test.sh";
 }
 build = {
   type = "builtin";
