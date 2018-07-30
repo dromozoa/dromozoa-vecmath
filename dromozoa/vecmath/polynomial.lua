@@ -26,7 +26,7 @@ end
 
 local class = {
   is_polynomial = true;
-  set = set_bernstein;
+  set_bernstein = set_bernstein;
 }
 local metatable = { __index = class }
 
