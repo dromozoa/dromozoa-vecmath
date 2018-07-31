@@ -39,6 +39,8 @@ local function test(n, class)
   assert(t:set(2,3,4,5) :equals {2,3,4,5})
   assert(t:set{3,4,5,6} :equals {3,4,5,6})
 
+  assert(t["is_tuple" .. n])
+
   local t1 = class(1,2,3,4)
   local t2 = class(2,3,4,5)
   assert(t1:get(t2) == t2)
