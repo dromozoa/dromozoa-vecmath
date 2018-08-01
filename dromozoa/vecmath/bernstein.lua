@@ -48,21 +48,19 @@ local function set_polynomial(a, b)
   return a
 end
 
-local function eval(n, a, b, c)
-  if n > 2 then
+local function eval(a, b)
+  for n = #a, 2, -1 do
     local m = n - 1
     local t = (1 - b) * a[1]
     for i = 2, m do
       local u = a[i]
       local v = b * u
-      c[i - 1] = t + v
+      a[i - 1] = t + v
       t = u - v
     end
-    c[m] = t + b * a[n]
-    return eval(m, c, b, c)
-  else
-    return (1 - b) * a[1] + b * a[2]
+    a[m] = t + b * a[n]
   end
+  return a[1]
 end
 
 local class = {
@@ -121,7 +119,11 @@ end
 
 -- a:eval(number b)
 function class.eval(a, b)
-  return eval(#a, a, b, {})
+  local c = {}
+  for i = 1, #a do
+    c[i] = a[i]
+  end
+  return eval(c, b)
 end
 
 -- class(number b, ...)
