@@ -60,7 +60,7 @@ local function eval(n, a, b, c)
     end
     c[m] = t + b * a[n]
     return eval(m, c, b, c)
-  elseif n == 2 then
+  else
     return (1 - b) * a[1] + b * a[2]
   end
 end
