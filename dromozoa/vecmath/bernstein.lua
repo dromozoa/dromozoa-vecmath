@@ -51,15 +51,14 @@ end
 local function eval(a, b)
   local n = #a
   for i = n, 2, -1 do
-    local j = i - 1
     local t = (1 - b) * a[1]
-    for k = 2, j do
-      local u = a[k]
+    for j = 2, i - 1 do
+      local u = a[j]
       local v = b * u
-      a[k - 1] = t + v
+      a[j - 1] = t + v
       t = u - v
     end
-    a[j] = t + b * a[i]
+    a[i - 1] = t + b * a[i]
   end
   return a[1]
 end
@@ -125,7 +124,7 @@ function class.eval(a, b)
     c[i] = a[i]
   end
   local result = eval(c, b)
-  -- print("(" .. table.concat(c, ", ") .. ")")
+  print("(" .. table.concat(c, ", ") .. ")")
   return result
 end
 
