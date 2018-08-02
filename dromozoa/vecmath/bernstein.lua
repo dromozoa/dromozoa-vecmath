@@ -49,16 +49,17 @@ local function set_polynomial(a, b)
 end
 
 local function eval(a, b)
-  for n = #a, 2, -1 do
-    local m = n - 1
+  local n = #a
+  for i = n, 2, -1 do
+    local j = i - 1
     local t = (1 - b) * a[1]
-    for i = 2, m do
-      local u = a[i]
+    for k = 2, j do
+      local u = a[k]
       local v = b * u
-      a[i - 1] = t + v
+      a[k - 1] = t + v
       t = u - v
     end
-    a[m] = t + b * a[n]
+    a[j] = t + b * a[i]
   end
   return a[1]
 end
@@ -123,7 +124,9 @@ function class.eval(a, b)
   for i = 1, #a do
     c[i] = a[i]
   end
-  return eval(c, b)
+  local result = eval(c, b)
+  -- print("(" .. table.concat(c, ", ") .. ")")
+  return result
 end
 
 -- class(number b, ...)
