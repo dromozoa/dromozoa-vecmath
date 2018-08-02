@@ -48,20 +48,6 @@ local function set_polynomial(a, b)
   return a
 end
 
-local function eval(a, b)
-  local n = #a
-  for i = 2, n do
-    a[n * 2 - i + 1] = a[n]
-    local u = a[i - 1]
-    for j = i, n do
-      local v = a[j]
-      a[j] = (1 - b) * u + b * v
-      u = v
-    end
-  end
-  return a[n]
-end
-
 local class = {
   is_bernstein = true;
   set_polynomial = set_polynomial;
@@ -117,29 +103,44 @@ function class.get(a, b)
 end
 
 -- a:eval(number b)
-function class.eval(a, b)
-  local n = #a
-  local t = {}
-  for i = 1, n do
-    t[i] = a[i]
+-- a:eval(number b, bernstein c)
+-- a:eval(number b, bernstein c, bernstein d)
+function class.eval(a, b, c, d)
+  if c then
+    class.set(c, a)
+  else
+    c = class.set({}, a)
   end
 
-  local result = eval(t, b)
-
-  -- local n = #a
-  -- for i = 2, n do
-  --   a[n * 2 - i + 1] = a[n]
-  --   local u = a[i - 1]
-  --   for j = i, n do
-  --     local v = a[j]
-  --     a[j] = (1 - b) * u + b * v
-  --     u = v
-  --   end
-  -- end
-  -- return a[n]
-
-  print("(" .. table.concat(t, ", ") .. ")")
-  return result
+  local n = #c
+  if d then
+    local m = n
+    for i = 2, n do
+      d[m] = c[n]
+      m = m - 1
+      local t = (1 - b) * c[i - 1]
+      for j = i, n do
+        local u = c[j]
+        local v = b * u
+        c[j] = t + v
+        t = u - v
+      end
+    end
+    local v = c[n]
+    d[1] = v
+    return v, c, d
+  else
+    for i = 2, n do
+      local t = (1 - b) * c[i - 1]
+      for j = i, n do
+        local u = c[j]
+        local v = b * u
+        c[j] = t + v
+        t = u - v
+      end
+    end
+    return c[n], c
+  end
 end
 
 -- class(number b, ...)
