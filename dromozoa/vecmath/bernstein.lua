@@ -50,17 +50,16 @@ end
 
 local function eval(a, b)
   local n = #a
-  for i = n, 2, -1 do
-    local t = (1 - b) * a[1]
-    for j = 2, i - 1 do
-      local u = a[j]
-      local v = b * u
-      a[j - 1] = t + v
-      t = u - v
+  for i = 2, n do
+    a[n * 2 - i + 1] = a[n]
+    local u = a[i - 1]
+    for j = i, n do
+      local v = a[j]
+      a[j] = (1 - b) * u + b * v
+      u = v
     end
-    a[i - 1] = t + b * a[i]
   end
-  return a[1]
+  return a[n]
 end
 
 local class = {
@@ -119,12 +118,27 @@ end
 
 -- a:eval(number b)
 function class.eval(a, b)
-  local c = {}
-  for i = 1, #a do
-    c[i] = a[i]
+  local n = #a
+  local t = {}
+  for i = 1, n do
+    t[i] = a[i]
   end
-  local result = eval(c, b)
-  print("(" .. table.concat(c, ", ") .. ")")
+
+  local result = eval(t, b)
+
+  -- local n = #a
+  -- for i = 2, n do
+  --   a[n * 2 - i + 1] = a[n]
+  --   local u = a[i - 1]
+  --   for j = i, n do
+  --     local v = a[j]
+  --     a[j] = (1 - b) * u + b * v
+  --     u = v
+  --   end
+  -- end
+  -- return a[n]
+
+  print("(" .. table.concat(t, ", ") .. ")")
   return result
 end
 
