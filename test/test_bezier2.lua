@@ -16,111 +16,162 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local vecmath = require "dromozoa.vecmath"
-local curve = require "dromozoa.vecmath.curve"
-
-local point2 = vecmath.point2
-local vector2 = vecmath.vector2
+local bezier = require "dromozoa.vecmath.bezier"
 
 local verbose = os.getenv "VERBOSE" == "1"
+local tightness = 0.5
 local epsilon = 1e-9
-local n = 64
+local n = 16
 
-local names = {
-  "linear";
-  "cubic";
-  "quadratic";
-  "cubic";
-  "quartic";
-  "quintic";
-}
+local point2 = vecmath.point2
+local point3 = vecmath.point3
 
-local function bezier(P, t)
-  if #P == 2 then
-    return point2():interpolate(P[1], P[2], t)
-  else
-    local Q = {}
-    for i = 1, #P - 1 do
-      Q[#Q + 1] = point2():interpolate(P[i], P[i + 1], t)
-    end
-    return bezier(Q, t)
-  end
+local function quadratic_bezier(p1, p2, p3, t)
+  local u = 1 - t
+  local a = u * u
+  local b = 2 * u * t
+  local c = t * t
+  local q = point2()
+  q:scale_add(a, p1, q)
+  q:scale_add(b, p2, q)
+  q:scale_add(c, p3, q)
+  return q
 end
 
-local function diff_bezier(P, t, order)
-  if not order then
-    order = #P - 1
-  end
-  if #P == 2 then
-    return vector2():sub(P[2], P[1]):scale(order)
-  else
-    local Q = {}
-    for i = 1, #P - 1 do
-      Q[#Q + 1] = point2():interpolate(P[i], P[i + 1], t)
-    end
-    return diff_bezier(Q, t, order)
-  end
+local function rational_quadratic_bezier(p1, p2, p3, t)
+  local u = 1 - t
+  local a = u * u     * p1.z
+  local b = 2 * u * t * p2.z
+  local c = t * t     * p3.z
+  local d = a + b + c
+  local q = point2()
+  q:scale_add(a / d, p1, q)
+  q:scale_add(b / d, p2, q)
+  q:scale_add(c / d, p3, q)
+  return q
 end
 
-local function check(P)
-  local f = curve[names[#P] .. "_bezier"]
-  local diff = curve["diff_" .. names[#P] .. "_bezier"]
-  local to = curve["to_" .. names[#P] .. "_bezier"]
-  for i = 1, #P do
-    P[i] = point2(P[i])
-  end
+local function catmull_rom(p1, p2, p3, p4, t)
+  local p2 = vecmath.point2(p2)
+  local v1 = vecmath.vector2():sub(p3, p1):scale(tightness)
+  local v2 = vecmath.vector2():sub(p4, p2):scale(tightness)
+  local p3 = vecmath.point2(p3)
+
+  local u = 1 - t
+  p2:scale((1 + 2 * t) * u * u)
+  v1:scale(t * u * u)
+  v2:scale(t * t * u)
+  p3:scale(t * t * (1 + 2 * u))
+
+  return vecmath.point2():add(p2):add(v1):sub(v2):add(p3)
+end
+
+local function check_catmull_rom(p1, p2, p3, p4, t)
+  local b = bezier():set_catmull_rom(p1, p2, p3, p4)
   for i = 0, n do
     local t = i / n
-    local p = bezier(P, t)
-    local q = f(P, t, point2())
-    assert(p:epsilon_equals(q, epsilon))
-    local u = diff_bezier(P, t)
-    local v = diff(P, t, vector2())
+    local r = catmull_rom(p1, p2, p3, p4, t)
+    local p = b:eval(t, point2())
     if verbose then
-      print(i, tostring(u), tostring(v))
+      print(tostring(p), tostring(r))
     end
-    assert(u:epsilon_equals(v, epsilon))
-  end
-  local Q = {}
-  for i = 1, #P do
-    Q[i] = point2()
-  end
-  to(function (t, p) return f(P, t, p) end, Q)
-  for i = 1, #P do
-    local p = P[i]
-    local q = Q[i]
-    if verbose then
-      print(i, tostring(p), tostring(q))
-    end
-    assert(p:epsilon_equals(q, epsilon))
+    assert(p:epsilon_equals(r, epsilon))
   end
 end
 
-check{ {0,0}, {1,1}, {2,0} }
-check{ {1,1}, {1,1}, {2,0} }
-check{ {0,0}, {1,1}, {1,1} }
-check{ {1,1}, {1,1}, {1,1} }
-check{ {0,0}, {1,0}, {0,0} }
-check{ {0,0}, {1,0}, {0,1} }
-check{ {0,0}, {1,0}, {1,1} }
-check{ {2,3}, {5,7}, {11,13} }
-check{ {2,-3}, {-5,7}, {11,-13} }
+local p1 = point2(0, 0)
+local p2 = point2(1, 1)
+local p3 = point2(2, 0)
 
-check{ {0,0}, {1,1}, {2,-1}, {3, 0} }
-check{ {1,1}, {1,1}, {2,-1}, {3, 0} }
-check{ {0,0}, {1,1}, {2,-1}, {2,-1} }
-check{ {1,1}, {1,1}, {2,-1}, {2,-1} }
-check{ {0,0}, {1,0}, {0, 1}, {0, 0} }
-check{ {0,0}, {1,0}, {0, 1}, {1, 0} }
-check{ {0,0}, {1,0}, {0, 1}, {0, 1} }
-check{ {2,3}, {5,7}, {11,13}, {17,19} }
-check{ {2,-3}, {-5,7}, {11,-13}, {-17,19} }
+local b = bezier(p1, p2, p3)
+assert(b:get(1, point2()):equals(p1))
+assert(b:get(2, point2()):equals(p2))
+assert(b:get(3, point2()):equals(p3))
+assert(b:get(1, point3()):equals{ p1.x, p1.y, 1 })
+assert(b:get(2, point3()):equals{ p2.x, p2.y, 1 })
+assert(b:get(3, point3()):equals{ p3.x, p3.y, 1 })
 
-check{ {0,0}, {1,1}, {2,0}, {3,1}, {4,0} }
-check{ {0,0}, {1,1}, {2,0}, {1,-1}, {0,0} }
-check{ {2,3}, {5,7}, {11,13}, {17,19}, {23,29} }
-check{ {2,-3}, {-5,7}, {11,-13}, {-17,19}, {23,-29} }
+for i = 0, n do
+  local t = i / n
+  local r = quadratic_bezier(p1, p2, p3, t)
+  local p = b:eval(t, point2())
+  local q = point2():project(b:eval(t, point3()))
+  if verbose then
+    print(tostring(r), tostring(p), tostring(q))
+  end
+  assert(p:epsilon_equals(r, epsilon))
+  assert(q:epsilon_equals(r, epsilon))
+end
 
-check{ {0,0}, {1,1}, {2,0}, {3,1}, {4,0}, {5,1} }
-check{ {0,0}, {1,1}, {2,0}, {1,-1}, {0,0}, {-1,-1} }
-check{ {2,3}, {5,7}, {11,13}, {17,19}, {23,29}, {31,37} }
-check{ {2,-3}, {-5,7}, {11,-13}, {-17,19}, {23,-29}, {-31,37} }
+local z = math.cos(math.pi / 4)
+local p1 = point3(-200,     -200,     1)
+local p2 = point3( 200 * z, -200 * z, z)
+local p3 = point3( 200,      200,     1)
+local q1 = point3(-200, -200, 1)
+local q2 = point3( 200, -200, z)
+local q3 = point3( 200,  200, 1)
+
+local b = bezier(p1, p2, p3)
+assert(b:get(1, point2()):equals{ -200, -200 })
+assert(b:get(2, point2()):equals{  200, -200 })
+assert(b:get(3, point2()):equals{  200,  200 })
+assert(b:get(1, point3()):equals(p1))
+assert(b:get(2, point3()):equals(p2))
+assert(b:get(3, point3()):equals(p3))
+
+for i = 0, n do
+  local t = i / n
+  local r = rational_quadratic_bezier(q1, q2, q3, t)
+  local p = b:eval(t, point2())
+  local q = point2():project(b:eval(t, point3()))
+  if verbose then
+    print(tostring(r), tostring(p), tostring(q))
+  end
+  assert(p:epsilon_equals(r, epsilon))
+  assert(q:epsilon_equals(r, epsilon))
+end
+
+local b = bezier(p1, p2, p3)
+local p, b1, b2 = b:eval(1/4, point2(), bezier(), bezier())
+local d = p:distance(point2(-200, 200))
+if verbose then
+  print "--"
+  print(tostring(p))
+  print "--"
+  print(tostring(b1:get(1, point3())))
+  print(tostring(b1:get(2, point3())))
+  print(tostring(b1:get(3, point3())))
+  print "--"
+  print(tostring(b2:get(1, point3())))
+  print(tostring(b2:get(2, point3())))
+  print(tostring(b2:get(3, point3())))
+end
+assert(d == 400)
+
+local r = rational_quadratic_bezier(q1, q2, q3, 3/16)
+local p = b1:eval(3/4, point2())
+local d = p:distance(point2(-200, 200))
+if verbose then
+  print "--"
+  print(tostring(p), tostring(r))
+end
+assert(d == 400)
+assert(p:epsilon_equals(r, epsilon))
+
+local r = rational_quadratic_bezier(q1, q2, q3, 7/16)
+local p = b2:eval(1/4, point2())
+local d = p:distance(point2(-200, 200))
+if verbose then
+  print "--"
+  print(tostring(p), tostring(r))
+end
+assert(d == 400)
+assert(p:epsilon_equals(r, epsilon))
+
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
+check_catmull_rom(vecmath.point2(1,1), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(2,-1))
+check_catmull_rom(vecmath.point2(1,1), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(2,-1))
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,0), vecmath.point2(0,1), vecmath.point2(0,0))
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,0), vecmath.point2(0,1), vecmath.point2(1,0))
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,0), vecmath.point2(0,1), vecmath.point2(0,1))

@@ -201,6 +201,35 @@ function class.set(a, b, c, ...)
   end
 end
 
+-- a:set_catmull_rom(point2 p1, point2 p2, point2 p3, point2 p4)
+function class.set_catmull_rom(a, p1, p2, p3, p4)
+  local X = a[1]
+  local Y = a[2]
+
+  local p2x = p2[1]
+  local p3x = p3[1]
+  local p2y = p2[2]
+  local p3y = p3[2]
+
+  X[1] = p2x
+  X[2] = p2x + (p3x - p1[1]) / 6
+  X[3] = p3x + (p2x - p4[1]) / 6
+  X[4] = p3x
+
+  Y[1] = p2y
+  Y[2] = p2y + (p3y - p1[2]) / 6
+  Y[3] = p3y + (p2y - p4[2]) / 6
+  Y[4] = p3y
+
+  for i = 5, #X do
+    X[i] = nil
+    Y[i] = nil
+  end
+  bernstein.set(a[3])
+
+  return a
+end
+
 -- a:get(number b, point2 c)
 -- a:get(number b, point3 c)
 function class.get(a, b, c)
