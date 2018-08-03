@@ -234,6 +234,6 @@ end
 -- class()
 return setmetatable(class, {
   __call = function (_, ...)
-    return setmetatable(class.set({ {}, {}, {} }, ...), metatable)
+    return setmetatable(class.set({ bernstein(), bernstein(), bernstein() }, ...), metatable)
   end;
 })
