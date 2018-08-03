@@ -20,9 +20,6 @@ local bernstein = require "dromozoa.vecmath.bernstein"
 local setmetatable = setmetatable
 local type = type
 
-local bernstein_eval = bernstein.eval
-local bernstein_set = bernstein.set
-
 -- a:get_point2(number b, point2 c)
 local function get_point2(a, b, c)
   local z = a[3][b]
@@ -68,9 +65,9 @@ local function eval_point2(a, b, c, d, e)
       EY = e[2]
       EZ = e[3]
     end
-    local z = bernstein_eval(Z, b, DZ, EZ)
-    c[1] = bernstein_eval(X, b, DX, EX) / z
-    c[2] = bernstein_eval(Y, b, DY, EY) / z
+    local z = bernstein.eval(Z, b, DZ, EZ)
+    c[1] = bernstein.eval(X, b, DX, EX) / z
+    c[2] = bernstein.eval(Y, b, DY, EY) / z
     return c, d, e
   else
     local DX
@@ -80,15 +77,15 @@ local function eval_point2(a, b, c, d, e)
     if d then
       DX = d[1]
       DY = d[2]
-      bernstein_set(d[3])
+      bernstein.set(d[3])
     end
     if e then
       EX = e[1]
       EY = e[2]
-      bernstein_set(e[3])
+      bernstein.set(e[3])
     end
-    c[1] = bernstein_eval(X, b, DX, EY)
-    c[2] = bernstein_eval(Y, b, DY, EY)
+    c[1] = bernstein.eval(X, b, DX, EY)
+    c[2] = bernstein.eval(Y, b, DY, EY)
     return c, d, e
   end
 end
@@ -115,9 +112,9 @@ local function eval_point3(a, b, c)
       EY = e[2]
       EZ = e[3]
     end
-    c[1] = bernstein_eval(X, b, DX, EX)
-    c[2] = bernstein_eval(Y, b, DY, EY)
-    c[3] = bernstein_eval(Z, b, DZ, EZ)
+    c[1] = bernstein.eval(X, b, DX, EX)
+    c[2] = bernstein.eval(Y, b, DY, EY)
+    c[3] = bernstein.eval(Z, b, DZ, EZ)
     return c, d, e
   else
     local DX
@@ -127,15 +124,15 @@ local function eval_point3(a, b, c)
     if d then
       DX = d[1]
       DY = d[2]
-      bernstein_set(d[3])
+      bernstein.set(d[3])
     end
     if e then
       EX = e[1]
       EY = e[2]
-      bernstein_set(e[3])
+      bernstein.set(e[3])
     end
-    c[1] = bernstein_eval(X, b, DX, EX)
-    c[2] = bernstein_eval(Y, b, DY, EY)
+    c[1] = bernstein.eval(X, b, DX, EX)
+    c[2] = bernstein.eval(Y, b, DY, EY)
     c[3] = 1
     return c, d, e
   end
@@ -172,7 +169,7 @@ function class.set(a, b, c, ...)
           X[i] = nil
           Y[i] = nil
         end
-        bernstein_set(Z)
+        bernstein.set(Z)
         return a
       else
         local points = { b, c, ... }
@@ -191,15 +188,15 @@ function class.set(a, b, c, ...)
         return a
       end
     else
-      bernstein_set(X, b[1])
-      bernstein_set(Y, b[2])
-      bernstein_set(Z, b[3])
+      bernstein.set(X, b[1])
+      bernstein.set(Y, b[2])
+      bernstein.set(Z, b[3])
       return a
     end
   else
-    bernstein_set(X)
-    bernstein_set(Y)
-    bernstein_set(Z)
+    bernstein.set(X)
+    bernstein.set(Y)
+    bernstein.set(Z)
     return a
   end
 end
