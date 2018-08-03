@@ -127,6 +127,9 @@ function class.eval(a, b, c, d)
     end
     local v = c[n]
     d[1] = v
+    for i = n + 1, #d do
+      d[i] = nil
+    end
     return v, c, d
   else
     for i = 2, n do
