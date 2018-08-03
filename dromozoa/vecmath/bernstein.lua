@@ -110,9 +110,9 @@ function class.get(a, b)
   return b
 end
 
--- a:eval(number b)
--- a:eval(number b, bernstein c)
 -- a:eval(number b, bernstein c, bernstein d)
+-- a:eval(number b, bernstein c)
+-- a:eval(number b)
 function class.eval(a, b, c, d)
   if c then
     class.set(c, a)
