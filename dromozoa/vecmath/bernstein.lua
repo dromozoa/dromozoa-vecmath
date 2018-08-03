@@ -48,40 +48,31 @@ local function set_polynomial(a, b)
   return a
 end
 
-local function eval(n, a, b, c)
-  if n > 2 then
-    local m = n - 1
-    local t = (1 - b) * a[1]
-    for i = 2, m do
-      local u = a[i]
-      local v = b * u
-      c[i - 1] = t + v
-      t = u - v
-    end
-    c[m] = t + b * a[n]
-    return eval(m, c, b, c)
-  else
-    return (1 - b) * a[1] + b * a[2]
-  end
-end
-
 local class = {
   is_bernstein = true;
-  set = set_polynomial;
+  set_polynomial = set_polynomial;
 }
 local metatable = { __index = class }
 
 -- a:set(polynomial b)
 -- a:set(bernstein b)
+-- a:set()
 function class.set(a, b)
-  if b.is_polynomial then
-    return set_polynomial(a, b)
-  else
-    local n = #b
-    for i = 1, n do
-      a[i] = b[i]
+  if b then
+    if b.is_polynomial then
+      return set_polynomial(a, b)
+    else
+      local n = #b
+      for i = 1, n do
+        a[i] = b[i]
+      end
+      for i = n + 1, #a do
+        a[i] = nil
+      end
+      return a
     end
-    for i = n + 1, #a do
+  else
+    for i = 1, #a do
       a[i] = nil
     end
     return a
@@ -119,17 +110,46 @@ function class.get(a, b)
   return b
 end
 
+-- a:eval(number b, bernstein c, bernstein d)
+-- a:eval(number b, bernstein c)
 -- a:eval(number b)
-function class.eval(a, b)
-  local n = #a
-  if n > 2 then
-    return eval(n, a, b, {})
-  elseif n == 2 then
-    return (1 - b) * a[1] + b * a[2]
-  elseif n == 1 then
-    return a[1]
-  elseif n == 0 then
-    return 0
+function class.eval(a, b, c, d)
+  if c then
+    class.set(c, a)
+  else
+    c = class.set({}, a)
+  end
+
+  local n = #c
+  if d then
+    local m = n + 2
+    for i = 2, n do
+      d[m - i] = c[n]
+      local t = (1 - b) * c[i - 1]
+      for j = i, n do
+        local u = c[j]
+        local v = b * u
+        c[j] = t + v
+        t = u - v
+      end
+    end
+    local v = c[n]
+    d[1] = v
+    for i = n + 1, #d do
+      d[i] = nil
+    end
+    return v, c, d
+  else
+    for i = 2, n do
+      local t = (1 - b) * c[i - 1]
+      for j = i, n do
+        local u = c[j]
+        local v = b * u
+        c[j] = t + v
+        t = u - v
+      end
+    end
+    return c[n], c
   end
 end
 

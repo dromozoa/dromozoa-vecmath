@@ -130,7 +130,7 @@ return function (source, result)
     for i = 2, #result do
       result[i] = nil
     end
-    return result, 1
+    return result
   end
 
   local after = {
