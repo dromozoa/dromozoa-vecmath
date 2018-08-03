@@ -114,10 +114,9 @@ function class.eval(a, b, c, d)
 
   local n = #c
   if d then
-    local m = n
+    local m = n + 2
     for i = 2, n do
-      d[m] = c[n]
-      m = m - 1
+      d[m - i] = c[n]
       local t = (1 - b) * c[i - 1]
       for j = i, n do
         local u = c[j]
