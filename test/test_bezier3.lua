@@ -19,6 +19,7 @@ local vecmath = require "dromozoa.vecmath"
 local bezier = require "dromozoa.vecmath.bezier"
 
 local verbose = os.getenv "VERBOSE" == "1"
+local tightness = 0.5
 local epsilon = 1e-9
 local n = 16
 
@@ -48,6 +49,34 @@ local function rational_quadratic_bezier(p1, p2, p3, t)
   q:scale_add(b / d, p2, q)
   q:scale_add(c / d, p3, q)
   return q
+end
+
+local function catmull_rom(p1, p2, p3, p4, t)
+  local p2 = vecmath.point2(p2)
+  local v1 = vecmath.vector2():sub(p3, p1):scale(tightness)
+  local v2 = vecmath.vector2():sub(p4, p2):scale(tightness)
+  local p3 = vecmath.point2(p3)
+
+  local u = 1 - t
+  p2:scale((1 + 2 * t) * u * u)
+  v1:scale(t * u * u)
+  v2:scale(t * t * u)
+  p3:scale(t * t * (1 + 2 * u))
+
+  return vecmath.point2():add(p2):add(v1):sub(v2):add(p3)
+end
+
+local function check_catmull_rom(p1, p2, p3, p4, t)
+  local b = bezier():set_catmull_rom(p1, p2, p3, p4)
+  for i = 0, n do
+    local t = i / n
+    local r = catmull_rom(p1, p2, p3, p4, t)
+    local p = b:eval(t, point2())
+    if verbose then
+      print(tostring(p), tostring(r))
+    end
+    assert(p:epsilon_equals(r, epsilon))
+  end
 end
 
 local p1 = point2(0, 0)
@@ -138,3 +167,11 @@ if verbose then
 end
 assert(d == 400)
 assert(p:epsilon_equals(r, epsilon))
+
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
+check_catmull_rom(vecmath.point2(1,1), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(2,-1))
+check_catmull_rom(vecmath.point2(1,1), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(2,-1))
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,0), vecmath.point2(0,1), vecmath.point2(0,0))
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,0), vecmath.point2(0,1), vecmath.point2(1,0))
+check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,0), vecmath.point2(0,1), vecmath.point2(0,1))
