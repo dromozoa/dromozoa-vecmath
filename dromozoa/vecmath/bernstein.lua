@@ -56,15 +56,23 @@ local metatable = { __index = class }
 
 -- a:set(polynomial b)
 -- a:set(bernstein b)
+-- a:set()
 function class.set(a, b)
-  if b.is_polynomial then
-    return set_polynomial(a, b)
-  else
-    local n = #b
-    for i = 1, n do
-      a[i] = b[i]
+  if b then
+    if b.is_polynomial then
+      return set_polynomial(a, b)
+    else
+      local n = #b
+      for i = 1, n do
+        a[i] = b[i]
+      end
+      for i = n + 1, #a do
+        a[i] = nil
+      end
+      return a
     end
-    for i = n + 1, #a do
+  else
+    for i = 1, #a do
       a[i] = nil
     end
     return a
