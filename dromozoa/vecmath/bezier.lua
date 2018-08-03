@@ -45,20 +45,51 @@ local function get_point3(a, b, c)
   return c
 end
 
+-- a:eval_point2(number b, point2 c, bernstein d)
 -- a:eval_point2(number b, point2 c)
-local function eval_point2(a, b, c)
+local function eval_point2(a, b, c, d, e)
   local X = a[1]
   local Y = a[2]
   local Z = a[3]
   if Z[1] then
-    local z = bernstein_eval(Z, b)
-    c[1] = bernstein_eval(X, b) / z
-    c[2] = bernstein_eval(Y, b) / z
-    return c
+    local DX
+    local DY
+    local DZ
+    local EX
+    local EY
+    local EZ
+    if d then
+      DX = d[1]
+      DY = d[2]
+      DZ = d[3]
+    end
+    if e then
+      EX = e[1]
+      EY = e[2]
+      EZ = e[3]
+    end
+    local z = bernstein_eval(Z, b, DZ, EZ)
+    c[1] = bernstein_eval(X, b, DX, EX) / z
+    c[2] = bernstein_eval(Y, b, DY, EY) / z
+    return c, d, e
   else
-    c[1] = bernstein_eval(X, b)
-    c[2] = bernstein_eval(Y, b)
-    return c
+    local DX
+    local DY
+    local EX
+    local EY
+    if d then
+      DX = d[1]
+      DY = d[2]
+      bernstein_set(d[3])
+    end
+    if e then
+      EX = e[1]
+      EY = e[2]
+      bernstein_set(e[3])
+    end
+    c[1] = bernstein_eval(X, b, DX, EY)
+    c[2] = bernstein_eval(Y, b, DY, EY)
+    return c, d, e
   end
 end
 
@@ -68,15 +99,45 @@ local function eval_point3(a, b, c)
   local Y = a[2]
   local Z = a[3]
   if Z[1] then
-    c[1] = bernstein_eval(X, b)
-    c[2] = bernstein_eval(Y, b)
-    c[3] = bernstein_eval(Z, b)
-    return c
+    local DX
+    local DY
+    local DZ
+    local EX
+    local EY
+    local EZ
+    if d then
+      DX = d[1]
+      DY = d[2]
+      DZ = d[3]
+    end
+    if e then
+      EX = e[1]
+      EY = e[2]
+      EZ = e[3]
+    end
+    c[1] = bernstein_eval(X, b, DX, EX)
+    c[2] = bernstein_eval(Y, b, DY, EY)
+    c[3] = bernstein_eval(Z, b, DZ, EZ)
+    return c, d, e
   else
-    c[1] = bernstein_eval(X, b)
-    c[2] = bernstein_eval(Y, b)
+    local DX
+    local DY
+    local EX
+    local EY
+    if d then
+      DX = d[1]
+      DY = d[2]
+      bernstein_set(d[3])
+    end
+    if e then
+      EX = e[1]
+      EY = e[2]
+      bernstein_set(e[3])
+    end
+    c[1] = bernstein_eval(X, b, DX, EX)
+    c[2] = bernstein_eval(Y, b, DY, EY)
     c[3] = 1
-    return c
+    return c, d, e
   end
 end
 
@@ -157,14 +218,13 @@ end
 -- a:eval(number b, point3 c, bezier d, bezier e)
 -- a:eval(number b, point2 c, bezier d)
 -- a:eval(number b, point3 c, bezier d)
-
 -- a:eval(number b, point2 c)
 -- a:eval(number b, point3 c)
-function class.eval(a, b, c)
+function class.eval(a, b, c, d, e)
   if #c == 2 then
-    return eval_point2(a, b, c)
+    return eval_point2(a, b, c, d, e)
   else
-    return eval_point3(a, b, c)
+    return eval_point3(a, b, c, d, e)
   end
 end
 
