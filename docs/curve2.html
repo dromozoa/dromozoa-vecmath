@@ -215,6 +215,16 @@
 
 <p class="note">
 新しい制御点を決めるときはド・カステリョのアルゴリズムを使う。
+\(\bm{P}_{[t_0,t_1]}(t)\)をリパラメタライズして\(\bm{Q}_{[0,1]}(s)\)を得たとき、
+\[\begin{aligned}
+  \bm{P}_{[t_0,t_1]}(t_0) &amp;= \bm{Q}_{[0,1]}(0) \\
+  \bm{P}_{[t_0,t_1]}(t_1) &amp;= \bm{Q}_{[0,1]}(1) \\
+\end{aligned}\]
+が成り立ち、前段落の式で\(s_0 = 0, s_1 = 1\)なので
+\[\begin{aligned}
+  t &amp;= (1 - s) t_0 + s t_1 \\
+  s &amp;= \frac{t - t_0}{t_1 - t_0} \\
+\end{aligned}\]
 </p>
 
 <div class="note">
