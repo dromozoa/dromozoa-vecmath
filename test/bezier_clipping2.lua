@@ -24,6 +24,82 @@ local _ = element
 
 local n = 64
 
+local function fat_line(b, v1)
+  local n = #b[1]
+  local p1 = b:get(1, vecmath.point2())
+  local p2 = b:get(n, vecmath.point2())
+
+  -- normalize not required
+  v1:sub(p2, p1):normalize()
+
+  local d_min = 0
+  local d_max = 0
+  for i = 2, n - 1 do
+    local p = b:get(i, vecmath.point2())
+    local v = vecmath.vector2(p):sub(p1)
+    local d = v1:cross(v)
+
+    if d_min > d then
+      d_min = d
+    end
+    if d_max < d then
+      d_max = d
+    end
+  end
+
+  if not b[3][1] then -- non rational
+    if n == 3 then -- quadratic
+      d_min = d_min / 2
+      d_max = d_max / 2
+    elseif n == 4 then -- cubic
+      if d_min == 0 or d_max == 0 then
+        d_min = d_min * 3 / 4
+        d_max = d_max * 3 / 4
+      else
+        d_min = d_min * 4 / 9
+        d_max = d_max * 4 / 9
+      end
+    end
+  end
+
+  return v1, d_min, d_max
+end
+
+local function bezier_clipping(b1, b2)
+  local v1, d_min, d_max = fat_line(b2, vecmath.vector2())
+end
+
+local function draw_fat_line(node, b)
+  local v1, d_min, d_max = fat_line(b, vecmath.vector2())
+
+  local n = #b[1]
+  local p1 = b:get(1, vecmath.point2())
+  local p2 = b:get(n, vecmath.point2())
+
+  local pd = path_data()
+  pd:M(p1.x, p1.y):L(p2.x, p2.y)
+  node[#node + 1] = _"path" {
+    d = pd;
+    fill = "none";
+    stroke = "#c33";
+  }
+
+  local v2 = vecmath.vector2(-v1.y, v1.x)
+  local q1 = vecmath.point2():scale_add(d_min, v2, p1)
+  local q2 = vecmath.point2():scale_add(d_min, v2, p2)
+  local q3 = vecmath.point2():scale_add(d_max, v2, p2)
+  local q4 = vecmath.point2():scale_add(d_max, v2, p1)
+
+  local pd = path_data()
+  pd:M(q1.x, q1.y):L(q2.x, q2.y):L(q3.x, q3.y):L(q4.x, q4.y):Z()
+  node[#node + 1] = _"path" {
+    d = pd;
+    fill = "#c33";
+    ["fill-opacity"] = 0.25;
+    stroke = "none";
+  }
+end
+
 local function draw_bezier(node, b)
   local pd = path_data()
 
@@ -41,6 +117,8 @@ local function draw_bezier(node, b)
     stroke = "#333";
   }
 
+  -- control points
+  --[[
   local pd = path_data()
 
   local p = {}
@@ -49,19 +127,22 @@ local function draw_bezier(node, b)
   end
   local q = vecmath.quickhull(p, {})
 
-  -- local p = q[1]
-  -- pd:M(p.x, p.y)
-  -- for i = 2, #q do
-  --   local p = q[i]
-  --   pd:L(p.x, p.y)
-  -- end
+  local p = q[1]
+  pd:M(p.x, p.y)
+  for i = 2, #q do
+    local p = q[i]
+    pd:L(p.x, p.y)
+  end
 
-  -- node[#node + 1] = _"path" {
-  --   d = pd:Z();
-  --   fill = "#ccc";
-  --   ["fill-opacity"] = 0.5;
-  --   stroke = "none";
-  -- }
+  node[#node + 1] = _"path" {
+    d = pd:Z();
+    fill = "#ccc";
+    ["fill-opacity"] = 0.5;
+    stroke = "none";
+  }
+  ]]
+
+  draw_fat_line(node, b)
 end
 
 local b1 = vecmath.bezier({-240,0}, {-80,80}, {80,-160}, {240,80})
@@ -89,8 +170,10 @@ local ex_root = _"g" {
 -- }
 
 draw_bezier(root, b1)
--- draw_bezier(root, b2)
-draw_bezier(root, b3)
+draw_bezier(root, b2)
+-- draw_bezier(root, b3)
+
+bezier_clipping(b1, b2)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
