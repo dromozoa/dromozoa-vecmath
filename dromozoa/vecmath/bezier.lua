@@ -254,6 +254,16 @@ function class.eval(a, b, c, d, e)
   end
 end
 
+-- a:size()
+function class.size(a)
+  return #a[1]
+end
+
+-- a:is_rational()
+function class.is_rational(a)
+  return a[3][1]
+end
+
 -- class(point2 b, point2 c, ...)
 -- class(point3 b, point3 c, ...)
 -- class(bezier b)
