@@ -29,7 +29,7 @@ local function fat_line(b, v1)
   local p1 = b:get(1, vecmath.point2())
   local p2 = b:get(n, vecmath.point2())
 
-  -- normalize not required
+  -- [TODO] normalize not required?
   v1:sub(p2, p1):normalize()
 
   local d_min = 0
@@ -62,18 +62,77 @@ local function fat_line(b, v1)
     end
   end
 
-  return v1, d_min, d_max
+  return p1, v1, d_min, d_max
 end
 
-local function bezier_clipping(b1, b2)
-  local v1, d_min, d_max = fat_line(b2, vecmath.vector2())
+local function bezier_clipping(b1, b2, ex_node)
+  local p1, v1, d_min, d_max = fat_line(b2, vecmath.vector2())
+
+  local rx = 320
+  local ry =  80 / math.max(math.abs(d_min), d_max)
+
+  -- draw explicit
+  local pd = path_data()
+
+  local p = b1:eval(0, vecmath.point2())
+  local v = vecmath.vector2(p):sub(p1)
+  local d = v1:cross(v)
+  -- print(tostring(p), d)
+  pd:M(0, d * ry)
+  for i = 1, n do
+    local t = i / n
+    local p = b1:eval(t, vecmath.point2())
+    local v = vecmath.vector2(p):sub(p1)
+    local d = v1:cross(v)
+    -- print(tostring(p), d)
+    pd:L(t * rx, d * ry)
+  end
+
+  ex_node[#ex_node + 1] = _"path" {
+    d = pd;
+    fill = "none";
+    stroke = "#333";
+  }
+
+  if not b1[3][1] then -- non rational
+    local q = {}
+
+    local n = #b1[1]
+    for i = 1, n do
+      local p = b1:get(i, vecmath.point2())
+      local t = (i - 1) / (n - 1)
+      local v = vecmath.vector2(p):sub(p1)
+      local d = v1:cross(v)
+      q[i] = vecmath.point2(t, d)
+    end
+
+    local pd = path_data()
+    local r = vecmath.quickhull(q, {})
+    for i = 1, #r do
+      local p = r[i]
+      if i == 1 then
+        pd:M(p.x * rx, p.y * ry)
+      else
+        pd:L(p.x * rx, p.y * ry)
+      end
+    end
+    ex_node[#ex_node + 1] = _"path" {
+      d = pd:Z();
+      fill = "#c33";
+      ["fill-opacity"] = 0.25;
+      stroke = "none";
+    }
+  else
+    -- [TODO] impl
+  end
+
+  print(tostring(p1), tostring(v1), d_min, d_max)
 end
 
 local function draw_fat_line(node, b)
-  local v1, d_min, d_max = fat_line(b, vecmath.vector2())
+  local p1, v1, d_min, d_max = fat_line(b, vecmath.vector2())
 
   local n = #b[1]
-  local p1 = b:get(1, vecmath.point2())
   local p2 = b:get(n, vecmath.point2())
 
   local pd = path_data()
@@ -173,7 +232,7 @@ draw_bezier(root, b1)
 draw_bezier(root, b2)
 -- draw_bezier(root, b3)
 
-bezier_clipping(b1, b2)
+bezier_clipping(b2, b1, ex_root)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
