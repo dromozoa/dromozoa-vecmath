@@ -148,6 +148,23 @@ if verbose then
 end
 assert(d == 400)
 
+local b = bezier(p1, p2, p3)
+local p, b1, b2 = b:eval(1/4, point3(), bezier(), bezier())
+assert(b1)
+assert(b2)
+if verbose then
+  print "--"
+  print(tostring(p))
+  print "--"
+  print(tostring(b1:get(1, point3())))
+  print(tostring(b1:get(2, point3())))
+  print(tostring(b1:get(3, point3())))
+  print "--"
+  print(tostring(b2:get(1, point3())))
+  print(tostring(b2:get(2, point3())))
+  print(tostring(b2:get(3, point3())))
+end
+
 local r = rational_quadratic_bezier(q1, q2, q3, 3/16)
 local p = b1:eval(3/4, point2())
 local d = p:distance(point2(-200, 200))

@@ -42,6 +42,7 @@ local function get_point3(a, b, c)
   return c
 end
 
+-- a:eval_point2(number b, point2 c, bernstein d, bernstein e)
 -- a:eval_point2(number b, point2 c, bernstein d)
 -- a:eval_point2(number b, point2 c)
 local function eval_point2(a, b, c, d, e)
@@ -90,8 +91,10 @@ local function eval_point2(a, b, c, d, e)
   end
 end
 
+-- a:eval_point3(number b, point3 c, bernstein d, bernstein e)
+-- a:eval_point3(number b, point3 c, bernstein d)
 -- a:eval_point3(number b, point3 c)
-local function eval_point3(a, b, c)
+local function eval_point3(a, b, c, d, e)
   local X = a[1]
   local Y = a[2]
   local Z = a[3]
