@@ -71,6 +71,16 @@ local function bezier_clipping(b1, b2, ex_node)
   local rx = 320
   local ry =  80 / math.max(math.abs(d_min), d_max)
 
+  -- draw explicit min/max
+  local pd = path_data()
+  pd:M(0, d_max * ry):L(rx, d_max * ry)
+  pd:M(0, d_min * ry):L(rx, d_min * ry)
+  ex_node[#ex_node + 1] = _"path" {
+    d = pd;
+    fill = "none";
+    stroke = "#33c";
+  }
+
   -- draw explicit
   local pd = path_data()
 
@@ -232,7 +242,7 @@ draw_bezier(root, b1)
 draw_bezier(root, b2)
 -- draw_bezier(root, b3)
 
-bezier_clipping(b2, b1, ex_root)
+bezier_clipping(b1, b2, ex_root)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
