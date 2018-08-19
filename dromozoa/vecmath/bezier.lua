@@ -257,6 +257,33 @@ function class.eval(a, b, c, d, e)
   end
 end
 
+-- a:clip(number b, number c, bezier d)
+-- a:clip(number b, number c)
+function class.clip(a, b, c, d)
+  if d then
+    class.set(d, a)
+  else
+    d = class.set({}, a)
+  end
+
+  local t = (c - b) / (1 - b)
+
+  local X = d[1]
+  local Y = d[2]
+  local Z = d[3]
+
+  bernstein.eval(X, b, bernstein(), X)
+  bernstein.eval(X, t, X)
+  bernstein.eval(Y, b, bernstein(), Y)
+  bernstein.eval(Y, t, Y)
+  if Z[1] then
+    bernstein.eval(Z, b, bernstein(), Z)
+    bernstein.eval(Z, t, Z)
+  end
+
+  return d
+end
+
 -- a:size()
 function class.size(a)
   return #a[1]
