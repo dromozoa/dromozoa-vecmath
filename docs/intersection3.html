@@ -100,6 +100,31 @@
 このとき、Luaのテーブルに<code>is_identical</code>というフラグを与える。
 </p>
 
+<h2>線分の交差判定</h2>
+
+<p>
+線分\((\bm{p}_1,\bm{p}_2)\)と
+線分\((\bm{p}_3,\bm{p}_4)\)が存在するとき
+\[\begin{aligned}
+  \bm{v}_1 &amp;= \bm{p}_2 - \bm{p}_1 \\
+  \bm{v}_2 &amp;= \bm{p}_4 - \bm{p}_3 \\
+  \bm{v}_3 &amp;= \bm{p}_3 - \bm{p}_1 \\
+\end{aligned}\]
+線分が同一直線上に存在すると
+\[
+  \bm{v}_1 \times \bm{v}_2 = 0
+\]
+になる。
+\[\begin{aligned}
+  \bm{p}_1 + a_1 \bm{v}_1 &amp;= \bm{p}_3 \\
+  \bm{p}_1 + a_2 \bm{v}_1 &amp;= \bm{p}_4 \\
+  \bm{p}_3 + b_1 \bm{v}_2 &amp;= \bm{p}_1 \\
+  \bm{p}_3 + b_2 \bm{v}_2 &amp;= \bm{p}_2 \\
+\end{aligned}\]
+となるような\(a_1, a_2, b_1, b_2\)を求める。
+線分が同一直線上に存在し、ひとつの端点だけで接続する場合も考慮する。
+</p>
+
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>

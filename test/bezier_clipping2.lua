@@ -25,7 +25,7 @@ local _ = element
 local n = 64
 
 local function fat_line(b, v1)
-  local n = #b[1]
+  local n = b:size()
   local p1 = b:get(1, vecmath.point2())
   local p2 = b:get(n, vecmath.point2())
 
@@ -47,7 +47,7 @@ local function fat_line(b, v1)
     end
   end
 
-  if not b[3][1] then -- non rational
+  if not b:is_rational() then -- non rational
     if n == 3 then -- quadratic
       d_min = d_min / 2
       d_max = d_max / 2
@@ -70,6 +70,16 @@ local function bezier_clipping(b1, b2, ex_node)
 
   local rx = 320
   local ry =  80 / math.max(math.abs(d_min), d_max)
+
+  -- draw explicit min/max
+  local pd = path_data()
+  pd:M(0, d_max * ry):L(rx, d_max * ry)
+  pd:M(0, d_min * ry):L(rx, d_min * ry)
+  ex_node[#ex_node + 1] = _"path" {
+    d = pd;
+    fill = "none";
+    stroke = "#33c";
+  }
 
   -- draw explicit
   local pd = path_data()
@@ -94,10 +104,10 @@ local function bezier_clipping(b1, b2, ex_node)
     stroke = "#333";
   }
 
-  if not b1[3][1] then -- non rational
+  if not b1:is_rational() then -- non rational
     local q = {}
 
-    local n = #b1[1]
+    local n = b1:size()
     for i = 1, n do
       local p = b1:get(i, vecmath.point2())
       local t = (i - 1) / (n - 1)
@@ -132,7 +142,7 @@ end
 local function draw_fat_line(node, b)
   local p1, v1, d_min, d_max = fat_line(b, vecmath.vector2())
 
-  local n = #b[1]
+  local n = b:size()
   local p2 = b:get(n, vecmath.point2())
 
   local pd = path_data()
@@ -181,7 +191,7 @@ local function draw_bezier(node, b)
   local pd = path_data()
 
   local p = {}
-  for i = 1, #b[1] do
+  for i = 1, b:size() do
     p[i] = b:get(i, vecmath.point2())
   end
   local q = vecmath.quickhull(p, {})
@@ -232,7 +242,7 @@ draw_bezier(root, b1)
 draw_bezier(root, b2)
 -- draw_bezier(root, b3)
 
-bezier_clipping(b2, b1, ex_root)
+bezier_clipping(b1, b2, ex_root)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

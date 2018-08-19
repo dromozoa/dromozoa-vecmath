@@ -42,6 +42,7 @@ local function get_point3(a, b, c)
   return c
 end
 
+-- a:eval_point2(number b, point2 c, bernstein d, bernstein e)
 -- a:eval_point2(number b, point2 c, bernstein d)
 -- a:eval_point2(number b, point2 c)
 local function eval_point2(a, b, c, d, e)
@@ -90,8 +91,10 @@ local function eval_point2(a, b, c, d, e)
   end
 end
 
+-- a:eval_point3(number b, point3 c, bernstein d, bernstein e)
+-- a:eval_point3(number b, point3 c, bernstein d)
 -- a:eval_point3(number b, point3 c)
-local function eval_point3(a, b, c)
+local function eval_point3(a, b, c, d, e)
   local X = a[1]
   local Y = a[2]
   local Z = a[3]
@@ -252,6 +255,43 @@ function class.eval(a, b, c, d, e)
   else
     return eval_point3(a, b, c, d, e)
   end
+end
+
+-- a:clip(number b, number c, bezier d)
+-- a:clip(number b, number c)
+function class.clip(a, b, c, d)
+  if d then
+    class.set(d, a)
+  else
+    d = class.set({}, a)
+  end
+
+  local t = (c - b) / (1 - b)
+
+  local X = d[1]
+  local Y = d[2]
+  local Z = d[3]
+
+  bernstein.eval(X, b, bernstein(), X)
+  bernstein.eval(X, t, X)
+  bernstein.eval(Y, b, bernstein(), Y)
+  bernstein.eval(Y, t, Y)
+  if Z[1] then
+    bernstein.eval(Z, b, bernstein(), Z)
+    bernstein.eval(Z, t, Z)
+  end
+
+  return d
+end
+
+-- a:size()
+function class.size(a)
+  return #a[1]
+end
+
+-- a:is_rational()
+function class.is_rational(a)
+  return a[3][1]
 end
 
 -- class(point2 b, point2 c, ...)
