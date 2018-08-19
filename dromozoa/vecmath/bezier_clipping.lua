@@ -152,10 +152,6 @@ local function iterate(b1, b2, u1, u2, u3, u4)
 
     end
   end
-
-  if t2 < 0.8 then
-    local b3 = b
-  end
 end
 
 return function (b1, b2, result)
