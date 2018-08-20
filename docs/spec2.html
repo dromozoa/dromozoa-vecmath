@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>仕様</h1>
+
+<table>
+  <tr>
+    <td><code>out a:set(b)</code></td>
+    <td><code>a=b</code></td>
+    <td><code>b</code>を<code>a</code>に設定する</td>
+  </tr>
+  <tr>
+    <td><code>a:get(out b)</code></td>
+    <td><code>b=a</code></td>
+    <td><code>a</code>を<code>b</code>に書きこむ</td>
+  </tr>
+  <tr>
+    <td><code>a:transform(out b)</code></td>
+    <td><code>b=a*b</code></td>
+    <td><code>a</code>で<code>b</code>を変換した結果を<code>b</code>に書きこむ</td>
+  </tr>
+  <tr>
+    <td><code>a:transform(b, out c)</code></td>
+    <td><code>c=a*b</code></td>
+    <td><code>a</code>で<code>b</code>を変換した結果を<code>c</code>に書きこむ</td>
+  </tr>
+  <tr>
+    <td><code>out a:negate()</code></td>
+    <td><code>a=-a</code></td>
+    <td><code>a</code>の符号を反転する</td>
+  </tr>
+  <tr>
+    <td><code>out a:negate(b)</code></td>
+    <td><code>a=-b</code></td>
+    <td><code>b</code>の符号を反転した結果を<code>a</code>に設定する</td>
+  </tr>
+  <tr>
+    <td><code>out a:interpolate(b, c)</code></td>
+    <td><code>a=a*(1-c)+b*c</code></td>
+    <td><code>a</code>と<code>b</code>を<code>c</code>で内分した結果を<code>a</code>に設定する</td>
+  </tr>
+  <tr>
+    <td><code>out a:interpolate(b, c, d)</code></td>
+    <td><code>a=b*(1-d)+c*d</code></td>
+    <td><code>b</code>と<code>c</code>を<code>d</code>で内分した結果を<code>a</code>に設定する</td>
+  </tr>
+</table>
+
+</div>
+<script>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>
