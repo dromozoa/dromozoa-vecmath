@@ -190,30 +190,44 @@ end
 -- a:clip(number min, number max, bezier b)
 -- a:clip(number min, number max)
 function class.clip(a, min, max, b)
-  if not b then
-    b = a
-  end
-
-  local AX = a[1]
-  local AY = a[2]
-  local AZ = a[3]
-  local BX = b[1]
-  local BY = b[2]
-  local BZ = b[3]
-
   local t = (max - min) / (1 - min)
-  bernstein.eval(BX, min, nil, AX)
-  bernstein.eval(AX, t, AX)
-  bernstein.eval(BY, min, nil, AY)
-  bernstein.eval(AY, t, AY)
-  if BZ[1] then
-    bernstein.eval(BZ, min, nil, AZ)
-    bernstein.eval(AZ, t, AZ)
-  else
-    bernstein.set(AZ)
-  end
 
-  return a
+  if b then
+    local AX = a[1]
+    local AY = a[2]
+    local AZ = a[3]
+    local BX = b[1]
+    local BY = b[2]
+    local BZ = b[3]
+
+    bernstein.eval(BX, min, nil, AX)
+    bernstein.eval(AX, t, AX)
+    bernstein.eval(BY, min, nil, AY)
+    bernstein.eval(AY, t, AY)
+    if BZ[1] then
+      bernstein.eval(BZ, min, nil, AZ)
+      bernstein.eval(AZ, t, AZ)
+    else
+      bernstein.set(AZ)
+    end
+
+    return a
+  else
+    local X = a[1]
+    local Y = a[2]
+    local Z = a[3]
+
+    bernstein.eval(X, min, nil, X)
+    bernstein.eval(X, t, X)
+    bernstein.eval(Y, min, nil, Y)
+    bernstein.eval(Y, t, Y)
+    if Z[1] then
+      bernstein.eval(Z, min, nil, Z)
+      bernstein.eval(Z, t, Z)
+    end
+
+    return a
+  end
 end
 
 -- a:size()
