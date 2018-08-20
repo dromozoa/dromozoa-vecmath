@@ -37,6 +37,7 @@ local function to_string(a)
       a[13], a[14], a[15], a[16])
 end
 
+-- a:set_axis_angle4(axis_angle4 b)
 local function set_axis_angle4(a, b)
   local m = matrix3.set_axis_angle4({}, b)
   a[ 1] = m[1]
@@ -58,6 +59,7 @@ local function set_axis_angle4(a, b)
   return a
 end
 
+-- a:set_quat4(quat4 b)
 local function set_quat4(a, b)
   local m = matrix3.set_quat4({}, b)
   a[ 1] = m[1]
@@ -79,6 +81,8 @@ local function set_quat4(a, b)
   return a
 end
 
+-- a:transform_point3(point3 b, point3 c)
+-- a:transform_point3(point3 b)
 local function transform_point3(a, b, c)
   if not c then
     c = b
@@ -92,6 +96,8 @@ local function transform_point3(a, b, c)
   return c
 end
 
+-- a:transform_vector3(vector3 b, vector3 c)
+-- a:transform_vector3(vector3 b)
 local function transform_vector3(a, b, c)
   if not c then
     c = b
@@ -105,6 +111,7 @@ local function transform_vector3(a, b, c)
   return c
 end
 
+-- a:set_rotation_axis_angle4(axis_angle4 b)
 local function set_rotation_axis_angle4(a, b)
   local sx, sy, sz = svd3{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
   local m = matrix3.set_axis_angle4({}, b)
@@ -120,6 +127,7 @@ local function set_rotation_axis_angle4(a, b)
   return a
 end
 
+-- a:set_rotation_quat4(quat4 b)
 local function set_rotation_quat4(a, b)
   local sx, sy, sz = svd3{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
   local m = matrix3.set_quat4({}, b)
@@ -1019,8 +1027,8 @@ end
 -- a:transform(point3 b, point3 c)
 -- a:transform(vector3 b, vector3 c)
 -- a:transform(tuple4 b, tuple4 c)
--- a:transform(vector3 b)
 -- a:transform(point3 b)
+-- a:transform(vector3 b)
 -- a:transform(tuple4 b)
 function class.transform(a, b, c)
   if #b == 3 then
