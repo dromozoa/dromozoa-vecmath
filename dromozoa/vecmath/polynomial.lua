@@ -20,6 +20,7 @@ local bernstein = require "dromozoa.vecmath.bernstein"
 local setmetatable = setmetatable
 local type = type
 
+-- a:set_bernstein(bernstein b)
 local function set_bernstein(a, b)
   return bernstein.get(b, a)
 end
