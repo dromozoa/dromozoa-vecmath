@@ -131,62 +131,6 @@ for i = 0, n do
   assert(q:epsilon_equals(r, epsilon))
 end
 
---[[
-local b = bezier(p1, p2, p3)
-local p, b1, b2 = b:eval(1/4, point2(), bezier(), bezier())
-local d = p:distance(point2(-200, 200))
-if verbose then
-  print "--"
-  print(tostring(p))
-  print "--"
-  print(tostring(b1:get(1, point3())))
-  print(tostring(b1:get(2, point3())))
-  print(tostring(b1:get(3, point3())))
-  print "--"
-  print(tostring(b2:get(1, point3())))
-  print(tostring(b2:get(2, point3())))
-  print(tostring(b2:get(3, point3())))
-end
-assert(d == 400)
-
-local b = bezier(p1, p2, p3)
-local p, b1, b2 = b:eval(1/4, point3(), bezier(), bezier())
-assert(b1)
-assert(b2)
-if verbose then
-  print "--"
-  print(tostring(p))
-  print "--"
-  print(tostring(b1:get(1, point3())))
-  print(tostring(b1:get(2, point3())))
-  print(tostring(b1:get(3, point3())))
-  print "--"
-  print(tostring(b2:get(1, point3())))
-  print(tostring(b2:get(2, point3())))
-  print(tostring(b2:get(3, point3())))
-end
-
-local r = rational_quadratic_bezier(q1, q2, q3, 3/16)
-local p = b1:eval(3/4, point2())
-local d = p:distance(point2(-200, 200))
-if verbose then
-  print "--"
-  print(tostring(p), tostring(r))
-end
-assert(d == 400)
-assert(p:epsilon_equals(r, epsilon))
-
-local r = rational_quadratic_bezier(q1, q2, q3, 7/16)
-local p = b2:eval(1/4, point2())
-local d = p:distance(point2(-200, 200))
-if verbose then
-  print "--"
-  print(tostring(p), tostring(r))
-end
-assert(d == 400)
-assert(p:epsilon_equals(r, epsilon))
-]]
-
 check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
 check_catmull_rom(vecmath.point2(1,1), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
 check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(2,-1))
