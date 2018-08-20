@@ -110,6 +110,22 @@ assert(b2[2] == 14)
 assert(b2[3] == 16)
 assert(b2[4] == 19)
 
+local v, b1, b2 = b:eval(0.5, bernstein())
+assert(v == 12.25)
+assert(b1[1] == 7)
+assert(b1[2] == 9)
+assert(b1[3] == 10.5)
+assert(b1[4] == 12.25)
+assert(not b2)
+
+local v, b1, b2 = b:eval(0.5, nil, bernstein())
+assert(v == 12.25)
+assert(not b1)
+assert(b2[1] == 12.25)
+assert(b2[2] == 14)
+assert(b2[3] == 16)
+assert(b2[4] == 19)
+
 -- 7 11 13 19
 -- 7 10 12.5 17.5 | 19
 -- 7 10 11.875 16.25 | 17.5 19
