@@ -33,20 +33,24 @@ local t1 = 1/8
 local t2 = 3/4
 
 local b1 = bezier(p1, p2, p3)
-local b2 = b1:clip(t1, t2, bezier())
 
-local q1 = b2:get(1, point2())
-local q3 = b2:get(3, point2())
+local function check(b2)
+  local q1 = b2:get(1, point2())
+  local q3 = b2:get(3, point2())
 
-if verbose then
-  print(tostring(q1))
-  print(tostring(b1:eval(t1, point2())))
-  print(tostring(q3))
-  print(tostring(b1:eval(t2, point2())))
+  if verbose then
+    print(tostring(q1))
+    print(tostring(b1:eval(t1, point2())))
+    print(tostring(q3))
+    print(tostring(b1:eval(t2, point2())))
+  end
+
+  assert(q1:epsilon_equals(b1:eval(t1, point2()), epsilon))
+  assert(q3:epsilon_equals(b1:eval(t2, point2()), epsilon))
+
+  assert(q1:distance{-200,200} - 400 < epsilon)
+  assert(q3:distance{-200,200} - 400 < epsilon)
 end
 
-assert(q1:epsilon_equals(b1:eval(t1, point2()), epsilon))
-assert(q3:epsilon_equals(b1:eval(t2, point2()), epsilon))
-
-assert(q1:distance{-200,200} - 400 < epsilon)
-assert(q3:distance{-200,200} - 400 < epsilon)
+check(bezier():clip(t1, t2, b1))
+check(bezier(b1):clip(t1, t2))

@@ -131,6 +131,7 @@ for i = 0, n do
   assert(q:epsilon_equals(r, epsilon))
 end
 
+--[[
 local b = bezier(p1, p2, p3)
 local p, b1, b2 = b:eval(1/4, point2(), bezier(), bezier())
 local d = p:distance(point2(-200, 200))
@@ -184,6 +185,7 @@ if verbose then
 end
 assert(d == 400)
 assert(p:epsilon_equals(r, epsilon))
+]]
 
 check_catmull_rom(vecmath.point2(0,0), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
 check_catmull_rom(vecmath.point2(1,1), vecmath.point2(1,1), vecmath.point2(2,-1), vecmath.point2(3,0))
