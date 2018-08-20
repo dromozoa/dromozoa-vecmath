@@ -114,32 +114,47 @@ end
 -- a:eval(number b, bernstein c)
 -- a:eval(number b)
 function class.eval(a, b, c, d)
-  if c then
-    class.set(c, a)
-  else
-    c = class.set({}, a)
-  end
-
-  local n = #c
   if d then
-    local m = n + 2
-    for i = 2, n do
-      d[m - i] = c[n]
-      local t = (1 - b) * c[i - 1]
-      for j = i, n do
-        local u = c[j]
-        local v = b * u
-        c[j] = t + v
-        t = u - v
+    if c then
+      class.set(c, a)
+      local n = #c
+      local m = n + 2
+      for i = 2, n do
+        d[m - i] = c[n]
+        local t = (1 - b) * c[i - 1]
+        for j = i, n do
+          local u = c[j]
+          local v = b * u
+          c[j] = t + v
+          t = u - v
+        end
       end
+      local v = c[n]
+      d[1] = v
+      for i = n + 1, #d do
+        d[i] = nil
+      end
+      return v, c, d
+    else
+      class.set(d, a)
+      for i = #d, 2, -1 do
+        local t = b * d[i]
+        for j = i - 1, 1, -1 do
+          local u = d[j]
+          local v = b * u
+          d[j] = t + u - v
+          t = v
+        end
+      end
+      return d[1], nil, d
     end
-    local v = c[n]
-    d[1] = v
-    for i = n + 1, #d do
-      d[i] = nil
-    end
-    return v, c, d
   else
+    if c then
+      class.set(c, a)
+    else
+      c = class.set({}, a)
+    end
+    local n = #c
     for i = 2, n do
       local t = (1 - b) * c[i - 1]
       for j = i, n do
