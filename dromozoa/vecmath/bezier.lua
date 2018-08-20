@@ -187,27 +187,27 @@ function class.eval(a, b, c)
   end
 end
 
--- a:clip(number b, number c, bezier d)
--- a:clip(number b, number c)
-function class.clip(a, b, c, d)
-  if not d then
-    d = a
+-- a:clip(number min, number max, bezier b)
+-- a:clip(number min, number max)
+function class.clip(a, min, max, b)
+  if not b then
+    b = a
   end
 
   local AX = a[1]
   local AY = a[2]
   local AZ = a[3]
-  local DX = d[1]
-  local DY = d[2]
-  local DZ = d[3]
+  local BX = b[1]
+  local BY = b[2]
+  local BZ = b[3]
 
-  local t = (c - b) / (1 - b)
-  bernstein.eval(DX, b, nil, AX)
+  local t = (max - min) / (1 - min)
+  bernstein.eval(BX, min, nil, AX)
   bernstein.eval(AX, t, AX)
-  bernstein.eval(DY, b, nil, AY)
+  bernstein.eval(BY, min, nil, AY)
   bernstein.eval(AY, t, AY)
-  if DZ[1] then
-    bernstein.eval(DZ, b, nil, AZ)
+  if BZ[1] then
+    bernstein.eval(BZ, min, nil, AZ)
     bernstein.eval(AZ, t, AZ)
   else
     bernstein.set(AZ)
