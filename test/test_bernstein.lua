@@ -118,7 +118,17 @@ assert(b1[3] == 10.5)
 assert(b1[4] == 12.25)
 assert(not b2)
 
+-- 7 11 13 19
+-- 9 12 16 | 19
+-- 10.5 14 | 16 19
+-- 12.25 | 14 16 19
+-- 12.25 14 16 19
+
 local v, b1, b2 = b:eval(0.5, nil, bernstein())
+if verbose then
+  print(table.concat(b2, " "))
+end
+
 assert(v == 12.25)
 assert(not b1)
 assert(b2[1] == 12.25)
@@ -139,6 +149,15 @@ assert(b1[1] == 7)
 assert(b1[2] == 10)
 assert(b1[3] == 11.875)
 assert(b1[4] == 15.15625)
+assert(#b2 == 4)
+assert(b2[1] == 15.15625)
+assert(b2[2] == 16.25)
+assert(b2[3] == 17.5)
+assert(b2[4] == 19)
+
+local v, b1, b2 = b:eval(0.75, nil, bernstein(1,1,1,1,1,1,1,1))
+assert(v == 15.15625)
+assert(not b1)
 assert(#b2 == 4)
 assert(b2[1] == 15.15625)
 assert(b2[2] == 16.25)

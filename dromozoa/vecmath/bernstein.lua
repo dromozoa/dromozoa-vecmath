@@ -136,25 +136,17 @@ function class.eval(a, b, c, d)
       end
       return v, c, d
     else
-      c = class.set({}, a)
-      local n = #c
-      local m = n + 2
-      for i = 2, n do
-        d[m - i] = c[n]
-        local t = (1 - b) * c[i - 1]
-        for j = i, n do
-          local u = c[j]
+      class.set(d, a)
+      for i = #d, 2, -1 do
+        local t = b * d[i]
+        for j = i - 1, 1, -1 do
+          local u = d[j]
           local v = b * u
-          c[j] = t + v
-          t = u - v
+          d[j] = t + u - v
+          t = v
         end
       end
-      local v = c[n]
-      d[1] = v
-      for i = n + 1, #d do
-        d[i] = nil
-      end
-      return v, nil, d
+      return d[1], nil, d
     end
   else
     if c then
