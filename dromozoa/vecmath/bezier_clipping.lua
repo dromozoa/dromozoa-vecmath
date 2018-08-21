@@ -141,17 +141,25 @@ end
 local function iterate(b1, b2, u1, u2, u3, u4)
   local t3, t4 = bezier_clipping(b1, b2)
   if t3 then
-    -- 0.1 .. 0.5 / 0.4
     local t = t4 - t3
     if t < 0.8 then
       local u = u4 - u3
-      -- clip b2
       u3 = u3 + u * t3
       u4 = u3 + u * t4
-      -- local b3 = b2:eval(t3, point3())
-
+      bezier.clip(b1, t3, t4)
     end
   end
+  local t1, t2 = bezier_clipping(b2, b1)
+  if t1 then
+    local t = t2 - t1
+    if t < 0.8 then
+      local u = u2 - u1
+      u1 = u1 + u * t1
+      u2 = u1 + u * t2
+      bezier.clip(b2, t1, t2)
+    end
+  end
+  return u1, u2, u3, u4
 end
 
 return function (b1, b2, result)
