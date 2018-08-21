@@ -23,22 +23,24 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 
 local epsilon = 1e-9
 
-local function fat_line(b, p, u)
-  local n = bezier.size(b)
+local function fat_line(b)
+  local p = point2()
   local q = point2()
+  local u = vector2()
   local v = vector2()
 
-  bezier.get(b, 1, p)
-  bezier.get(b, n, q)
-  vector2.sub(u, q, p)
-  vector2.normalize(u)
+  local n = bezier.size(b)
+  b:get(1, p)
+  b:get(n, q)
+  u:sub(q, p)
+  u:normalize()
 
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
-    bezier.get(b, i, q)
-    vector2.sub(v, q, p)
-    local d = vector2.cross(v, u)
+    b:get(i, q)
+    v:sub(q, p)
+    local d = v:cross(u)
     if d_min > d then
       d_min = d
     end
@@ -47,7 +49,7 @@ local function fat_line(b, p, u)
     end
   end
 
-  if not bezier.is_rational(b) then
+  if not b:is_rational() then
     if n == 3 then
       d_min = d_min / 2
       d_max = d_max / 2
@@ -66,97 +68,83 @@ local function fat_line(b, p, u)
   return p, u, d_min, d_max
 end
 
-local function bezier_clipping(b1, b2)
-  local p, u, d_min, d_max = fat_line(b2, point2(), vector2())
+local function explicit_intersection(Q, d, t_min, t_max)
+  local p3 = point2(0, d)
+  local v1 = vector2()
+  local v2 = vector2(1, 0)
+  local v3 = vector2()
 
-  local n = bezier.size(b1)
+  for i = 1, #Q do
+    local p1 = Q[i]
+    local p2 = Q[i + 1]
+    if not p2 then
+      p2 = Q[1]
+    end
+    v1:sub(p2, p1)
+    v3:sub(p3, p1)
+    local d = v1:cross(v2)
+    local a_min = v3:cross(v2) / d
+    local b_min = v3:cross(v1) / d
+    if 0 <= a_min and a_min <= 1 and 0 <= b_min and b_min <= 1 then
+      if not t_min or t_min > b_min then
+        t_min = b_min
+      end
+      if not t_max or t_max < b_min then
+        t_max = b_min
+      end
+    end
+  end
+
+  return t_min, t_max
+end
+
+local function bezier_clipping(b1, b2)
+  local p, u, d_min, d_max = fat_line(b2)
+
   local q = point2()
   local v = vector2()
 
-  print("d_min", d_min)
-  print("d_max", d_max)
+  local n = bezier.size(b1)
 
   if bezier.is_rational(b1) then
     -- TODO impl
   else
     local P = {}
     for i = 1, n do
-      bezier.get(b1, i, q)
-      vector2.sub(v, q, p)
-      local d = vector2.cross(v, u)
-      P[#P + 1] = point2((i - 1) / (n - 1), d)
+      b1:get(i, q)
+      v:sub(q, p)
+      local d = v:cross(u)
+      P[i] = point2((i - 1) / (n - 1), d)
     end
 
-    local p3 = point2(0, d_min)
-    local p4 = point2(0, d_max)
-    local v1 = vector2()
-    local v2 = vector2(1, 0)
-    local v3 = vector2()
-
-    local t_min
-    local t_max
     local Q = quickhull(P, {})
-    for i = 1, #Q do
-      local p1 = Q[i]
-      local p2 = Q[i + 1]
-      if not p2 then
-        p2 = Q[1]
-      end
-      print("p1", tostring(p1))
-      print("p2", tostring(p2))
-      vector2.sub(v1, p2, p1)
-      local d = vector2.cross(v1, v2)
-      vector2.sub(v3, p3, p1)
-      local a_min = vector2.cross(v3, v2) / d
-      local b_min = vector2.cross(v3, v1) / d
-      vector2.sub(v3, p4, p1)
-      local a_max = vector2.cross(v3, v2) / d
-      local b_max = vector2.cross(v3, v1) / d
-      if 0 <= a_min and a_min <= 1 and 0 <= b_min and b_min <= 1 then
-        print("b_min", b_min)
-        if not t_min or t_min > b_min then
-          t_min = b_min
-        end
-        if not t_max or t_max < b_min then
-          t_max = b_min
-        end
-      end
-      if 0 <= a_max and a_max <= 1 and 0 <= b_max and b_max <= 1 then
-        print("b_max", b_max)
-        if not t_min or t_min > b_max then
-          t_min = b_max
-        end
-        if not t_max or t_max < b_max then
-          t_max = b_max
-        end
-      end
-      print("t_min", t_min)
-      print("t_max", t_max)
-    end
 
+    local t_min, t_max = explicit_intersection(Q, d_min)
+    t_min, t_max = explicit_intersection(Q, d_max, t_min, t_max)
     return t_min, t_max
   end
 end
 
 local function iterate(b1, b2, u1, u2, u3, u4)
-  local t3, t4 = bezier_clipping(b1, b2)
-  if t3 then
-    local t = t4 - t3
-    if t < 0.8 then
-      local u = u4 - u3
-      u3 = u3 + u * t3
-      u4 = u3 + u * t4
-      bezier.clip(b1, t3, t4)
-    end
-  end
-  local t1, t2 = bezier_clipping(b2, b1)
+  local t1, t2 = bezier_clipping(b1, b2)
   if t1 then
     local t = t2 - t1
     if t < 0.8 then
       local u = u2 - u1
       u1 = u1 + u * t1
-      u2 = u1 + u * t2
-      bezier.clip(b2, t1, t2)
+      u2 = u2 + u * t2
+      bezier.clip(b1, t1, t2)
+    end
+  end
+
+  local t3, t4 = bezier_clipping(b2, b1)
+  if t3 then
+    local t = t4 - t3
+    if t < 0.8 then
+      local u = u4 - u3
+      u4 = u3 + u * t3
+      u3 = u4 + u * t4
+      bezier.clip(b2, t3, t4)
     end
   end
   return u1, u2, u3, u4
