@@ -69,25 +69,19 @@ local function fat_line(b)
 end
 
 local function explicit_intersection(H, d, t_min, t_max)
-  local p3 = point2(0, d)
-  local v1 = vector2()
-  local v2 = vector2(1, 0)
-  local v3 = vector2()
+  local n = #H
+  local p = H[n]
 
-  for i = 1, #H do
-    local p1 = H[i]
-    local p2 = H[i + 1]
-    if not p2 then
-      p2 = H[1]
-    end
+  for i = 1, n do
+    local q = H[i]
 
-    local d1 = p1.y - d
-    local d2 = p2.y - d
+    local d1 = p[2] - d
+    local d2 = q[2] - d
     if d1 >= 0 and d2 < 0 then
       local d3 = d1 - d2
       local alpha = d1 / d3
       local beta = 1 - alpha
-      local t = p1.x * beta + p2.x * alpha
+      local t = p[1] * beta + q[1] * alpha
       if not t_max or t_max < t then
         t_max = t
       end
@@ -95,11 +89,13 @@ local function explicit_intersection(H, d, t_min, t_max)
       local d3 = d1 - d2
       local alpha = d1 / d3
       local beta = 1 - alpha
-      local t = p1.x * beta + p2.x * alpha
+      local t = p[1] * beta + q[1] * alpha
       if not t_min or t_min > t then
         t_min = t
       end
     end
+
+    p = q
   end
 
   return t_min, t_max
