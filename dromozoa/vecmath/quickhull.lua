@@ -99,6 +99,7 @@ local function visit(source, after, p1i, p3i, p2i)
   end
 end
 
+-- clockwise
 return function (source, result)
   local n = #source
   local p1 = source[1]

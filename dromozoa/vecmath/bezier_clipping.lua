@@ -68,29 +68,36 @@ local function fat_line(b)
   return p, u, d_min, d_max
 end
 
-local function explicit_intersection(Q, d, t_min, t_max)
+local function explicit_intersection(H, d, t_min, t_max)
   local p3 = point2(0, d)
   local v1 = vector2()
   local v2 = vector2(1, 0)
   local v3 = vector2()
 
-  for i = 1, #Q do
-    local p1 = Q[i]
-    local p2 = Q[i + 1]
+  for i = 1, #H do
+    local p1 = H[i]
+    local p2 = H[i + 1]
     if not p2 then
-      p2 = Q[1]
+      p2 = H[1]
     end
-    v1:sub(p2, p1)
-    v3:sub(p3, p1)
-    local d = v1:cross(v2)
-    local a_min = v3:cross(v2) / d
-    local b_min = v3:cross(v1) / d
-    if 0 <= a_min and a_min <= 1 and 0 <= b_min and b_min <= 1 then
-      if not t_min or t_min > b_min then
-        t_min = b_min
+
+    local d1 = p1.y - d
+    local d2 = p2.y - d
+    if d1 >= 0 and d2 < 0 then
+      local d3 = d1 - d2
+      local alpha = d1 / d3
+      local beta = 1 - alpha
+      local t = p1.x * beta + p2.x * alpha
+      if not t_max or t_max < t then
+        t_max = t
       end
-      if not t_max or t_max < b_min then
-        t_max = b_min
+    elseif d1 <= 0 and d2 > 0 then
+      local d3 = d1 - d2
+      local alpha = d1 / d3
+      local beta = 1 - alpha
+      local t = p1.x * beta + p2.x * alpha
+      if not t_min or t_min > t then
+        t_min = t
       end
     end
   end
@@ -117,10 +124,10 @@ local function bezier_clipping(b1, b2)
       P[i] = point2((i - 1) / (n - 1), d)
     end
 
-    local Q = quickhull(P, {})
+    local H = quickhull(P, {})
 
-    local t_min, t_max = explicit_intersection(Q, d_min)
-    t_min, t_max = explicit_intersection(Q, d_max, t_min, t_max)
+    local t_min, t_max = explicit_intersection(H, d_min)
+    t_min, t_max = explicit_intersection(H, d_max, t_min, t_max)
     return t_min, t_max
   end
 end
