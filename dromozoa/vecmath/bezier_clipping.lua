@@ -71,33 +71,26 @@ end
 local function explicit_intersection(H, d, t_min, t_max)
   local n = #H
   local p = H[n]
-
+  local pd = p[2]
   for i = 1, n do
     local q = H[i]
-
-    local d1 = p[2] - d
-    local d2 = q[2] - d
-    if d1 >= 0 and d2 < 0 then
-      local d3 = d1 - d2
-      local alpha = d1 / d3
-      local beta = 1 - alpha
-      local t = p[1] * beta + q[1] * alpha
+    local qd = q[2]
+    if pd >= d and qd < d then
+      local a = (pd - d) / (pd - qd)
+      local t = p[1] * (1 - a) + q[1] * a
       if not t_max or t_max < t then
         t_max = t
       end
-    elseif d1 <= 0 and d2 > 0 then
-      local d3 = d1 - d2
-      local alpha = d1 / d3
-      local beta = 1 - alpha
-      local t = p[1] * beta + q[1] * alpha
+    elseif pd <= d and qd > d then
+      local a = (pd - d) / (pd - qd)
+      local t = p[1] * (1 - a) + q[1] * a
       if not t_min or t_min > t then
         t_min = t
       end
     end
-
     p = q
+    pd = qd
   end
-
   return t_min, t_max
 end
 
@@ -106,11 +99,15 @@ local function bezier_clipping(b1, b2)
 
   local q = point2()
   local v = vector2()
-
   local n = bezier.size(b1)
 
   if bezier.is_rational(b1) then
     -- TODO impl
+
+    local P = {}
+    for i = 1, n do
+    end
+
   else
     local P = {}
     for i = 1, n do
@@ -119,12 +116,8 @@ local function bezier_clipping(b1, b2)
       local d = v:cross(u)
       P[i] = point2((i - 1) / (n - 1), d)
     end
-
     local H = quickhull(P, {})
-
-    local t_min, t_max = explicit_intersection(H, d_min)
-    t_min, t_max = explicit_intersection(H, d_max, t_min, t_max)
-    return t_min, t_max
+    return explicit_intersection(H, d_min, explicit_intersection(H, d_max))
   end
 end
 
