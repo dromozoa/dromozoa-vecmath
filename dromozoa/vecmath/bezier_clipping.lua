@@ -26,21 +26,24 @@ local epsilon = 1e-9
 local function fat_line(b)
   local p = point2()
   local q = point2()
-  local u = vector2()
   local v = vector2()
 
   local n = bezier.size(b)
   b:get(1, p)
   b:get(n, q)
-  u:sub(q, p)
-  u:normalize()
+  v:sub(q, p)
+  v:normalize()
+
+  local x = v[1]
+  local A = v[2]
+  local B = -x
+  local C = x * p[2] - A * p[1]
 
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
     b:get(i, q)
-    v:sub(q, p)
-    local d = v:cross(u)
+    local d = A * q[1] + B * q[2] + C
     if d_min > d then
       d_min = d
     end
@@ -65,7 +68,7 @@ local function fat_line(b)
     end
   end
 
-  return p, u, d_min, d_max
+  return A, B, C, d_min, d_max
 end
 
 local function explicit_intersection(H, d, t_min, t_max)
@@ -95,12 +98,7 @@ local function explicit_intersection(H, d, t_min, t_max)
 end
 
 local function bezier_clipping(b1, b2)
-  local p, u, d_min, d_max = fat_line(b2)
-
-  local x = u[1]
-  local a = u[2]
-  local b = -x
-  local c = x * p[2] - a * p[1]
+  local A, B, C, d_min, d_max = fat_line(b2)
 
   local q = point2()
   local n = bezier.size(b1)
@@ -116,7 +114,7 @@ local function bezier_clipping(b1, b2)
     local P = {}
     for i = 1, n do
       b1:get(i, q)
-      local d = a * q[1] + b * q[2] + c
+      local d = A * q[1] + B * q[2] + C
       P[i] = point2((i - 1) / (n - 1), d)
     end
     local H = quickhull(P, {})
