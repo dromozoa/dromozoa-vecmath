@@ -97,8 +97,12 @@ end
 local function bezier_clipping(b1, b2)
   local p, u, d_min, d_max = fat_line(b2)
 
+  local x = u[1]
+  local a = u[2]
+  local b = -x
+  local c = x * p[2] - a * p[1]
+
   local q = point2()
-  local v = vector2()
   local n = bezier.size(b1)
 
   if bezier.is_rational(b1) then
@@ -112,8 +116,7 @@ local function bezier_clipping(b1, b2)
     local P = {}
     for i = 1, n do
       b1:get(i, q)
-      v:sub(q, p)
-      local d = v:cross(u)
+      local d = a * q[1] + b * q[2] + c
       P[i] = point2((i - 1) / (n - 1), d)
     end
     local H = quickhull(P, {})

@@ -137,14 +137,14 @@
   &amp;= \rm{normalize}(\bm{q} - \bm{p}) \\
   &amp;= (u_x, u_y) \quad u_x^2 + u_y^2 = 1 \\
   d
-  &amp;= \bm{u} \times (\bm{P} - \bm{p}) \\
-  &amp;= (u_x, u_y) \times (x - p_x, y - p_y) \\
-  &amp;= u_x (y - p_y) - u_y (x - p_x) \\
-  &amp;= -u_y x + u_x y + u_y p_x - u_x p_y \\
+  &amp;= (\bm{P} - \bm{p}) \times \bm{u} \\
+  &amp;= (x - p_x, y - p_y) \times (u_x, u_y) \\
+  &amp;= u_y (x - p_x) - u_x (y - p_y) \\
+  &amp;= u_y x - u_x y - u_y p_x + u_x p_y \\
   &amp;= a x + b y + c \\
-  a &amp;= -u_y \\
-  b &amp;= u_x \\
-  c &amp;= u_y p_x - u_x p_y \\
+  a &amp;= u_y \\
+  b &amp;= -u_x \\
+  c &amp;= -u_y p_x + u_x p_y
 \end{aligned}\]
 線分は\(d=0\)となるような直線で表される。
 </p>
