@@ -215,10 +215,10 @@ local function draw_bezier(node, b)
 end
 
 local b1 = vecmath.bezier({-240,0}, {-80,80}, {80,-160}, {240,80})
-local b2 = vecmath.bezier({-50,-150}, {-25,200}, {150,300}, {150,150})
+-- local b2 = vecmath.bezier({-50,-150}, {-25,200}, {150,300}, {150,150})
 
 local z = math.cos(math.pi / 4)
-local b3 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
+local b2 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
 
 local root = _"g" {
   transform = "translate(320, 320)";
@@ -242,7 +242,7 @@ draw_bezier(root, b1)
 draw_bezier(root, b2)
 -- draw_bezier(root, b3)
 
-bezier_clipping(b1, b2, ex_root)
+bezier_clipping(b2, b1, ex_root)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

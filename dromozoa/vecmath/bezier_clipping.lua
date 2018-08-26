@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local point2 = require "dromozoa.vecmath.point2"
+local point3 = require "dromozoa.vecmath.point3"
 local vector2 = require "dromozoa.vecmath.vector2"
 
 local bezier = require "dromozoa.vecmath.bezier"
@@ -100,18 +101,28 @@ end
 local function bezier_clipping(b1, b2)
   local A, B, C, d_min, d_max = fat_line(b2)
 
-  local q = point2()
   local n = bezier.size(b1)
 
   if bezier.is_rational(b1) then
     -- TODO impl
-
     local P = {}
+    local q = point3()
     for i = 1, n do
+      b1:get(i, q)
+      local w = q[3]
+      local x = q[1] / w
+      local y = q[2] / w
+      local d1 = w * (A * x + B * y + C - d_min)
+      local d2 = w * (A * x + B * y + C + d_max)
+      local t = (i - 1) / (n - 1)
+      P[#P + 1] = point2(t, d1)
+      P[#P + 2] = point2(t, d2)
     end
-
+    local H = quickhull(P, {})
+    return explicit_intersection(H, 0)
   else
     local P = {}
+    local q = point2()
     for i = 1, n do
       b1:get(i, q)
       local d = A * q[1] + B * q[2] + C
@@ -133,17 +144,16 @@ local function iterate(b1, b2, u1, u2, u3, u4)
       bezier.clip(b1, t1, t2)
     end
   end
-
-  local t3, t4 = bezier_clipping(b2, b1)
-  if t3 then
-    local t = t4 - t3
-    if t < 0.8 then
-      local u = u4 - u3
-      u4 = u3 + u * t3
-      u3 = u4 + u * t4
-      bezier.clip(b2, t3, t4)
-    end
-  end
+  -- local t3, t4 = bezier_clipping(b2, b1)
+  -- if t3 then
+  --   local t = t4 - t3
+  --   if t < 0.8 then
+  --     local u = u4 - u3
+  --     u4 = u3 + u * t3
+  --     u3 = u4 + u * t4
+  --     bezier.clip(b2, t3, t4)
+  --   end
+  -- end
   return u1, u2, u3, u4
 end
 
