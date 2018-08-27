@@ -72,7 +72,7 @@ local function fat_line(b)
   return A, B, C, d_min, d_max
 end
 
-local function clip(H, d_min, d_max)
+local function clip_both(H, d_min, d_max)
   local t_min = 1
   local t_max = 0
 
@@ -220,7 +220,7 @@ local function clip_max(H)
   end
 end
 
-local function bezier_clipping(b1, b2)
+local function clip(b1, b2)
   local A, B, C, d_min, d_max = fat_line(b2)
 
   local n = bezier.size(b1)
@@ -262,12 +262,12 @@ local function bezier_clipping(b1, b2)
       P[i] = point2((i - 1) / (n - 1), A * p[1] + B * p[2] + C)
     end
     local H = quickhull(P, {})
-    return clip(H, d_min, d_max)
+    return clip_both(H, d_min, d_max)
   end
 end
 
 local function iterate(b1, b2, u1, u2, u3, u4, result)
-  local t1, t2 = bezier_clipping(b1, b2)
+  local t1, t2 = clip(b1, b2)
   if t1 then
     local t = t2 - t1
     if t < 0.8 then
@@ -277,7 +277,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, result)
       bezier.clip(b1, t1, t2)
     end
   end
-  local t3, t4 = bezier_clipping(b2, b1)
+  local t3, t4 = clip(b2, b1)
   if t3 then
     local t = t4 - t3
     if t < 0.8 then
