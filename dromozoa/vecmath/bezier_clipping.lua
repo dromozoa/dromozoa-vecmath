@@ -218,21 +218,21 @@ local function clip_max(H)
 end
 
 local function clip(B1, B2)
-  local A, B, C, d_min, d_max = fat_line(B2)
+  local a, b, c, d_min, d_max = fat_line(B2)
 
   local n = B1:size()
   local m = n - 1
 
   if B1:is_rational() then
-    local C1 = C + d_min
-    local C2 = C - d_max
+    local C1 = c + d_min
+    local C2 = c - d_max
     local P1 = {}
     local P2 = {}
     local p = point3()
     for i = 1, n do
       B1:get(i, p)
       local t = (i - 1) / m
-      local u = A * p[1] + B * p[2]
+      local u = a * p[1] + b * p[2]
       local w = p[3]
       P1[i] = point2(t, u + w * C1)
       P2[i] = point2(t, u + w * C2)
@@ -257,7 +257,7 @@ local function clip(B1, B2)
     local p = point2()
     for i = 1, n do
       B1:get(i, p)
-      P[i] = point2((i - 1) / m, A * p[1] + B * p[2] + C)
+      P[i] = point2((i - 1) / m, a * p[1] + b * p[2] + c)
     end
     local H = quickhull(P, {})
     return clip_both(H, d_min, d_max)
