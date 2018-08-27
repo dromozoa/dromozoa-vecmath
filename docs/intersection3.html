@@ -125,6 +125,30 @@
 線分が同一直線上に存在し、ひとつの端点だけで接続する場合も考慮する。
 </p>
 
+<h2>線分と直線の表現</h2>
+
+<p>
+線分\((\bm{p},\bm{q})\)と点\(\bm{P}\)の距離を考える。
+\[\begin{aligned}
+  \bm{p} &amp;= (p_x, p_y) \\
+  \bm{q} &amp;= (q_x, q_y) \\
+  \bm{P} &amp;= (x, y) \\
+  \bm{u}
+  &amp;= \rm{normalize}(\bm{q} - \bm{p}) \\
+  &amp;= (u_x, u_y) \quad u_x^2 + u_y^2 = 1 \\
+  d
+  &amp;= (\bm{P} - \bm{p}) \times \bm{u} \\
+  &amp;= (x - p_x, y - p_y) \times (u_x, u_y) \\
+  &amp;= u_y (x - p_x) - u_x (y - p_y) \\
+  &amp;= u_y x - u_x y - u_y p_x + u_x p_y \\
+  &amp;= a x + b y + c \\
+  a &amp;= u_y \\
+  b &amp;= -u_x \\
+  c &amp;= -u_y p_x + u_x p_y
+\end{aligned}\]
+線分は\(d=0\)となるような直線で表される。
+</p>
+
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>

@@ -24,29 +24,43 @@ local point3 = vecmath.point3
 local verbose = os.getenv "VERBOSE" == "1"
 local epsilon = 1e-9
 
+local t1 = 1/8
+local t2 = 3/4
+
+local function check(b1, b2)
+  local p = b2:get(1, point2())
+  local q = b2:get(b2:size(), point2())
+
+  if verbose then
+    print(tostring(p))
+    print(tostring(b1:eval(t1, point2())))
+    print(tostring(q))
+    print(tostring(b1:eval(t2, point2())))
+  end
+
+  assert(p:epsilon_equals(b1:eval(t1, point2()), epsilon))
+  assert(q:epsilon_equals(b1:eval(t2, point2()), epsilon))
+
+  if b1:is_rational() then
+    assert(p:distance{-200,200} - 400 < epsilon)
+    assert(q:distance{-200,200} - 400 < epsilon)
+  end
+end
+
+local p1 = point2(0, 0)
+local p2 = point2(1, 1)
+local p3 = point2(2, 0)
+local p4 = point2(2, 1)
+
+local b1 = bezier(p1, p2, p3, p4)
+check(b1, bezier():clip(t1, t2, b1))
+check(b1, bezier(b1):clip(t1, t2))
+
 local z = math.cos(math.pi / 4)
 local p1 = point3(-200,     -200,     1)
 local p2 = point3( 200 * z, -200 * z, z)
 local p3 = point3( 200,      200,     1)
 
-local t1 = 1/8
-local t2 = 3/4
-
 local b1 = bezier(p1, p2, p3)
-local b2 = b1:clip(t1, t2, bezier())
-
-local q1 = b2:get(1, point2())
-local q3 = b2:get(3, point2())
-
-if verbose then
-  print(tostring(q1))
-  print(tostring(b1:eval(t1, point2())))
-  print(tostring(q3))
-  print(tostring(b1:eval(t2, point2())))
-end
-
-assert(q1:epsilon_equals(b1:eval(t1, point2()), epsilon))
-assert(q3:epsilon_equals(b1:eval(t2, point2()), epsilon))
-
-assert(q1:distance{-200,200} - 400 < epsilon)
-assert(q3:distance{-200,200} - 400 < epsilon)
+check(b1, bezier():clip(t1, t2, b1))
+check(b1, bezier(b1):clip(t1, t2))

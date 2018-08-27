@@ -42,102 +42,36 @@ local function get_point3(a, b, c)
   return c
 end
 
--- a:eval_point2(number b, point2 c, bernstein d, bernstein e)
--- a:eval_point2(number b, point2 c, bernstein d)
 -- a:eval_point2(number b, point2 c)
-local function eval_point2(a, b, c, d, e)
-  local X = a[1]
-  local Y = a[2]
+local function eval_point2(a, b, c)
   local Z = a[3]
+  local t = {}
   if Z[1] then
-    local DX
-    local DY
-    local DZ
-    local EX
-    local EY
-    local EZ
-    if d then
-      DX = d[1]
-      DY = d[2]
-      DZ = d[3]
-    end
-    if e then
-      EX = e[1]
-      EY = e[2]
-      EZ = e[3]
-    end
-    local z = bernstein.eval(Z, b, DZ, EZ)
-    c[1] = bernstein.eval(X, b, DX, EX) / z
-    c[2] = bernstein.eval(Y, b, DY, EY) / z
-    return c, d, e
+    local z = bernstein.eval(Z, b, t)
+    c[1] = bernstein.eval(a[1], b, t) / z
+    c[2] = bernstein.eval(a[2], b, t) / z
+    return c
   else
-    local DX
-    local DY
-    local EX
-    local EY
-    if d then
-      DX = d[1]
-      DY = d[2]
-      bernstein.set(d[3])
-    end
-    if e then
-      EX = e[1]
-      EY = e[2]
-      bernstein.set(e[3])
-    end
-    c[1] = bernstein.eval(X, b, DX, EY)
-    c[2] = bernstein.eval(Y, b, DY, EY)
-    return c, d, e
+    c[1] = bernstein.eval(a[1], b, t)
+    c[2] = bernstein.eval(a[2], b, t)
+    return c
   end
 end
 
--- a:eval_point3(number b, point3 c, bernstein d, bernstein e)
--- a:eval_point3(number b, point3 c, bernstein d)
 -- a:eval_point3(number b, point3 c)
-local function eval_point3(a, b, c, d, e)
-  local X = a[1]
-  local Y = a[2]
+local function eval_point3(a, b, c)
   local Z = a[3]
+  local t = {}
   if Z[1] then
-    local DX
-    local DY
-    local DZ
-    local EX
-    local EY
-    local EZ
-    if d then
-      DX = d[1]
-      DY = d[2]
-      DZ = d[3]
-    end
-    if e then
-      EX = e[1]
-      EY = e[2]
-      EZ = e[3]
-    end
-    c[1] = bernstein.eval(X, b, DX, EX)
-    c[2] = bernstein.eval(Y, b, DY, EY)
-    c[3] = bernstein.eval(Z, b, DZ, EZ)
-    return c, d, e
+    c[1] = bernstein.eval(a[1], b, t)
+    c[2] = bernstein.eval(a[2], b, t)
+    c[3] = bernstein.eval(a[3], b, t)
+    return c
   else
-    local DX
-    local DY
-    local EX
-    local EY
-    if d then
-      DX = d[1]
-      DY = d[2]
-      bernstein.set(d[3])
-    end
-    if e then
-      EX = e[1]
-      EY = e[2]
-      bernstein.set(e[3])
-    end
-    c[1] = bernstein.eval(X, b, DX, EX)
-    c[2] = bernstein.eval(Y, b, DY, EY)
+    c[1] = bernstein.eval(a[1], b, t)
+    c[2] = bernstein.eval(a[2], b, t)
     c[3] = 1
-    return c, d, e
+    return c
   end
 end
 
@@ -243,45 +177,57 @@ function class.get(a, b, c)
   end
 end
 
--- a:eval(number b, point2 c, bezier d, bezier e)
--- a:eval(number b, point3 c, bezier d, bezier e)
--- a:eval(number b, point2 c, bezier d)
--- a:eval(number b, point3 c, bezier d)
 -- a:eval(number b, point2 c)
 -- a:eval(number b, point3 c)
-function class.eval(a, b, c, d, e)
+function class.eval(a, b, c)
   if #c == 2 then
-    return eval_point2(a, b, c, d, e)
+    return eval_point2(a, b, c)
   else
-    return eval_point3(a, b, c, d, e)
+    return eval_point3(a, b, c)
   end
 end
 
--- a:clip(number b, number c, bezier d)
--- a:clip(number b, number c)
-function class.clip(a, b, c, d)
-  if d then
-    class.set(d, a)
+-- a:clip(number min, number max, bezier b)
+-- a:clip(number min, number max)
+function class.clip(a, min, max, b)
+  local t = (max - min) / (1 - min)
+
+  if b then
+    local AX = a[1]
+    local AY = a[2]
+    local AZ = a[3]
+    local BX = b[1]
+    local BY = b[2]
+    local BZ = b[3]
+
+    bernstein.eval(BX, min, nil, AX)
+    bernstein.eval(AX, t, AX)
+    bernstein.eval(BY, min, nil, AY)
+    bernstein.eval(AY, t, AY)
+    if BZ[1] then
+      bernstein.eval(BZ, min, nil, AZ)
+      bernstein.eval(AZ, t, AZ)
+    else
+      bernstein.set(AZ)
+    end
+
+    return a
   else
-    d = class.set({}, a)
+    local X = a[1]
+    local Y = a[2]
+    local Z = a[3]
+
+    bernstein.eval(X, min, nil, X)
+    bernstein.eval(X, t, X)
+    bernstein.eval(Y, min, nil, Y)
+    bernstein.eval(Y, t, Y)
+    if Z[1] then
+      bernstein.eval(Z, min, nil, Z)
+      bernstein.eval(Z, t, Z)
+    end
+
+    return a
   end
-
-  local t = (c - b) / (1 - b)
-
-  local X = d[1]
-  local Y = d[2]
-  local Z = d[3]
-
-  bernstein.eval(X, b, bernstein(), X)
-  bernstein.eval(X, t, X)
-  bernstein.eval(Y, b, bernstein(), Y)
-  bernstein.eval(Y, t, Y)
-  if Z[1] then
-    bernstein.eval(Z, b, bernstein(), Z)
-    bernstein.eval(Z, t, Z)
-  end
-
-  return d
 end
 
 -- a:size()
