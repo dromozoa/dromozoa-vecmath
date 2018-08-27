@@ -72,32 +72,6 @@ local function fat_line(b)
   return A, B, C, d_min, d_max
 end
 
-local function explicit_intersection(H, d, t_min, t_max)
-  local n = #H
-  local p = H[n]
-  local pd = p[2]
-  for i = 1, n do
-    local q = H[i]
-    local qd = q[2]
-    if pd >= d and qd < d then
-      local a = (pd - d) / (pd - qd)
-      local t = p[1] * (1 - a) + q[1] * a
-      if not t_max or t_max < t then
-        t_max = t
-      end
-    elseif pd <= d and qd > d then
-      local a = (pd - d) / (pd - qd)
-      local t = p[1] * (1 - a) + q[1] * a
-      if not t_min or t_min > t then
-        t_min = t
-      end
-    end
-    p = q
-    pd = qd
-  end
-  return t_min, t_max
-end
-
 local function clip(H, d_min, d_max)
   local t_min = 1
   local t_max = 0
@@ -292,7 +266,7 @@ local function bezier_clipping(b1, b2)
   end
 end
 
-local function iterate(b1, b2, u1, u2, u3, u4)
+local function iterate(b1, b2, u1, u2, u3, u4, result)
   local t1, t2 = bezier_clipping(b1, b2)
   if t1 then
     local t = t2 - t1
