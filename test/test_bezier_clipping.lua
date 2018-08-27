@@ -23,6 +23,7 @@ local vecmath = require "dromozoa.vecmath"
 local bezier_clipping = require "dromozoa.vecmath.bezier_clipping"
 
 local point2 = vecmath.point2
+local bezier = vecmath.bezier
 
 local _ = element
 local n = 64
@@ -48,31 +49,43 @@ local root = _"g" {
 }
 
 local b1 = vecmath.bezier({-240,0}, {-80,80}, {80,-160}, {240,80})
-local b2 = vecmath.bezier({-50,-150}, {-25,200}, {150,300}, {150,150})
+-- local b2 = vecmath.bezier({-50,-150}, {-25,200}, {150,300}, {150,150})
 
-local z = math.cos(math.pi / 4)
-local b2 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
+-- local b2 = vecmath.bezier({-50,-150}, {-25,200}, {25,200}, {50,-150})
+
+local b2 = vecmath.bezier({-50,-150}, {-25,400}, {25,-400}, {50,150})
+
+-- local z = math.cos(math.pi / 4)
+-- local b2 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
 
 draw_bezier(root, b1, "#ccc")
 draw_bezier(root, b2, "#ccc")
 
-local t1, t2, t3, t4 = bezier_clipping(b1, b2, {})
-print(t1, t2, t3, t4)
+local result = bezier_clipping(bezier(b1), bezier(b2), { {}, {} })
 
-draw_bezier(root, b1, "#c66")
-draw_bezier(root, b2, "#c66")
+local U = result[1]
+for i = 1, #U do
+  local p = b1:eval(U[i], point2())
+  root[#root + 1] = _"circle" {
+    cx = p.x;
+    cy = p.y;
+    r = 2;
+    fill = "#66c";
+  }
+  print(U[i], tostring(p))
+end
 
-local t1, t2, t3, t4 = bezier_clipping(b1, b2, {})
-print(t1, t2, t3, t4)
-
-draw_bezier(root, b1, "#6c6")
-draw_bezier(root, b2, "#6c6")
-
-local t1, t2, t3, t4 = bezier_clipping(b1, b2, {})
-print(t1, t2, t3, t4)
-
-draw_bezier(root, b1, "#66c")
-draw_bezier(root, b2, "#66c")
+local U = result[2]
+for i = 1, #U do
+  local p = b2:eval(U[i], point2())
+  root[#root + 1] = _"circle" {
+    cx = p.x;
+    cy = p.y;
+    r = 2;
+    fill = "#c66";
+  }
+  print(U[i], tostring(p))
+end
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

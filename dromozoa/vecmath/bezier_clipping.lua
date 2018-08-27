@@ -29,7 +29,7 @@ local function fat_line(b)
   local q = point2()
   local v = vector2()
 
-  local n = bezier.size(b)
+  local n = b:size()
   b:get(1, p)
   b:get(n, q)
   v:sub(q, p)
@@ -73,8 +73,8 @@ local function fat_line(b)
 end
 
 local function clip_both(H, d_min, d_max)
-  local t_min = 1
-  local t_max = 0
+  local t1 = 1
+  local t2 = 0
 
   local n = #H
   local p = H[n]
@@ -87,37 +87,37 @@ local function clip_both(H, d_min, d_max)
     local qd = q[2]
 
     if d_min <= pd and pd <= d_max then
-      if t_min > pt then
-        t_min = pt
+      if t1 > pt then
+        t1 = pt
       end
-      if t_max < pt then
-        t_max = pt
+      if t2 < pt then
+        t2 = pt
       end
     end
 
-    local c = pd - qd
-    local a = (pd - d_min) / c
-    local b = (pd - d_max) / c
+    local d = pd - qd
 
     -- TODO use clockwise
+    local a = (pd - d_min) / d
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
-      if t_min > t then
-        t_min = t
+      if t1 > t then
+        t1 = t
       end
-      if t_max < t then
-        t_max = t
+      if t2 < t then
+        t2 = t
       end
     end
 
     -- TODO use clockwise
-    if 0 < b and b < 1 then
-      local t = pt * (1 - b) + qt * b
-      if t_min > t then
-        t_min = t
+    local a = (pd - d_max) / d
+    if 0 < a and a < 1 then
+      local t = pt * (1 - a) + qt * a
+      if t1 > t then
+        t1 = t
       end
-      if t_max < t then
-        t_max = t
+      if t2 < t then
+        t2 = t
       end
     end
 
@@ -125,14 +125,14 @@ local function clip_both(H, d_min, d_max)
     pd = qd
   end
 
-  if t_min <= t_max then
-    return t_min, t_max
+  if t1 <= t2 then
+    return t1, t2
   end
 end
 
 local function clip_min(H)
-  local t_min = 1
-  local t_max = 0
+  local t1 = 1
+  local t2 = 0
 
   local n = #H
   local p = H[n]
@@ -145,24 +145,23 @@ local function clip_min(H)
     local qd = q[2]
 
     if pd >= 0 then
-      if t_min > pt then
-        t_min = pt
+      if t1 > pt then
+        t1 = pt
       end
-      if t_max < pt then
-        t_max = pt
+      if t2 < pt then
+        t2 = pt
       end
     end
 
-    local a = pd / (pd - qd)
-
     -- TODO use clockwise
+    local a = pd / (pd - qd)
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
-      if t_min > t then
-        t_min = t
+      if t1 > t then
+        t1 = t
       end
-      if t_max < t then
-        t_max = t
+      if t2 < t then
+        t2 = t
       end
     end
 
@@ -170,14 +169,14 @@ local function clip_min(H)
     pd = qd
   end
 
-  if t_min <= t_max then
-    return t_min, t_max
+  if t1 <= t2 then
+    return t1, t2
   end
 end
 
 local function clip_max(H)
-  local t_min = 1
-  local t_max = 0
+  local t1 = 1
+  local t2 = 0
 
   local n = #H
   local p = H[n]
@@ -190,24 +189,23 @@ local function clip_max(H)
     local qd = q[2]
 
     if pd <= 0 then
-      if t_min > pt then
-        t_min = pt
+      if t1 > pt then
+        t1 = pt
       end
-      if t_max < pt then
-        t_max = pt
+      if t2 < pt then
+        t2 = pt
       end
     end
 
-    local a = pd / (pd - qd)
-
     -- TODO use clockwise
+    local a = pd / (pd - qd)
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
-      if t_min > t then
-        t_min = t
+      if t1 > t then
+        t1 = t
       end
-      if t_max < t then
-        t_max = t
+      if t2 < t then
+        t2 = t
       end
     end
 
@@ -215,19 +213,18 @@ local function clip_max(H)
     pd = qd
   end
 
-  if t_min <= t_max then
-    return t_min, t_max
+  if t1 <= t2 then
+    return t1, t2
   end
 end
 
 local function clip(b1, b2)
   local A, B, C, d_min, d_max = fat_line(b2)
 
-  local n = bezier.size(b1)
-
-  if bezier.is_rational(b1) then
-    local C_min = C + d_min
-    local C_max = C - d_max
+  local n = b1:size()
+  if b1:is_rational() then
+    local C1 = C + d_min
+    local C2 = C - d_max
     local P1 = {}
     local P2 = {}
     local p = point3()
@@ -236,23 +233,23 @@ local function clip(b1, b2)
       local t = (i - 1) / (n - 1)
       local u = A * p[1] + B * p[2]
       local w = p[3]
-      P1[i] = point2(t, u + w * C_min)
-      P2[i] = point2(t, u + w * C_max)
+      P1[i] = point2(t, u + w * C1)
+      P2[i] = point2(t, u + w * C2)
     end
     local H = quickhull(P1, {})
-    local t_min, t_max = clip_min(H)
-    if not t_min then
+    local t1, t2 = clip_min(H)
+    if not t1 then
       return
     end
     quickhull(P2, H)
-    local u_min, u_max = clip_max(H)
-    if not u_min then
+    local t3, t4 = clip_max(H)
+    if not t3 then
       return
     end
-    if t_max - t_min < u_max - u_min then
-      return t_min, t_max
+    if t2 - t1 < t4 - t3 then
+      return t1, t2
     else
-      return u_min, u_max
+      return t3, t4
     end
   else
     local P = {}
@@ -267,29 +264,77 @@ local function clip(b1, b2)
 end
 
 local function iterate(b1, b2, u1, u2, u3, u4, result)
+  local U1 = result[1]
+  local U2 = result[2]
+
+  assert(0 <= u1 and u1 <= 1)
+  assert(0 <= u2 and u2 <= 1)
+  assert(u1 < u2 or math.abs(u2 - u1) < epsilon)
+  assert(0 <= u3 and u3 <= 1)
+  assert(0 <= u4 and u4 <= 1)
+  assert(u3 < u4 or math.abs(u4 - u3) < epsilon)
+
+  local m = (b1:size() - 1) * (b2:size() - 1)
+  if #U1 > m then
+    return result
+  end
+
+  if math.abs(u2 - u1) < epsilon and math.abs(u4 - u3) < epsilon then
+    U1[#U1 + 1] = (u1 + u2) / 2
+    U2[#U2 + 1] = (u3 + u4) / 2
+    return result
+  end
+
   local t1, t2 = clip(b1, b2)
-  if t1 then
-    local t = t2 - t1
-    if t < 0.8 then
-      local u = u2 - u1
-      u1 = u1 + u * t1
-      u2 = u2 + u * t2
-      bezier.clip(b1, t1, t2)
-    end
+  if not t1 then
+    return result
   end
+  assert(0 <= t1 and t1 <= 1)
+  assert(0 <= t2 and t2 <= 1)
+  local r1 = t2 - t1
+  local s1 = u2 - u1
+  u2 = u1 + s1 * t2
+  u1 = u1 + s1 * t1
+  b1:clip(t1, t2)
+
   local t3, t4 = clip(b2, b1)
-  if t3 then
-    local t = t4 - t3
-    if t < 0.8 then
-      local u = u4 - u3
-      u4 = u3 + u * t3
-      u3 = u4 + u * t4
-      bezier.clip(b2, t3, t4)
-    end
+  if not t3 then
+    return result
   end
-  return u1, u2, u3, u4
+  assert(0 <= t3 and t3 <= 1)
+  assert(0 <= t4 and t4 <= 1)
+  local r2 = t4 - t3
+  local s2 = u4 - u3
+  u4 = u3 + s2 * t4
+  u3 = u3 + s2 * t3
+  b2:clip(t3, t4)
+
+  if r1 > 0.8 and r2 > 0.8 then
+    if s1 > s2 then
+      local b3 = bezier(b1):clip(0, 0.5)
+      local b4 = bezier(b2)
+      local b5 = bezier(b1):clip(0.5, 1)
+      local b6 = bezier(b2)
+      local u5 = (u1 + u2) / 2
+      iterate(b3, b4, u1, u5, u3, u4, result)
+      iterate(b5, b6, u5, u2, u3, u4, result)
+      return result
+    else
+      local b3 = bezier(b1)
+      local b4 = bezier(b2):clip(0, 0.5)
+      local b5 = bezier(b1)
+      local b6 = bezier(b2):clip(0.5, 1)
+      local u5 = (u3 + u4) / 2
+      iterate(b3, b4, u1, u2, u3, u5, result)
+      iterate(b5, b6, u1, u2, u5, u4, result)
+      return result
+    end
+  else
+    iterate(b1, b2, u1, u2, u3, u4, result)
+    return result
+  end
 end
 
 return function (b1, b2, result)
-  return iterate(b1, b2, 0, 1, 0, 1)
+  return iterate(b1, b2, 0, 1, 0, 1, result)
 end
