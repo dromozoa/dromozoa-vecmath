@@ -24,27 +24,26 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 
 local epsilon = 1e-9
 
-local function fat_line(b)
+local function fat_line(B)
   local p = point2()
   local q = point2()
   local v = vector2()
 
-  local n = b:size()
-  b:get(1, p)
-  b:get(n, q)
-  v:sub(q, p)
-  v:normalize()
+  local n = B:size()
+  B:get(1, p)
+  B:get(n, q)
+  v:sub(q, p):normalize()
 
   local x = v[1]
-  local A = v[2]
-  local B = -x
-  local C = x * p[2] - A * p[1]
+  local a = v[2]
+  local b = -x
+  local c = x * p[2] - a * p[1]
 
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
-    b:get(i, q)
-    local d = A * q[1] + B * q[2] + C
+    B:get(i, p)
+    local d = a * p[1] + b * p[2] + c
     if d_min > d then
       d_min = d
     end
@@ -53,7 +52,7 @@ local function fat_line(b)
     end
   end
 
-  if not b:is_rational() then
+  if not B:is_rational() then
     if n == 3 then
       d_min = d_min / 2
       d_max = d_max / 2
@@ -69,7 +68,7 @@ local function fat_line(b)
     end
   end
 
-  return A, B, C, d_min, d_max
+  return a, b, c, d_min, d_max
 end
 
 local function clip_both(H, d_min, d_max)
