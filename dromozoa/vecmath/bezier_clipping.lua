@@ -98,9 +98,11 @@ local function explicit_intersection(H, d, t_min, t_max)
   return t_min, t_max
 end
 
-local function clip_min(H, d, t_min, t_max)
-  local n = #H
+local function clip(H, d_min, d_max)
+  local t_min = 1
+  local t_max = 0
 
+  local n = #H
   local p = H[n]
   local pt = p[1]
   local pd = p[2]
@@ -110,41 +112,55 @@ local function clip_min(H, d, t_min, t_max)
     local qt = q[1]
     local qd = q[2]
 
-    if pd >= d then
-      if not t_min or t_min > pt then
+    if d_min <= pd and pd <= d_max then
+      if t_min > pt then
         t_min = pt
       end
-      if not t_max or t_max < pt then
+      if t_max < pt then
         t_max = pt
-      end
-      if qd < d then
-        local a = (pd - d) / (pd - qd)
-        local t = pt * (1 - a) + qt * a
-        if not t_max or t_max < t then
-          t_max = t
-        end
-      end
-    else
-      if qd > d then
-        local a = (pd - d) / (pd - qd)
-        local t = pt * (1 - a) + qt * a
-        if not t_min or t_min > t then
-          t_min = t
-        end
       end
     end
 
-    p = q
+    local c = pd - qd
+    local a = (pd - d_min) / c
+    local b = (pd - d_max) / c
+
+    -- TODO use clockwise
+    if 0 < a and a < 1 then
+      local t = pt * (1 - a) + qt * a
+      if t_min > t then
+        t_min = t
+      end
+      if t_max < t then
+        t_max = t
+      end
+    end
+
+    -- TODO use clockwise
+    if 0 < b and b < 1 then
+      local t = pt * (1 - b) + qt * b
+      if t_min > t then
+        t_min = t
+      end
+      if t_max < t then
+        t_max = t
+      end
+    end
+
     pt = qt
     pd = qd
   end
 
-  return t_min, t_max
+  if t_min <= t_max then
+    return t_min, t_max
+  end
 end
 
-local function clip_max(H, d, t_min, t_max)
-  local n = #H
+local function clip_min(H)
+  local t_min = 1
+  local t_max = 0
 
+  local n = #H
   local p = H[n]
   local pt = p[1]
   local pd = p[2]
@@ -154,36 +170,80 @@ local function clip_max(H, d, t_min, t_max)
     local qt = q[1]
     local qd = q[2]
 
-    if pd <= d then
-      if not t_min or t_min > pt then
+    if pd >= 0 then
+      if t_min > pt then
         t_min = pt
       end
-      if not t_max or t_max < pt then
+      if t_max < pt then
         t_max = pt
-      end
-      if qd > d then
-        local a = (pd - d) / (pd - qd)
-        local t = pt * (1 - a) + qt * a
-        if not t_min or t_min > t then
-          t_min = t
-        end
-      end
-    else
-      if qd < d then
-        local a = (pd - d) / (pd - qd)
-        local t = pt * (1 - a) + qt * a
-        if not t_max or t_max < t then
-          t_max = t
-        end
       end
     end
 
-    p = q
+    local a = pd / (pd - qd)
+
+    -- TODO use clockwise
+    if 0 < a and a < 1 then
+      local t = pt * (1 - a) + qt * a
+      if t_min > t then
+        t_min = t
+      end
+      if t_max < t then
+        t_max = t
+      end
+    end
+
     pt = qt
     pd = qd
   end
 
-  return t_min, t_max
+  if t_min <= t_max then
+    return t_min, t_max
+  end
+end
+
+local function clip_max(H)
+  local t_min = 1
+  local t_max = 0
+
+  local n = #H
+  local p = H[n]
+  local pt = p[1]
+  local pd = p[2]
+
+  for i = 1, n do
+    local q = H[i]
+    local qt = q[1]
+    local qd = q[2]
+
+    if pd <= 0 then
+      if t_min > pt then
+        t_min = pt
+      end
+      if t_max < pt then
+        t_max = pt
+      end
+    end
+
+    local a = pd / (pd - qd)
+
+    -- TODO use clockwise
+    if 0 < a and a < 1 then
+      local t = pt * (1 - a) + qt * a
+      if t_min > t then
+        t_min = t
+      end
+      if t_max < t then
+        t_max = t
+      end
+    end
+
+    pt = qt
+    pd = qd
+  end
+
+  if t_min <= t_max then
+    return t_min, t_max
+  end
 end
 
 local function bezier_clipping(b1, b2)
@@ -191,45 +251,44 @@ local function bezier_clipping(b1, b2)
 
   local n = bezier.size(b1)
 
-  print("d", d_min, d_max)
-
   if bezier.is_rational(b1) then
-    local P = {}
-    local q = point3()
+    local C_min = C + d_min
+    local C_max = C - d_max
+    local P1 = {}
+    local P2 = {}
+    local p = point3()
     for i = 1, n do
-      b1:get(i, q)
-      local w = q[3]
-      local x = q[1] / w
-      local y = q[2] / w
-      local d1 = w * (A * x + B * y + C - d_min)
-      local d2 = w * (A * x + B * y + C + d_max)
+      b1:get(i, p)
       local t = (i - 1) / (n - 1)
-      P[#P + 1] = point2(t, d1)
-      P[#P + 2] = point2(t, d2)
+      local u = A * p[1] + B * p[2]
+      local w = p[3]
+      P1[i] = point2(t, u + w * C_min)
+      P2[i] = point2(t, u + w * C_max)
     end
-    local H = quickhull(P, {})
-    return explicit_intersection(H, 0)
+    local H = quickhull(P1, {})
+    local t_min, t_max = clip_min(H)
+    if not t_min then
+      return
+    end
+    quickhull(P2, H)
+    local u_min, u_max = clip_max(H)
+    if not u_min then
+      return
+    end
+    if t_max - t_min < u_max - u_min then
+      return t_min, t_max
+    else
+      return u_min, u_max
+    end
   else
     local P = {}
-    local q = point2()
+    local p = point2()
     for i = 1, n do
-      b1:get(i, q)
-      local d = A * q[1] + B * q[2] + C
-      P[i] = point2((i - 1) / (n - 1), d)
+      b1:get(i, p)
+      P[i] = point2((i - 1) / (n - 1), A * p[1] + B * p[2] + C)
     end
     local H = quickhull(P, {})
-
-    local t_min, t_max = clip_min(H, d_min)
-    print("t", t_min, t_max)
-    local u_min, u_max = clip_max(H, d_max)
-    print("u", u_min, u_max)
-    -- local t_min, t_max = clip_max(H, d_max, clip_min(H, d_min))
-    -- print("t", t_min, t_max)
-
-    local t_min, t_max = explicit_intersection(H, d_min, explicit_intersection(H, d_max))
-    print("T", t_min, t_max)
-
-    return explicit_intersection(H, d_min, explicit_intersection(H, d_max))
+    return clip(H, d_min, d_max)
   end
 end
 
@@ -244,16 +303,16 @@ local function iterate(b1, b2, u1, u2, u3, u4)
       bezier.clip(b1, t1, t2)
     end
   end
-  -- local t3, t4 = bezier_clipping(b2, b1)
-  -- if t3 then
-  --   local t = t4 - t3
-  --   if t < 0.8 then
-  --     local u = u4 - u3
-  --     u4 = u3 + u * t3
-  --     u3 = u4 + u * t4
-  --     bezier.clip(b2, t3, t4)
-  --   end
-  -- end
+  local t3, t4 = bezier_clipping(b2, b1)
+  if t3 then
+    local t = t4 - t3
+    if t < 0.8 then
+      local u = u4 - u3
+      u4 = u3 + u * t3
+      u3 = u4 + u * t4
+      bezier.clip(b2, t3, t4)
+    end
+  end
   return u1, u2, u3, u4
 end
 
