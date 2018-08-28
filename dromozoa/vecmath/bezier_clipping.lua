@@ -242,7 +242,7 @@ local function clip(B1, B2)
     if not t3 then
       return
     end
-    if math.abs(t2 - t1) < math.abs(t4 - t3) then
+    if t2 - t1 < t4 - t3 then
       return t1, t2
     else
       return t3, t4
@@ -306,24 +306,24 @@ local function iterate(B1, B2, u1, u2, u3, u4, result)
   B2:clip(t3, t4)
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
-    if a > b then
-      local b3 = bezier(B1):clip(0, 0.5)
-      local b4 = bezier(B2)
-      local b5 = bezier(B1):clip(0.5, 1)
-      local b6 = bezier(B2)
-      local u5 = (u1 + u2) / 2
-      assert(u1 <= u5 and u5 <= u2)
-      iterate(b3, b4, u1, u5, u3, u4, result)
-      return iterate(b5, b6, u5, u2, u3, u4, result)
-    else
-      local b3 = bezier(B1)
-      local b4 = bezier(B2):clip(0, 0.5)
-      local b5 = bezier(B1)
-      local b6 = bezier(B2):clip(0.5, 1)
+    if a < b then
+      local B3 = bezier(B1)
+      local B4 = bezier(B2):clip(0, 0.5)
+      local B5 = bezier(B1)
+      local B6 = bezier(B2):clip(0.5, 1)
       local u5 = (u3 + u4) / 2
       assert(u3 <= u5 and u5 <= u4)
-      iterate(b3, b4, u1, u2, u3, u5, result)
-      return iterate(b5, b6, u1, u2, u5, u4, result)
+      iterate(B3, B4, u1, u2, u3, u5, result)
+      return iterate(B5, B6, u1, u2, u5, u4, result)
+    else
+      local B3 = bezier(B1):clip(0, 0.5)
+      local B4 = bezier(B2)
+      local B5 = bezier(B1):clip(0.5, 1)
+      local B6 = bezier(B2)
+      local u5 = (u1 + u2) / 2
+      assert(u1 <= u5 and u5 <= u2)
+      iterate(B3, B4, u1, u5, u3, u4, result)
+      return iterate(B5, B6, u5, u2, u3, u4, result)
     end
   else
     return iterate(B1, B2, u1, u2, u3, u4, result)
