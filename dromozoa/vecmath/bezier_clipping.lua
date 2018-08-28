@@ -22,6 +22,7 @@ local vector2 = require "dromozoa.vecmath.vector2"
 local bezier = require "dromozoa.vecmath.bezier"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
+-- TODO check
 local epsilon = 1e-9
 
 local function fat_line(B)
@@ -307,22 +308,20 @@ local function iterate(B1, B2, u1, u2, u3, u4, result)
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
-      local B3 = bezier(B1)
-      local B4 = bezier(B2):clip(0, 0.5)
       local B5 = bezier(B1)
       local B6 = bezier(B2):clip(0.5, 1)
+      B2:clip(0, 0.5)
       local u5 = (u3 + u4) / 2
       assert(u3 <= u5 and u5 <= u4)
-      iterate(B3, B4, u1, u2, u3, u5, result)
+      iterate(B1, B2, u1, u2, u3, u5, result)
       return iterate(B5, B6, u1, u2, u5, u4, result)
     else
-      local B3 = bezier(B1):clip(0, 0.5)
-      local B4 = bezier(B2)
       local B5 = bezier(B1):clip(0.5, 1)
       local B6 = bezier(B2)
+      B1:clip(0, 0.5)
       local u5 = (u1 + u2) / 2
       assert(u1 <= u5 and u5 <= u2)
-      iterate(B3, B4, u1, u5, u3, u4, result)
+      iterate(B1, B2, u1, u5, u3, u4, result)
       return iterate(B5, B6, u5, u2, u3, u4, result)
     end
   else
@@ -331,5 +330,5 @@ local function iterate(B1, B2, u1, u2, u3, u4, result)
 end
 
 return function (B1, B2, result)
-  return iterate(B1, B2, 0, 1, 0, 1, result)
+  return iterate(bezier(B1), bezier(B2), 0, 1, 0, 1, result)
 end
