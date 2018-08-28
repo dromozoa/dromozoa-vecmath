@@ -260,7 +260,7 @@ local function clip(B1, B2)
   end
 end
 
-local function iterate(B1, B2, u1, u2, u3, u4, result)
+local function iterate(B1, B2, u1, u2, u3, u4, m, result)
   assert(0 <= u1 and u1 <= 1)
   assert(0 <= u2 and u2 <= 1)
   assert(u1 <= u2)
@@ -269,16 +269,35 @@ local function iterate(B1, B2, u1, u2, u3, u4, result)
   assert(u3 <= u4)
 
   local U1 = result[1]
-  local U2 = result[2]
-
-  local m = (B1:size() - 1) * (B2:size() - 1)
-  if #U1 > m then
+  local n = #U1
+  if n > m then
     return result
   end
 
-  if u2 - u1 < epsilon and u4 - u3 < epsilon then
-    U1[#U1 + 1] = (u1 + u2) / 2
-    U2[#U2 + 1] = (u3 + u4) / 2
+  if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
+    local U2 = result[2]
+    local t1 = (u1 + u2) / 2
+    local t2 = (u3 + u4) / 2
+
+    for i = 1, n do
+      local a = U1[i] - t1
+      if a < 0 then
+        a = -a
+      end
+      if a <= epsilon then
+        local b = U2[i] - t2
+        if b < 0 then
+          b = -b
+        end
+        if b <= epsilon then
+          return result
+        end
+      end
+    end
+
+    n = n + 1
+    U1[n] = t1
+    U2[n] = t2
     return result
   end
 
@@ -313,22 +332,24 @@ local function iterate(B1, B2, u1, u2, u3, u4, result)
       B2:clip(0, 0.5)
       local u5 = (u3 + u4) / 2
       assert(u3 <= u5 and u5 <= u4)
-      iterate(B1, B2, u1, u2, u3, u5, result)
-      return iterate(B5, B6, u1, u2, u5, u4, result)
+      iterate(B1, B2, u1, u2, u3, u5, m, result)
+      return iterate(B5, B6, u1, u2, u5, u4, m, result)
     else
       local B5 = bezier(B1):clip(0.5, 1)
       local B6 = bezier(B2)
       B1:clip(0, 0.5)
       local u5 = (u1 + u2) / 2
       assert(u1 <= u5 and u5 <= u2)
-      iterate(B1, B2, u1, u5, u3, u4, result)
-      return iterate(B5, B6, u5, u2, u3, u4, result)
+      iterate(B1, B2, u1, u5, u3, u4, m, result)
+      return iterate(B5, B6, u5, u2, u3, u4, m, result)
     end
   else
-    return iterate(B1, B2, u1, u2, u3, u4, result)
+    return iterate(B1, B2, u1, u2, u3, u4, m, result)
   end
 end
 
 return function (B1, B2, result)
-  return iterate(bezier(B1), bezier(B2), 0, 1, 0, 1, result)
+  local B1 = bezier(B1)
+  local B2 = bezier(B2)
+  return iterate(B1, B2, 0, 1, 0, 1, (B1:size() - 1) * (B2:size() - 1), result)
 end
