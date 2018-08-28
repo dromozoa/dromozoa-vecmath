@@ -26,11 +26,12 @@ local point2 = vecmath.point2
 local bezier = vecmath.bezier
 
 local verbose = os.getenv "VERBOSE" == "1"
+local epsilon = 1e-6
 
 local _ = element
 local n = 64
 
-local function draw_bezier(node, b, stroke)
+local function draw_bezier(node, b, stroke, stroke_opacity)
   local p = b:eval(0, point2())
   local pd = path_data()
   pd:M(p.x, p.y)
@@ -43,6 +44,7 @@ local function draw_bezier(node, b, stroke)
     d = pd;
     fill = "none";
     stroke = stroke;
+    ["stroke-opacity"] = stroke_opacity;
   }
 end
 
@@ -87,8 +89,8 @@ local function check(B1, B2, n)
   }
   y = y + 640
 
-  draw_bezier(node, B1, "#CCC")
-  draw_bezier(node, B2, "#CCC")
+  draw_bezier(node, B1, "#666", 0.5)
+  draw_bezier(node, B2, "#666", 0.5)
 
   local result = bezier_clipping(B1, B2, { {}, {} })
   draw_points(node, B1, result[1], "#66C")
@@ -96,6 +98,7 @@ local function check(B1, B2, n)
 
   assert(#result[1] == n)
   assert(#result[2] == n)
+  return result
 end
 
 local B1 = vecmath.bezier({-240,0}, {-80,80}, {80,-160}, {240,80})
@@ -106,11 +109,21 @@ local z = math.cos(math.pi / 4)
 local B5 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
 local B6 = vecmath.bezier({-150,-50}, {400,-25}, {-400,25}, {150,50})
 
-check(B1, B2, 1)
-check(B1, B3, 2)
-check(B1, B4, 3)
-check(B1, B5, 1)
-check(B4, B6, 9)
+local B7 = vecmath.bezier(B1):clip(0, 0.6)
+local B8 = vecmath.bezier(B1):clip(0.2, 1)
+
+local r = check(B1, B2, 1)
+local r = check(B1, B3, 2)
+local r = check(B1, B4, 3)
+local r = check(B1, B5, 1)
+local r = check(B4, B6, 9)
+local r = check(B7, B8, 2)
+
+assert(r.is_identical)
+assert(math.abs(r[1][1] - 1/3) < epsilon)
+assert(math.abs(r[1][2] - 1/1) < epsilon)
+assert(math.abs(r[2][1] - 0/1) < epsilon)
+assert(math.abs(r[2][2] - 1/2) < epsilon)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

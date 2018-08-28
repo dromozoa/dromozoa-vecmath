@@ -348,30 +348,77 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
   end
 end
 
-return function (B1, B2, result)
-  local B3 = bezier(B1)
-  local B4 = bezier(B2)
-
-  -- TODO clear result
-
-  local m = (B3:size() - 1) * (B4:size() - 1)
-  iterate(B3, B4, 0, 1, 0, 1, m, result)
+return function (b1, b2, result)
+  local B1 = bezier(b1)
+  local B2 = bezier(b2)
 
   local U1 = result[1]
+  local U2 = result[2]
+  local n = #U1
+  for i = 1, n do
+    U1[i] = nil
+    U2[i] = nil
+  end
+  result.is_identical = nil
+
+  local m = (B1:size() - 1) * (B2:size() - 1)
+  iterate(B1, B2, 0, 1, 0, 1, m, result)
+
   local n = #U1
   if n > m then
-    local B3 = bezier(B1):reverse()
-    local B4 = bezier(B2):reverse()
-    local result2 = iterate(B3, B4, 0, 1, 0, 1, 1, { {}, {} })
-    local U1 = result2[1]
-    local U2 = result2[2]
-    print "=="
-    print("?", #U1)
-    for i = 1, #U1 do
-      local t1 = 1 - U1[i]
-      local t2 = 1 - U2[i]
-      print("!", t1, t2)
+    local t_min = U1[1]
+    local t_max = t_min
+    local u_min = U2[1]
+    local u_max = u_min
+
+    U1[1] = nil
+    U2[1] = nil
+
+    for i = 2, n do
+      local t = U1[i]
+      local u = U2[i]
+
+      U1[i] = nil
+      U2[i] = nil
+
+      if t_min > t then
+        t_min = t
+        u_min = u
+      end
+      if t_max < t then
+        t_max = t
+        u_max = u
+      end
     end
+
+    local B1 = bezier(b1):reverse()
+    local B2 = bezier(b2):reverse()
+    iterate(B1, B2, 0, 1, 0, 1, 1, result)
+
+    assert(#U1 == 2)
+    for i = 1, #U1 do
+      local t = 1 - U1[i]
+      local u = 1 - U2[i]
+
+      U1[i] = nil
+      U2[i] = nil
+
+      if t_min > t then
+        t_min = t
+        u_min = u
+      end
+      if t_max < t then
+        t_max = t
+        u_max = u
+      end
+    end
+
+    U1[1] = t_min
+    U1[2] = t_max
+    U2[1] = u_min
+    U2[2] = u_max
+    result.is_identical = true
+
     return result
   else
     return result
