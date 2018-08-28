@@ -22,7 +22,7 @@ local vector2 = require "dromozoa.vecmath.vector2"
 local bezier = require "dromozoa.vecmath.bezier"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
--- TODO check
+-- by experimentations
 local epsilon = 1e-9
 
 local function fat_line(B)

@@ -158,6 +158,7 @@ local ex_root = _"g" {
 
 local q = point2(200, -200)
 local q = point2(100, 100)
+local q = point2(-200, 200)
 
 -- local points = {
 --   point3(-200, -200, 1);
