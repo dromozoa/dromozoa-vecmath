@@ -95,8 +95,6 @@ local function clip_both(H, d_min, d_max)
     end
 
     local d = pd - qd
-
-    -- TODO use clockwise
     local a = (pd - d_min) / d
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
@@ -107,8 +105,6 @@ local function clip_both(H, d_min, d_max)
         t2 = t
       end
     end
-
-    -- TODO use clockwise
     local a = (pd - d_max) / d
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
@@ -152,7 +148,6 @@ local function clip_min(H)
       end
     end
 
-    -- TODO use clockwise
     local a = pd / (pd - qd)
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
@@ -196,7 +191,6 @@ local function clip_max(H)
       end
     end
 
-    -- TODO use clockwise
     local a = pd / (pd - qd)
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
@@ -222,10 +216,11 @@ local function clip(B1, B2)
 
   local n = B1:size()
   local m = n - 1
+  local H = {}
 
   if B1:is_rational() then
-    local C1 = c + d_min
-    local C2 = c - d_max
+    local c1 = c + d_min
+    local c2 = c - d_max
     local P1 = {}
     local P2 = {}
     local p = point3()
@@ -234,10 +229,10 @@ local function clip(B1, B2)
       local t = (i - 1) / m
       local u = a * p[1] + b * p[2]
       local w = p[3]
-      P1[i] = point2(t, u + w * C1)
-      P2[i] = point2(t, u + w * C2)
+      P1[i] = point2(t, u + w * c1)
+      P2[i] = point2(t, u + w * c2)
     end
-    local H = quickhull(P1, {})
+    quickhull(P1, H)
     local t1, t2 = clip_min(H)
     if not t1 then
       return
@@ -247,7 +242,7 @@ local function clip(B1, B2)
     if not t3 then
       return
     end
-    if t2 - t1 < t4 - t3 then
+    if math.abs(t2 - t1) < math.abs(t4 - t3) then
       return t1, t2
     else
       return t3, t4
@@ -259,28 +254,28 @@ local function clip(B1, B2)
       B1:get(i, p)
       P[i] = point2((i - 1) / m, a * p[1] + b * p[2] + c)
     end
-    local H = quickhull(P, {})
+    quickhull(P, H)
     return clip_both(H, d_min, d_max)
   end
 end
 
 local function iterate(b1, b2, u1, u2, u3, u4, result)
-  local U1 = result[1]
-  local U2 = result[2]
-
   assert(0 <= u1 and u1 <= 1)
   assert(0 <= u2 and u2 <= 1)
-  assert(u1 < u2 or math.abs(u2 - u1) < epsilon)
+  assert(u1 <= u2)
   assert(0 <= u3 and u3 <= 1)
   assert(0 <= u4 and u4 <= 1)
-  assert(u3 < u4 or math.abs(u4 - u3) < epsilon)
+  assert(u3 <= u4)
+
+  local U1 = result[1]
+  local U2 = result[2]
 
   local m = (b1:size() - 1) * (b2:size() - 1)
   if #U1 > m then
     return result
   end
 
-  if math.abs(u2 - u1) < epsilon and math.abs(u4 - u3) < epsilon then
+  if u2 - u1 < epsilon and u4 - u3 < epsilon then
     U1[#U1 + 1] = (u1 + u2) / 2
     U2[#U2 + 1] = (u3 + u4) / 2
     return result
@@ -292,6 +287,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, result)
   end
   assert(0 <= t1 and t1 <= 1)
   assert(0 <= t2 and t2 <= 1)
+  assert(t1 <= t2)
   local r1 = t2 - t1
   local s1 = u2 - u1
   u2 = u1 + s1 * t2
@@ -304,6 +300,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, result)
   end
   assert(0 <= t3 and t3 <= 1)
   assert(0 <= t4 and t4 <= 1)
+  assert(t3 <= t4)
   local r2 = t4 - t3
   local s2 = u4 - u3
   u4 = u3 + s2 * t4
@@ -317,22 +314,21 @@ local function iterate(b1, b2, u1, u2, u3, u4, result)
       local b5 = bezier(b1):clip(0.5, 1)
       local b6 = bezier(b2)
       local u5 = (u1 + u2) / 2
+      assert(u1 <= u5 and u5 <= u2)
       iterate(b3, b4, u1, u5, u3, u4, result)
-      iterate(b5, b6, u5, u2, u3, u4, result)
-      return result
+      return iterate(b5, b6, u5, u2, u3, u4, result)
     else
       local b3 = bezier(b1)
       local b4 = bezier(b2):clip(0, 0.5)
       local b5 = bezier(b1)
       local b6 = bezier(b2):clip(0.5, 1)
       local u5 = (u3 + u4) / 2
+      assert(u3 <= u5 and u5 <= u4)
       iterate(b3, b4, u1, u2, u3, u5, result)
-      iterate(b5, b6, u1, u2, u5, u4, result)
-      return result
+      return iterate(b5, b6, u1, u2, u5, u4, result)
     end
   else
-    iterate(b1, b2, u1, u2, u3, u4, result)
-    return result
+    return iterate(b1, b2, u1, u2, u3, u4, result)
   end
 end
 

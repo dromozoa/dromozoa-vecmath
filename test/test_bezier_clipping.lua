@@ -49,14 +49,14 @@ local root = _"g" {
 }
 
 local b1 = vecmath.bezier({-240,0}, {-80,80}, {80,-160}, {240,80})
--- local b2 = vecmath.bezier({-50,-150}, {-25,200}, {150,300}, {150,150})
+local b2 = vecmath.bezier({-50,-150}, {-25,200}, {150,300}, {150,150})
 
--- local b2 = vecmath.bezier({-50,-150}, {-25,200}, {25,200}, {50,-150})
+local b2 = vecmath.bezier({-50,-150}, {-25,200}, {25,200}, {50,-150})
 
 local b2 = vecmath.bezier({-50,-150}, {-25,400}, {25,-400}, {50,150})
 
--- local z = math.cos(math.pi / 4)
--- local b2 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
+local z = math.cos(math.pi / 4)
+local b2 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
 
 draw_bezier(root, b1, "#ccc")
 draw_bezier(root, b2, "#ccc")
