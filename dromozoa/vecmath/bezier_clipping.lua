@@ -259,7 +259,7 @@ local function clip(B1, B2)
   end
 end
 
-local function iterate(b1, b2, u1, u2, u3, u4, result)
+local function iterate(B1, B2, u1, u2, u3, u4, result)
   assert(0 <= u1 and u1 <= 1)
   assert(0 <= u2 and u2 <= 1)
   assert(u1 <= u2)
@@ -270,7 +270,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, result)
   local U1 = result[1]
   local U2 = result[2]
 
-  local m = (b1:size() - 1) * (b2:size() - 1)
+  local m = (B1:size() - 1) * (B2:size() - 1)
   if #U1 > m then
     return result
   end
@@ -281,57 +281,55 @@ local function iterate(b1, b2, u1, u2, u3, u4, result)
     return result
   end
 
-  local t1, t2 = clip(b1, b2)
+  local t1, t2 = clip(B1, B2)
   if not t1 then
     return result
   end
   assert(0 <= t1 and t1 <= 1)
   assert(0 <= t2 and t2 <= 1)
   assert(t1 <= t2)
-  local r1 = t2 - t1
-  local s1 = u2 - u1
-  u2 = u1 + s1 * t2
-  u1 = u1 + s1 * t1
-  b1:clip(t1, t2)
+  local a = u2 - u1
+  u2 = u1 + a * t2
+  u1 = u1 + a * t1
+  B1:clip(t1, t2)
 
-  local t3, t4 = clip(b2, b1)
+  local t3, t4 = clip(B2, B1)
   if not t3 then
     return result
   end
   assert(0 <= t3 and t3 <= 1)
   assert(0 <= t4 and t4 <= 1)
   assert(t3 <= t4)
-  local r2 = t4 - t3
-  local s2 = u4 - u3
-  u4 = u3 + s2 * t4
-  u3 = u3 + s2 * t3
-  b2:clip(t3, t4)
+  local b = u4 - u3
+  u4 = u3 + b * t4
+  u3 = u3 + b * t3
+  B2:clip(t3, t4)
 
-  if r1 > 0.8 and r2 > 0.8 then
-    if s1 > s2 then
-      local b3 = bezier(b1):clip(0, 0.5)
-      local b4 = bezier(b2)
-      local b5 = bezier(b1):clip(0.5, 1)
-      local b6 = bezier(b2)
+  if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
+    if a > b then
+      local b3 = bezier(B1):clip(0, 0.5)
+      local b4 = bezier(B2)
+      local b5 = bezier(B1):clip(0.5, 1)
+      local b6 = bezier(B2)
       local u5 = (u1 + u2) / 2
       assert(u1 <= u5 and u5 <= u2)
       iterate(b3, b4, u1, u5, u3, u4, result)
       return iterate(b5, b6, u5, u2, u3, u4, result)
     else
-      local b3 = bezier(b1)
-      local b4 = bezier(b2):clip(0, 0.5)
-      local b5 = bezier(b1)
-      local b6 = bezier(b2):clip(0.5, 1)
+      local b3 = bezier(B1)
+      local b4 = bezier(B2):clip(0, 0.5)
+      local b5 = bezier(B1)
+      local b6 = bezier(B2):clip(0.5, 1)
       local u5 = (u3 + u4) / 2
       assert(u3 <= u5 and u5 <= u4)
       iterate(b3, b4, u1, u2, u3, u5, result)
       return iterate(b5, b6, u1, u2, u5, u4, result)
     end
   else
-    return iterate(b1, b2, u1, u2, u3, u4, result)
+    return iterate(B1, B2, u1, u2, u3, u4, result)
   end
 end
 
-return function (b1, b2, result)
-  return iterate(b1, b2, 0, 1, 0, 1, result)
+return function (B1, B2, result)
+  return iterate(B1, B2, 0, 1, 0, 1, result)
 end
