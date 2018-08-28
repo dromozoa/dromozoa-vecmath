@@ -168,6 +168,29 @@ function class.eval(a, b, c, d)
   end
 end
 
+-- a:reverse(bernstein b)
+-- a:reverse()
+function class.reverse(a, b)
+  if b then
+    local n = #b
+    local m = n + 1
+    for i = 1, n do
+      a[i] = b[m - i]
+    end
+    for i = m, #a do
+      a[i] = nil
+    end
+    return a
+  else
+    local n = #a
+    for i = 1, n / 2 do
+      a[i], a[n] = a[n], a[i]
+      n = n - 1
+    end
+    return a
+  end
+end
+
 -- class(number b, ...)
 -- class(polynomial b)
 -- class(bernstein b)
