@@ -33,7 +33,17 @@ local function fat_line(B)
   local n = B:size()
   B:get(1, p)
   B:get(n, q)
-  v:sub(q, p):normalize()
+  v:sub(q, p)
+  local distance = v:length()
+  print(distance, n)
+  if not (distance > 0) then
+    for i = 1, n do
+      B:get(i, q)
+      print(tostring(q))
+    end
+  end
+  assert(distance > 0)
+  v:normalize()
 
   local x = v[1]
   local a = v[2]
