@@ -22,29 +22,34 @@ local vector2 = require "dromozoa.vecmath.vector2"
 local bezier = require "dromozoa.vecmath.bezier"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
+local sqrt = math.sqrt
+
 -- by experimentations
-local p_epsilon = 1e-10
-local t_epsilon = 1e-10
+local t_epsilon = 1e-9
 local d_epsilon = 1e-9
 
 local function fat_line(B)
-  local p = point2()
-  local q = point2()
-  local v = vector2()
-
   local n = B:size()
-  B:get(1, p)
-  B:get(n, q)
-  v:sub(q, p)
-  local distance = v:length()
-  print(distance)
-  assert(distance > 0)
-  v:normalize()
+  local p = point2()
 
-  local x = v[1]
-  local a = v[2]
+  B:get(1, p)
+  local px = p[1]
+  local py = p[2]
+
+  B:get(n, p)
+  local x = p[1] - px
+  local y = p[2] - py
+  local d = sqrt(x * x + y * y)
+  if d == 0 then
+    return
+  end
+  x = x / d
+  y = y / d
+  d = d * d_epsilon
+
+  local a = y
   local b = -x
-  local c = x * p[2] - a * p[1]
+  local c = x * py - y * px
 
   local d_min = 0
   local d_max = 0
@@ -75,8 +80,8 @@ local function fat_line(B)
     end
   end
 
-  d_min = d_min - distance * d_epsilon
-  d_max = d_max + distance * d_epsilon
+  d_min = d_min - d
+  d_max = d_max + d
 
   return a, b, c, d_min, d_max
 end
@@ -223,6 +228,9 @@ end
 
 local function clip(B1, B2)
   local a, b, c, d_min, d_max = fat_line(B2)
+  if not a then
+    return 0, 1
+  end
 
   local n = B1:size()
   local m = n - 1
@@ -285,17 +293,9 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
 
   local done = false
 
-  local p1 = B1:get(1, point2())
-  local p2 = B1:get(B1:size(), point2())
-  local p3 = B2:get(1, point2())
-  local p4 = B2:get(B2:size(), point2())
-  if p1:epsilon_equals(p2, p_epsilon) or p3:epsilon_equals(p4, p_epsilon) then
+  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
     done = true
   end
-
-  -- if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
-  --   done = true
-  -- end
 
   if done then
     local U2 = result[2]
@@ -321,13 +321,13 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
     n = n + 1
     U1[n] = t1
     U2[n] = t2
-    print("done", t1, t2)
+    -- print("done", t1, t2)
     return result
   end
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
-    print "empty clipped (1)"
+    -- print "empty clipped (1)"
     return result
   end
   assert(0 <= t1 and t1 <= 1)
@@ -338,49 +338,9 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
   u1 = u1 + a * t1
   B1:clip(t1, t2)
 
-  local p1 = B1:get(1, point2())
-  local p2 = B1:get(B1:size(), point2())
-  local p3 = B2:get(1, point2())
-  local p4 = B2:get(B2:size(), point2())
-  if p1:epsilon_equals(p2, p_epsilon) or p3:epsilon_equals(p4, p_epsilon) then
-    done = true
-  end
-
-  -- if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
-  --   done = true
-  -- end
-
-  if done then
-    local U2 = result[2]
-    local t1 = (u1 + u2) / 2
-    local t2 = (u3 + u4) / 2
-
-    for i = 1, n do
-      local a = U1[i] - t1
-      if a < 0 then
-        a = -a
-      end
-      if a <= t_epsilon then
-        local b = U2[i] - t2
-        if b < 0 then
-          b = -b
-        end
-        if b <= t_epsilon then
-          return result
-        end
-      end
-    end
-
-    n = n + 1
-    U1[n] = t1
-    U2[n] = t2
-    print("done", t1, t2)
-    return result
-  end
-
   local t3, t4 = clip(B2, B1)
   if not t3 then
-    print "empty clipped (2)"
+    -- print "empty clipped (2)"
     return result
   end
   assert(0 <= t3 and t3 <= 1)
@@ -393,7 +353,7 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
-      print "split (1)"
+      -- print "split (1)"
       local B5 = bezier(B1)
       local B6 = bezier(B2):clip(0.5, 1)
       B2:clip(0, 0.5)
@@ -402,7 +362,7 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
       iterate(B1, B2, u1, u2, u3, u5, m, result)
       return iterate(B5, B6, u1, u2, u5, u4, m, result)
     else
-      print "split (2)"
+      -- print "split (2)"
       local B5 = bezier(B1):clip(0.5, 1)
       local B6 = bezier(B2)
       B1:clip(0, 0.5)
