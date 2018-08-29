@@ -27,6 +27,7 @@ local sqrt = math.sqrt
 -- by experimentations
 local t_epsilon = 1e-9
 local d_epsilon = 1e-9
+local p_epsilon = 1e-6
 
 local function fat_line(B)
   local n = B:size()
@@ -291,40 +292,6 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
     return result
   end
 
-  local done = false
-
-  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
-    done = true
-  end
-
-  if done then
-    local U2 = result[2]
-    local t1 = (u1 + u2) / 2
-    local t2 = (u3 + u4) / 2
-
-    for i = 1, n do
-      local a = U1[i] - t1
-      if a < 0 then
-        a = -a
-      end
-      if a <= t_epsilon then
-        local b = U2[i] - t2
-        if b < 0 then
-          b = -b
-        end
-        if b <= t_epsilon then
-          return result
-        end
-      end
-    end
-
-    n = n + 1
-    U1[n] = t1
-    U2[n] = t2
-    -- print("done", t1, t2)
-    return result
-  end
-
   local t1, t2 = clip(B1, B2)
   if not t1 then
     -- print "empty clipped (1)"
@@ -350,6 +317,48 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
   u4 = u3 + b * t4
   u3 = u3 + b * t3
   B2:clip(t3, t4)
+
+  local done = false
+
+  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
+    local t1 = (u1 + u2) / 2
+    local t2 = (u3 + u4) / 2
+    local p1 = B1:eval(0.5, point2())
+    local p2 = B2:eval(0.5, point2())
+    if p1:epsilon_equals(p2, p_epsilon) then
+      local U2 = result[2]
+      local U3 = result[3]
+      if not U3 then
+        U3 = {}
+        result[3] = U3
+      end
+
+      p1:interpolate(p2, 0.5)
+
+      for i = 1, n do
+        local a = U1[i] - t1
+        if a < 0 then
+          a = -a
+        end
+        if a <= t_epsilon and U3[i]:epsilon_equals(p1, p_epsilon) then
+          local b = U2[i] - t2
+          if b < 0 then
+            b = -b
+          end
+          if b <= t_epsilon then
+            return result
+          end
+        end
+      end
+
+      n = n + 1
+      U1[n] = t1
+      U2[n] = t2
+      U3[n] = p1:interpolate(p2, 0.5)
+      -- print("done", t1, t2)
+      return result
+    end
+  end
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
