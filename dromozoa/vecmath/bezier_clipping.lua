@@ -284,7 +284,21 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
     return result
   end
 
+  local done = false
+
+  local p1 = B1:eval(u1, point2())
+  local p2 = B1:eval(u2, point2())
+  local p3 = B2:eval(u3, point2())
+  local p4 = B2:eval(u4, point2())
+  if p1:epsilon_equals(p2, 1e-9) and p3:epsilon_equals(p4, 1e-9) then
+    done = true
+  end
+
   if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
+    done = true
+  end
+
+  if done then
     local U2 = result[2]
     local t1 = (u1 + u2) / 2
     local t2 = (u3 + u4) / 2
