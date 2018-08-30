@@ -295,8 +295,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   u2 = u1 + a * t2
   u1 = u1 + a * t1
 
-  -- local B1 = bezier(b1):clip(u1, u2)
-
   local t3, t4 = clip(B2, B1)
   if not t3 then
     print "empty clipped (2)"
