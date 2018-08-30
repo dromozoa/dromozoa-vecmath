@@ -27,7 +27,6 @@ local sqrt = math.sqrt
 -- by experimentations
 local t_epsilon = 1e-14
 local d_epsilon = 1e-15
--- local p_epsilon = 1e-6
 
 local function fat_line(B)
   local n = B:size()
@@ -331,7 +330,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     local t2 = (u3 + u4) / 2
     local p1 = b1:eval(t1, point2())
     local p2 = b2:eval(t2, point2())
-    -- if p1:epsilon_equals(p2, p_epsilon) then
     if true then
       local U2 = result[2]
       local U3 = result[3]
@@ -347,7 +345,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
         if a < 0 then
           a = -a
         end
-        -- if a <= t_epsilon and U3[i]:epsilon_equals(p1, p_epsilon) then
         if a <= t_epsilon then
           local b = U2[i] - t2
           if b < 0 then

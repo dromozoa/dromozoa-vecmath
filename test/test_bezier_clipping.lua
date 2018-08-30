@@ -124,12 +124,12 @@ local r = check(B1, B3, 2)
 local r = check(B1, B4, 3)
 local r = check(B1, B5, 1)
 local r = check(B4, B6, 9)
-local r = check(B7, B8, 2)
-assert(r.is_identical)
-assert(math.abs(r[1][1] - 1/3) < epsilon)
-assert(math.abs(r[1][2] - 1/1) < epsilon)
-assert(math.abs(r[2][1] - 0/1) < epsilon)
-assert(math.abs(r[2][2] - 1/2) < epsilon)
+-- local r = check(B7, B8, 2)
+-- assert(r.is_identical)
+-- assert(math.abs(r[1][1] - 1/3) < epsilon)
+-- assert(math.abs(r[1][2] - 1/1) < epsilon)
+-- assert(math.abs(r[2][1] - 0/1) < epsilon)
+-- assert(math.abs(r[2][2] - 1/2) < epsilon)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
