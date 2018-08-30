@@ -112,8 +112,15 @@ local function check(B1, B2, n)
     e2 = e2 + p:distance_squared(q)
   end
   e2 = e2 / #U1
+  local e = math.sqrt(e2)
   if verbose then
-    print("E", math.sqrt(e2))
+    print("E", e)
+  end
+
+  if result.is_identical then
+    assert(e <= epsilon_identical)
+  else
+    assert(e <= epsilon)
   end
 
   if verbose then
@@ -142,10 +149,10 @@ local r = check(B1, B5, 1)
 local r = check(B4, B6, 9)
 local r = check(B7, B8, 2)
 assert(r.is_identical)
--- assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
--- assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
--- assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
--- assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
+assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
+assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
+assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
+assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

@@ -34,12 +34,9 @@ local function fat_line(B)
   local py = p[2]
 
   B:get(n, p)
-  local x = p[1] - px
-  local y = p[2] - py
-
-  local a = y
-  local b = -x
-  local c = x * py - y * px
+  local a = p[2] - py
+  local b = px - p[1]
+  local c = -(a * px + b * py)
 
   local d_min = 0
   local d_max = 0
@@ -215,7 +212,6 @@ end
 
 local function clip(B1, B2)
   local a, b, c, d_min, d_max = fat_line(B2)
-  assert(a)
 
   local n = B1:size()
   local m = n - 1
