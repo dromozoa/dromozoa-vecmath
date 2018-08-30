@@ -25,9 +25,9 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 local sqrt = math.sqrt
 
 -- by experimentations
-local t_epsilon = 1e-9
-local d_epsilon = 1e-9
-local p_epsilon = 1e-6
+local t_epsilon = 1e-14
+local d_epsilon = 1e-15
+-- local p_epsilon = 1e-6
 
 local function fat_line(B)
   local n = B:size()
@@ -42,6 +42,7 @@ local function fat_line(B)
   local y = p[2] - py
   local d = sqrt(x * x + y * y)
   if d == 0 then
+    print "fat line not determined"
     return
   end
   x = x / d
@@ -292,12 +293,14 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
 
+  print(u1, u2, u3, u4)
+
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
-    -- print "empty clipped (1)"
+    print "empty clipped (1)"
     return result
   end
   assert(0 <= t1 and t1 <= 1)
@@ -307,11 +310,11 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   u2 = u1 + a * t2
   u1 = u1 + a * t1
 
-  local B1 = bezier(b1):clip(u1, u2)
+  -- local B1 = bezier(b1):clip(u1, u2)
 
   local t3, t4 = clip(B2, B1)
   if not t3 then
-    -- print "empty clipped (2)"
+    print "empty clipped (2)"
     return result
   end
   assert(0 <= t3 and t3 <= 1)
@@ -328,7 +331,8 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     local t2 = (u3 + u4) / 2
     local p1 = b1:eval(t1, point2())
     local p2 = b2:eval(t2, point2())
-    if p1:epsilon_equals(p2, p_epsilon) then
+    -- if p1:epsilon_equals(p2, p_epsilon) then
+    if true then
       local U2 = result[2]
       local U3 = result[3]
       if not U3 then
@@ -343,7 +347,8 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
         if a < 0 then
           a = -a
         end
-        if a <= t_epsilon and U3[i]:epsilon_equals(p1, p_epsilon) then
+        -- if a <= t_epsilon and U3[i]:epsilon_equals(p1, p_epsilon) then
+        if a <= t_epsilon then
           local b = U2[i] - t2
           if b < 0 then
             b = -b
@@ -358,20 +363,20 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
       U1[n] = t1
       U2[n] = t2
       U3[n] = p1:interpolate(p2, 0.5)
-      -- print("done", t1, t2)
+      print("done", t1, t2)
       return result
     end
   end
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
-      -- print "split (1)"
+      print "split (1)"
       local u5 = (u3 + u4) / 2
       assert(u3 <= u5 and u5 <= u4)
       iterate(b1, b2, u1, u2, u3, u5, m, result)
       return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
-      -- print "split (2)"
+      print "split (2)"
       local u5 = (u1 + u2) / 2
       assert(u1 <= u5 and u5 <= u2)
       iterate(b1, b2, u1, u5, u3, u4, m, result)

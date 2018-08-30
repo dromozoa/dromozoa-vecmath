@@ -92,10 +92,17 @@ local function check(B1, B2, n)
   draw_bezier(node, B1, "#666", 0.5)
   draw_bezier(node, B2, "#666", 0.5)
 
+  if verbose then
+    print(("=="):rep(40))
+  end
+
   local result = bezier_clipping(B1, B2, { {}, {} })
   draw_points(node, B1, result[1], "#66C")
   draw_points(node, B2, result[2], "#C66")
 
+  if verbose then
+    print("!", #result[1], n)
+  end
   assert(#result[1] == n)
   assert(#result[2] == n)
   return result
