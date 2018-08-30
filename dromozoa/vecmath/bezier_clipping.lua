@@ -22,8 +22,6 @@ local vector2 = require "dromozoa.vecmath.vector2"
 local bezier = require "dromozoa.vecmath.bezier"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
-local sqrt = math.sqrt
-
 -- by experimentations
 local epsilon = 1e-14
 
@@ -307,46 +305,32 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   u4 = u3 + b * t4
   u3 = u3 + b * t3
 
-  local done = false
-
   if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
     local t1 = (u1 + u2) / 2
     local t2 = (u3 + u4) / 2
-    local p1 = b1:eval(t1, point2())
-    local p2 = b2:eval(t2, point2())
-    if true then
-      local U2 = result[2]
-      local U3 = result[3]
-      if not U3 then
-        U3 = {}
-        result[3] = U3
+    local U2 = result[2]
+
+    for i = 1, n do
+      local a = U1[i] - t1
+      if a < 0 then
+        a = -a
       end
-
-      p1:interpolate(p2, 0.5)
-
-      for i = 1, n do
-        local a = U1[i] - t1
-        if a < 0 then
-          a = -a
+      if a <= epsilon then
+        local b = U2[i] - t2
+        if b < 0 then
+          b = -b
         end
-        if a <= epsilon then
-          local b = U2[i] - t2
-          if b < 0 then
-            b = -b
-          end
-          if b <= epsilon then
-            return result
-          end
+        if b <= epsilon then
+          return result
         end
       end
-
-      n = n + 1
-      U1[n] = t1
-      U2[n] = t2
-      U3[n] = p1:interpolate(p2, 0.5)
-      print("done", t1, t2)
-      return result
     end
+
+    n = n + 1
+    U1[n] = t1
+    U2[n] = t2
+    print("done", t1, t2)
+    return result
   end
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
@@ -390,6 +374,8 @@ return function (b1, b2, result)
     local u_min = U2[1]
     local u_max = u_min
 
+    print("tu", U1[1], U2[1])
+
     U1[1] = nil
     U2[1] = nil
 
@@ -399,6 +385,8 @@ return function (b1, b2, result)
 
       U1[i] = nil
       U2[i] = nil
+
+      print("tu", t, u)
 
       if t_min > t then
         t_min = t
