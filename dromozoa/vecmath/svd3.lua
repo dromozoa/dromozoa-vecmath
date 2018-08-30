@@ -138,7 +138,7 @@ return function (a, b, c)
       pq = 6
     end
 
-    if u < epsilon then
+    if u <= epsilon then
       break
     end
 

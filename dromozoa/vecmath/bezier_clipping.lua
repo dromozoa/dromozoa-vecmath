@@ -22,29 +22,41 @@ local vector2 = require "dromozoa.vecmath.vector2"
 local bezier = require "dromozoa.vecmath.bezier"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
-local epsilon = 1e-9
+local sqrt = math.sqrt
 
-local function fat_line(b)
+-- by experimentations
+local t_epsilon = 1e-14
+local d_epsilon = 1e-15
+
+local function fat_line(B)
+  local n = B:size()
   local p = point2()
-  local q = point2()
-  local v = vector2()
 
-  local n = b:size()
-  b:get(1, p)
-  b:get(n, q)
-  v:sub(q, p)
-  v:normalize()
+  B:get(1, p)
+  local px = p[1]
+  local py = p[2]
 
-  local x = v[1]
-  local A = v[2]
-  local B = -x
-  local C = x * p[2] - A * p[1]
+  B:get(n, p)
+  local x = p[1] - px
+  local y = p[2] - py
+  local d = sqrt(x * x + y * y)
+  if d == 0 then
+    print "fat line not determined"
+    return
+  end
+  x = x / d
+  y = y / d
+  d = d * d_epsilon
+
+  local a = y
+  local b = -x
+  local c = x * py - y * px
 
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
-    b:get(i, q)
-    local d = A * q[1] + B * q[2] + C
+    B:get(i, p)
+    local d = a * p[1] + b * p[2] + c
     if d_min > d then
       d_min = d
     end
@@ -53,7 +65,7 @@ local function fat_line(b)
     end
   end
 
-  if not b:is_rational() then
+  if not B:is_rational() then
     if n == 3 then
       d_min = d_min / 2
       d_max = d_max / 2
@@ -69,7 +81,10 @@ local function fat_line(b)
     end
   end
 
-  return A, B, C, d_min, d_max
+  d_min = d_min - d
+  d_max = d_max + d
+
+  return a, b, c, d_min, d_max
 end
 
 local function clip_both(H, d_min, d_max)
@@ -96,8 +111,6 @@ local function clip_both(H, d_min, d_max)
     end
 
     local d = pd - qd
-
-    -- TODO use clockwise
     local a = (pd - d_min) / d
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
@@ -108,8 +121,6 @@ local function clip_both(H, d_min, d_max)
         t2 = t
       end
     end
-
-    -- TODO use clockwise
     local a = (pd - d_max) / d
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
@@ -153,7 +164,6 @@ local function clip_min(H)
       end
     end
 
-    -- TODO use clockwise
     local a = pd / (pd - qd)
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
@@ -197,7 +207,6 @@ local function clip_max(H)
       end
     end
 
-    -- TODO use clockwise
     local a = pd / (pd - qd)
     if 0 < a and a < 1 then
       local t = pt * (1 - a) + qt * a
@@ -218,25 +227,31 @@ local function clip_max(H)
   end
 end
 
-local function clip(b1, b2)
-  local A, B, C, d_min, d_max = fat_line(b2)
+local function clip(B1, B2)
+  local a, b, c, d_min, d_max = fat_line(B2)
+  if not a then
+    return 0, 1
+  end
 
-  local n = b1:size()
-  if b1:is_rational() then
-    local C1 = C + d_min
-    local C2 = C - d_max
+  local n = B1:size()
+  local m = n - 1
+  local H = {}
+
+  if B1:is_rational() then
+    local c1 = c + d_min
+    local c2 = c - d_max
     local P1 = {}
     local P2 = {}
     local p = point3()
     for i = 1, n do
-      b1:get(i, p)
-      local t = (i - 1) / (n - 1)
-      local u = A * p[1] + B * p[2]
+      B1:get(i, p)
+      local t = (i - 1) / m
+      local u = a * p[1] + b * p[2]
       local w = p[3]
-      P1[i] = point2(t, u + w * C1)
-      P2[i] = point2(t, u + w * C2)
+      P1[i] = point2(t, u + w * c1)
+      P2[i] = point2(t, u + w * c2)
     end
-    local H = quickhull(P1, {})
+    quickhull(P1, H)
     local t1, t2 = clip_min(H)
     if not t1 then
       return
@@ -255,86 +270,192 @@ local function clip(b1, b2)
     local P = {}
     local p = point2()
     for i = 1, n do
-      b1:get(i, p)
-      P[i] = point2((i - 1) / (n - 1), A * p[1] + B * p[2] + C)
+      B1:get(i, p)
+      P[i] = point2((i - 1) / m, a * p[1] + b * p[2] + c)
     end
-    local H = quickhull(P, {})
+    quickhull(P, H)
     return clip_both(H, d_min, d_max)
   end
 end
 
-local function iterate(b1, b2, u1, u2, u3, u4, result)
-  local U1 = result[1]
-  local U2 = result[2]
-
+local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   assert(0 <= u1 and u1 <= 1)
   assert(0 <= u2 and u2 <= 1)
-  assert(u1 < u2 or math.abs(u2 - u1) < epsilon)
+  assert(u1 <= u2)
   assert(0 <= u3 and u3 <= 1)
   assert(0 <= u4 and u4 <= 1)
-  assert(u3 < u4 or math.abs(u4 - u3) < epsilon)
+  assert(u3 <= u4)
 
-  local m = (b1:size() - 1) * (b2:size() - 1)
-  if #U1 > m then
+  local U1 = result[1]
+  local n = #U1
+  if n > m then
     return result
   end
 
-  if math.abs(u2 - u1) < epsilon and math.abs(u4 - u3) < epsilon then
-    U1[#U1 + 1] = (u1 + u2) / 2
-    U2[#U2 + 1] = (u3 + u4) / 2
-    return result
-  end
+  print(u1, u2, u3, u4)
 
-  local t1, t2 = clip(b1, b2)
+  local B1 = bezier(b1):clip(u1, u2)
+  local B2 = bezier(b2):clip(u3, u4)
+
+  local t1, t2 = clip(B1, B2)
   if not t1 then
+    print "empty clipped (1)"
     return result
   end
   assert(0 <= t1 and t1 <= 1)
   assert(0 <= t2 and t2 <= 1)
-  local r1 = t2 - t1
-  local s1 = u2 - u1
-  u2 = u1 + s1 * t2
-  u1 = u1 + s1 * t1
-  b1:clip(t1, t2)
+  assert(t1 <= t2)
+  local a = u2 - u1
+  u2 = u1 + a * t2
+  u1 = u1 + a * t1
 
-  local t3, t4 = clip(b2, b1)
+  -- local B1 = bezier(b1):clip(u1, u2)
+
+  local t3, t4 = clip(B2, B1)
   if not t3 then
+    print "empty clipped (2)"
     return result
   end
   assert(0 <= t3 and t3 <= 1)
   assert(0 <= t4 and t4 <= 1)
-  local r2 = t4 - t3
-  local s2 = u4 - u3
-  u4 = u3 + s2 * t4
-  u3 = u3 + s2 * t3
-  b2:clip(t3, t4)
+  assert(t3 <= t4)
+  local b = u4 - u3
+  u4 = u3 + b * t4
+  u3 = u3 + b * t3
 
-  if r1 > 0.8 and r2 > 0.8 then
-    if s1 > s2 then
-      local b3 = bezier(b1):clip(0, 0.5)
-      local b4 = bezier(b2)
-      local b5 = bezier(b1):clip(0.5, 1)
-      local b6 = bezier(b2)
-      local u5 = (u1 + u2) / 2
-      iterate(b3, b4, u1, u5, u3, u4, result)
-      iterate(b5, b6, u5, u2, u3, u4, result)
-      return result
-    else
-      local b3 = bezier(b1)
-      local b4 = bezier(b2):clip(0, 0.5)
-      local b5 = bezier(b1)
-      local b6 = bezier(b2):clip(0.5, 1)
-      local u5 = (u3 + u4) / 2
-      iterate(b3, b4, u1, u2, u3, u5, result)
-      iterate(b5, b6, u1, u2, u5, u4, result)
+  local done = false
+
+  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
+    local t1 = (u1 + u2) / 2
+    local t2 = (u3 + u4) / 2
+    local p1 = b1:eval(t1, point2())
+    local p2 = b2:eval(t2, point2())
+    if true then
+      local U2 = result[2]
+      local U3 = result[3]
+      if not U3 then
+        U3 = {}
+        result[3] = U3
+      end
+
+      p1:interpolate(p2, 0.5)
+
+      for i = 1, n do
+        local a = U1[i] - t1
+        if a < 0 then
+          a = -a
+        end
+        if a <= t_epsilon then
+          local b = U2[i] - t2
+          if b < 0 then
+            b = -b
+          end
+          if b <= t_epsilon then
+            return result
+          end
+        end
+      end
+
+      n = n + 1
+      U1[n] = t1
+      U2[n] = t2
+      U3[n] = p1:interpolate(p2, 0.5)
+      print("done", t1, t2)
       return result
     end
+  end
+
+  if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
+    if a < b then
+      print "split (1)"
+      local u5 = (u3 + u4) / 2
+      assert(u3 <= u5 and u5 <= u4)
+      iterate(b1, b2, u1, u2, u3, u5, m, result)
+      return iterate(b1, b2, u1, u2, u5, u4, m, result)
+    else
+      print "split (2)"
+      local u5 = (u1 + u2) / 2
+      assert(u1 <= u5 and u5 <= u2)
+      iterate(b1, b2, u1, u5, u3, u4, m, result)
+      return iterate(b1, b2, u5, u2, u3, u4, m, result)
+    end
   else
-    iterate(b1, b2, u1, u2, u3, u4, result)
-    return result
+    return iterate(b1, b2, u1, u2, u3, u4, m, result)
   end
 end
 
 return function (b1, b2, result)
-  return iterate(b1, b2, 0, 1, 0, 1, result)
+  local U1 = result[1]
+  local U2 = result[2]
+  local n = #U1
+  for i = 1, n do
+    U1[i] = nil
+    U2[i] = nil
+  end
+  result.is_identical = nil
+
+  local m = (b1:size() - 1) * (b2:size() - 1)
+  iterate(b1, b2, 0, 1, 0, 1, m, result)
+
+  local n = #U1
+  if n > m then
+    print "IS_IDENTICAL"
+
+    local t_min = U1[1]
+    local t_max = t_min
+    local u_min = U2[1]
+    local u_max = u_min
+
+    U1[1] = nil
+    U2[1] = nil
+
+    for i = 2, n do
+      local t = U1[i]
+      local u = U2[i]
+
+      U1[i] = nil
+      U2[i] = nil
+
+      if t_min > t then
+        t_min = t
+        u_min = u
+      end
+      if t_max < t then
+        t_max = t
+        u_max = u
+      end
+    end
+
+    local b3 = bezier(b1):reverse()
+    local b4 = bezier(b2):reverse()
+    iterate(b3, b4, 0, 1, 0, 1, 1, result)
+
+    assert(#U1 == 2)
+    for i = 1, #U1 do
+      local t = 1 - U1[i]
+      local u = 1 - U2[i]
+
+      U1[i] = nil
+      U2[i] = nil
+
+      if t_min > t then
+        t_min = t
+        u_min = u
+      end
+      if t_max < t then
+        t_max = t
+        u_max = u
+      end
+    end
+
+    U1[1] = t_min
+    U1[2] = t_max
+    U2[1] = u_min
+    U2[2] = u_max
+    result.is_identical = true
+
+    return result
+  else
+    return result
+  end
 end

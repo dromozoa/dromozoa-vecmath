@@ -230,6 +230,22 @@ function class.clip(a, min, max, b)
   end
 end
 
+-- a:reverse(bezier b)
+-- a:reverse()
+function class.reverse(a, b)
+  if b then
+    bernstein.reverse(a[1], b[1])
+    bernstein.reverse(a[2], b[2])
+    bernstein.reverse(a[3], b[3])
+    return a
+  else
+    bernstein.reverse(a[1])
+    bernstein.reverse(a[2])
+    bernstein.reverse(a[3])
+    return a
+  end
+end
+
 -- a:size()
 function class.size(a)
   return #a[1]
