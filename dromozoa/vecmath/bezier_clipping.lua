@@ -278,7 +278,7 @@ local function clip(B1, B2)
   end
 end
 
-local function iterate(B1, B2, u1, u2, u3, u4, m, result)
+local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   assert(0 <= u1 and u1 <= 1)
   assert(0 <= u2 and u2 <= 1)
   assert(u1 <= u2)
@@ -292,6 +292,9 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
     return result
   end
 
+  local B1 = bezier(b1):clip(u1, u2)
+  local B2 = bezier(b2):clip(u3, u4)
+
   local t1, t2 = clip(B1, B2)
   if not t1 then
     -- print "empty clipped (1)"
@@ -303,7 +306,8 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
   local a = u2 - u1
   u2 = u1 + a * t2
   u1 = u1 + a * t1
-  B1:clip(t1, t2)
+
+  local B1 = bezier(b1):clip(u1, u2)
 
   local t3, t4 = clip(B2, B1)
   if not t3 then
@@ -316,15 +320,14 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
   local b = u4 - u3
   u4 = u3 + b * t4
   u3 = u3 + b * t3
-  B2:clip(t3, t4)
 
   local done = false
 
   if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
     local t1 = (u1 + u2) / 2
     local t2 = (u3 + u4) / 2
-    local p1 = B1:eval(0.5, point2())
-    local p2 = B2:eval(0.5, point2())
+    local p1 = b1:eval(t1, point2())
+    local p2 = b2:eval(t2, point2())
     if p1:epsilon_equals(p2, p_epsilon) then
       local U2 = result[2]
       local U3 = result[3]
@@ -363,32 +366,23 @@ local function iterate(B1, B2, u1, u2, u3, u4, m, result)
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
       -- print "split (1)"
-      local B5 = bezier(B1)
-      local B6 = bezier(B2):clip(0.5, 1)
-      B2:clip(0, 0.5)
       local u5 = (u3 + u4) / 2
       assert(u3 <= u5 and u5 <= u4)
-      iterate(B1, B2, u1, u2, u3, u5, m, result)
-      return iterate(B5, B6, u1, u2, u5, u4, m, result)
+      iterate(b1, b2, u1, u2, u3, u5, m, result)
+      return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
       -- print "split (2)"
-      local B5 = bezier(B1):clip(0.5, 1)
-      local B6 = bezier(B2)
-      B1:clip(0, 0.5)
       local u5 = (u1 + u2) / 2
       assert(u1 <= u5 and u5 <= u2)
-      iterate(B1, B2, u1, u5, u3, u4, m, result)
-      return iterate(B5, B6, u5, u2, u3, u4, m, result)
+      iterate(b1, b2, u1, u5, u3, u4, m, result)
+      return iterate(b1, b2, u5, u2, u3, u4, m, result)
     end
   else
-    return iterate(B1, B2, u1, u2, u3, u4, m, result)
+    return iterate(b1, b2, u1, u2, u3, u4, m, result)
   end
 end
 
 return function (b1, b2, result)
-  local B1 = bezier(b1)
-  local B2 = bezier(b2)
-
   local U1 = result[1]
   local U2 = result[2]
   local n = #U1
@@ -398,8 +392,8 @@ return function (b1, b2, result)
   end
   result.is_identical = nil
 
-  local m = (B1:size() - 1) * (B2:size() - 1)
-  iterate(B1, B2, 0, 1, 0, 1, m, result)
+  local m = (b1:size() - 1) * (b2:size() - 1)
+  iterate(b1, b2, 0, 1, 0, 1, m, result)
 
   local n = #U1
   if n > m then
@@ -430,9 +424,9 @@ return function (b1, b2, result)
       end
     end
 
-    local B1 = bezier(b1):reverse()
-    local B2 = bezier(b2):reverse()
-    iterate(B1, B2, 0, 1, 0, 1, 1, result)
+    local b3 = bezier(b1):reverse()
+    local b4 = bezier(b2):reverse()
+    iterate(b3, b4, 0, 1, 0, 1, 1, result)
 
     assert(#U1 == 2)
     for i = 1, #U1 do
