@@ -26,7 +26,8 @@ local point2 = vecmath.point2
 local bezier = vecmath.bezier
 
 local verbose = os.getenv "VERBOSE" == "1"
-local epsilon = 1e-3
+local epsilon = 1e-12
+local epsilon_identical = 1e-6
 
 local _ = element
 local n = 64
@@ -124,12 +125,12 @@ local r = check(B1, B3, 2)
 local r = check(B1, B4, 3)
 local r = check(B1, B5, 1)
 local r = check(B4, B6, 9)
--- local r = check(B7, B8, 2)
--- assert(r.is_identical)
--- assert(math.abs(r[1][1] - 1/3) < epsilon)
--- assert(math.abs(r[1][2] - 1/1) < epsilon)
--- assert(math.abs(r[2][1] - 0/1) < epsilon)
--- assert(math.abs(r[2][2] - 1/2) < epsilon)
+local r = check(B7, B8, 2)
+assert(r.is_identical)
+assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
+assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
+assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
+assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
