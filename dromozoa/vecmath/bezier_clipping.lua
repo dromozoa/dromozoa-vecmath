@@ -25,8 +25,7 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 local sqrt = math.sqrt
 
 -- by experimentations
-local t_epsilon = 1e-14
-local d_epsilon = 1e-15
+local epsilon = 1e-14
 
 local function fat_line(B)
   local n = B:size()
@@ -39,14 +38,6 @@ local function fat_line(B)
   B:get(n, p)
   local x = p[1] - px
   local y = p[2] - py
-  local d = sqrt(x * x + y * y)
-  if d == 0 then
-    print "fat line not determined"
-    return
-  end
-  x = x / d
-  y = y / d
-  d = d * d_epsilon
 
   local a = y
   local b = -x
@@ -80,9 +71,6 @@ local function fat_line(B)
       end
     end
   end
-
-  d_min = d_min - d
-  d_max = d_max + d
 
   return a, b, c, d_min, d_max
 end
@@ -229,9 +217,7 @@ end
 
 local function clip(B1, B2)
   local a, b, c, d_min, d_max = fat_line(B2)
-  if not a then
-    return 0, 1
-  end
+  assert(a)
 
   local n = B1:size()
   local m = n - 1
@@ -325,7 +311,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
 
   local done = false
 
-  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
+  if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
     local t1 = (u1 + u2) / 2
     local t2 = (u3 + u4) / 2
     local p1 = b1:eval(t1, point2())
@@ -345,12 +331,12 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
         if a < 0 then
           a = -a
         end
-        if a <= t_epsilon then
+        if a <= epsilon then
           local b = U2[i] - t2
           if b < 0 then
             b = -b
           end
-          if b <= t_epsilon then
+          if b <= epsilon then
             return result
           end
         end
