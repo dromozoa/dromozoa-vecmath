@@ -259,13 +259,6 @@ local function clip(B1, B2)
 end
 
 local function iterate(b1, b2, u1, u2, u3, u4, m, result)
-  assert(0 <= u1 and u1 <= 1)
-  assert(0 <= u2 and u2 <= 1)
-  assert(u1 <= u2)
-  assert(0 <= u3 and u3 <= 1)
-  assert(0 <= u4 and u4 <= 1)
-  assert(u3 <= u4)
-
   local U1 = result[1]
   local n = #U1
   if n > m then
@@ -279,9 +272,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   if not t1 then
     return result
   end
-  assert(0 <= t1 and t1 <= 1)
-  assert(0 <= t2 and t2 <= 1)
-  assert(t1 <= t2)
   local a = u2 - u1
   u2 = u1 + a * t2
   u1 = u1 + a * t1
@@ -290,9 +280,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   if not t3 then
     return result
   end
-  assert(0 <= t3 and t3 <= 1)
-  assert(0 <= t4 and t4 <= 1)
-  assert(t3 <= t4)
   local b = u4 - u3
   u4 = u3 + b * t4
   u3 = u3 + b * t3
@@ -327,12 +314,10 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
       local u5 = (u3 + u4) / 2
-      assert(u3 <= u5 and u5 <= u4)
       iterate(b1, b2, u1, u2, u3, u5, m, result)
       return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
       local u5 = (u1 + u2) / 2
-      assert(u1 <= u5 and u5 <= u2)
       iterate(b1, b2, u1, u5, u3, u4, m, result)
       return iterate(b1, b2, u5, u2, u3, u4, m, result)
     end
@@ -386,7 +371,6 @@ return function (b1, b2, result)
     local b4 = bezier(b2):reverse()
     iterate(b3, b4, 0, 1, 0, 1, 1, result)
 
-    assert(#U1 == 2)
     for i = 1, #U1 do
       local t = 1 - U1[i]
       local u = 1 - U2[i]
