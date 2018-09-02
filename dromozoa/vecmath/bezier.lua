@@ -190,7 +190,10 @@ end
 -- a:clip(number min, number max, bezier b)
 -- a:clip(number min, number max)
 function class.clip(a, min, max, b)
-  local t = (max - min) / (1 - min)
+  local t = 0
+  if min < 1 then
+    t = (max - min) / (1 - min)
+  end
 
   if b then
     local AX = a[1]
