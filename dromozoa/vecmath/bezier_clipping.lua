@@ -25,23 +25,44 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 -- by experimentations
 local epsilon = 1e-11
 
-local function fat_line(B)
-  local n = B:size()
+local function fat_line(B1, B2)
+  local n = B1:size()
   local p = point2()
 
-  B:get(1, p)
+  B1:get(1, p)
   local px = p[1]
   local py = p[2]
 
-  B:get(n, p)
+  B1:get(n, p)
   local a = p[2] - py
   local b = px - p[1]
   local c = -(a * px + b * py)
 
+  if a == 0 and b == 0 then
+    print "fat line is point"
+    B2:get(1, p)
+    local qx = p[1]
+    local qy = p[2]
+    B2:get(B2:size(), p)
+    local ux = p[1] - qx
+    local uy = p[2] - qy
+    if ux == 0 and uy == 0 then
+      a = 0
+      b = 0
+      c = 0
+    else
+      ux, uy = -uy, ux
+      a = uy
+      b = -ux
+      c = -uy * px + ux * py
+      print("F", a, b, c)
+    end
+  end
+
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
-    B:get(i, p)
+    B1:get(i, p)
     local d = a * p[1] + b * p[2] + c
     if d_min > d then
       d_min = d
@@ -51,7 +72,7 @@ local function fat_line(B)
     end
   end
 
-  if not B:is_rational() then
+  if not B1:is_rational() then
     if n == 3 then
       d_min = d_min / 2
       d_max = d_max / 2
@@ -66,6 +87,8 @@ local function fat_line(B)
       end
     end
   end
+
+  print(("|= %.17g\t%.17g\t%.17g\t| %.17g %.17g"):format(a, b, c, d_min, d_max))
 
   return a, b, c, d_min, d_max
 end
@@ -84,6 +107,10 @@ local function clip_both(H, d_min, d_max)
     local qt = q[1]
     local qd = q[2]
 
+    print(("? %.17g %.17g"):format(d_min, d_max))
+    print("|", i, tostring(p), tostring(q), ("%.17g\t%.17g"):format(pd - d_min, d_max - pd))
+
+    -- if d_min - 1e-11 <= pd and pd <= d_max + 1e-11 then
     if d_min <= pd and pd <= d_max then
       if t1 > pt then
         t1 = pt
@@ -94,24 +121,26 @@ local function clip_both(H, d_min, d_max)
     end
 
     local d = pd - qd
-    local a = (pd - d_min) / d
-    if 0 < a and a < 1 then
-      local t = pt * (1 - a) + qt * a
-      if t1 > t then
-        t1 = t
+    if d ~= 0 then
+      local a = (pd - d_min) / d
+      if 0 < a and a < 1 then
+        local t = pt * (1 - a) + qt * a
+        if t1 > t then
+          t1 = t
+        end
+        if t2 < t then
+          t2 = t
+        end
       end
-      if t2 < t then
-        t2 = t
-      end
-    end
-    local a = (pd - d_max) / d
-    if 0 < a and a < 1 then
-      local t = pt * (1 - a) + qt * a
-      if t1 > t then
-        t1 = t
-      end
-      if t2 < t then
-        t2 = t
+      local a = (pd - d_max) / d
+      if 0 < a and a < 1 then
+        local t = pt * (1 - a) + qt * a
+        if t1 > t then
+          t1 = t
+        end
+        if t2 < t then
+          t2 = t
+        end
       end
     end
 
@@ -211,7 +240,7 @@ local function clip_max(H)
 end
 
 local function clip(B1, B2)
-  local a, b, c, d_min, d_max = fat_line(B2)
+  local a, b, c, d_min, d_max = fat_line(B2, B1)
 
   local n = B1:size()
   local m = n - 1
@@ -251,10 +280,17 @@ local function clip(B1, B2)
     local p = point2()
     for i = 1, n do
       B1:get(i, p)
+      print("%", tostring(p))
       P[i] = point2((i - 1) / m, a * p[1] + b * p[2] + c)
     end
     quickhull(P, H)
     return clip_both(H, d_min, d_max)
+  end
+end
+
+local function print_bezier(b)
+  for i = 1, b:size() do
+    print("B", i, tostring(b:get(i, point2())))
   end
 end
 
@@ -265,11 +301,16 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
 
+  print(u1, u2, u3, u4)
+
   local B1 = bezier(b1):clip(u1, u2)
+  print_bezier(B1)
   local B2 = bezier(b2):clip(u3, u4)
+  print_bezier(B2)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
+    print "NOT CLIPPED (1)"
     return result
   end
   local a = u2 - u1
@@ -278,6 +319,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
 
   local t3, t4 = clip(B2, B1)
   if not t3 then
+    print "NOT CLIPPED (2)"
     return result
   end
   local b = u4 - u3
@@ -308,15 +350,18 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     n = n + 1
     U1[n] = t1
     U2[n] = t2
+    print("DONE", t1, t2)
     return result
   end
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
+      print "SPLIT (1)"
       local u5 = (u3 + u4) / 2
       iterate(b1, b2, u1, u2, u3, u5, m, result)
       return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
+      print "SPLIT (2)"
       local u5 = (u1 + u2) / 2
       iterate(b1, b2, u1, u5, u3, u4, m, result)
       return iterate(b1, b2, u5, u2, u3, u4, m, result)
@@ -341,6 +386,7 @@ return function (b1, b2, result)
 
   local n = #U1
   if n > m then
+    print("IS_IDENTICAL", n, m)
 
     local t_min = U1[1]
     local t_max = t_min
