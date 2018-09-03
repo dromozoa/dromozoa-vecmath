@@ -133,8 +133,12 @@
   \bm{p} &amp;= (p_x, p_y) \\
   \bm{q} &amp;= (q_x, q_y) \\
   \bm{P} &amp;= (x, y) \\
+  \bm{v}
+  &amp;= \bm{q} - \bm{p} \\
+  &amp;= (q_x - p_x, q_y - p_y) \\
   \bm{u}
-  &amp;= \rm{normalize}(\bm{q} - \bm{p}) \\
+  &amp;= \rm{normalize}(\bm{v}) \\
+  &amp;= \left(\frac{v_x}{|\bm{v}|}, \frac{v_y}{|\bm{v}|}\right) \\
   &amp;= (u_x, u_y) \quad u_x^2 + u_y^2 = 1 \\
   d
   &amp;= (\bm{P} - \bm{p}) \times \bm{u} \\
@@ -147,6 +151,21 @@
   c &amp;= -u_y p_x + u_x p_y
 \end{aligned}\]
 線分は\(d=0\)となるような直線で表される。
+</p>
+
+<h3>数値誤差</h3>
+
+<p>
+\(\bm{v}\)を正規化することで誤差が発生する。
+\[\begin{aligned}
+  d |\bm{v}|
+  &amp;= v_y x - v_x y - v_y p_x + v_x p_y \\
+  &amp;= A x + B y + C \\
+  A &amp;= v_y \\
+  B &amp;= -v_x \\
+  C &amp;= -v_y p_x + v_x p_y \\
+\end{aligned}\]
+を用いたほうがよい。
 </p>
 
 </div>

@@ -26,8 +26,9 @@ local point2 = vecmath.point2
 local bezier = vecmath.bezier
 
 local verbose = os.getenv "VERBOSE" == "1"
-local epsilon = 1e-12
+local epsilon = 1e-9
 local epsilon_identical = 1e-6
+local not_check = os.getenv "NOT_CHECK" == "1"
 
 local _ = element
 local n = 64
@@ -71,7 +72,7 @@ local root = _"g" {}
 
 local y = 0
 
-local function check(B1, B2, n)
+local function check(B1, B2, n, is_identical)
   local node = _"g" {
     transform = "translate(320,320)";
   }
@@ -97,15 +98,39 @@ local function check(B1, B2, n)
     print(("=="):rep(40))
   end
 
-  local result = bezier_clipping(B1, B2, { {}, {} })
-  draw_points(node, B1, result[1], "#66C")
-  draw_points(node, B2, result[2], "#C66")
+  local U1 = {}
+  local U2 = {}
 
-  if verbose then
-    print("!", #result[1], n)
+  local result = bezier_clipping(B1, B2, { U1, U2 })
+
+  draw_points(node, B1, U1, "#66C")
+  draw_points(node, B2, U2, "#C66")
+
+  local e2 = 0
+  for i = 1, #U1 do
+    local p = B1:eval(U1[i], point2())
+    local q = B2:eval(U2[i], point2())
+    e2 = e2 + p:distance_squared(q)
   end
-  assert(#result[1] == n)
-  assert(#result[2] == n)
+  e2 = e2 / #U1
+  local e = math.sqrt(e2)
+  if verbose then
+    print("E", e)
+    print("!", #U1, n)
+  end
+
+  if not not_check then
+    if result.is_identical then
+      assert(is_identical)
+      assert(e <= epsilon_identical)
+    else
+      assert(not is_identical)
+      assert(e <= epsilon)
+    end
+
+    assert(#U1 == n)
+    assert(#U2 == n)
+  end
   return result
 end
 
@@ -125,12 +150,61 @@ local r = check(B1, B3, 2)
 local r = check(B1, B4, 3)
 local r = check(B1, B5, 1)
 local r = check(B4, B6, 9)
-local r = check(B7, B8, 2)
-assert(r.is_identical)
-assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
-assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
-assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
-assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
+local r = check(B7, B8, 2, true)
+if not not_check then
+  assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
+  assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
+  assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
+  assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
+end
+
+local B1 = vecmath.bezier({-200,0},{200,0})
+local B2 = vecmath.bezier({200,0},{200,-200})
+local r = check(B1, B2, 1)
+
+local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
+local B2 = vecmath.bezier({200,0},{200,-200})
+local r = check(B1, B2, 1)
+
+local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
+local B2 = vecmath.bezier({200,0},{100,-100},{200,-200})
+local r = check(B1, B2, 1)
+
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
+local B2 = vecmath.bezier({-200,0},{200,0})
+local r = check(B1, B2, 3)
+
+local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
+local B2 = vecmath.bezier({-200,0},{200,0})
+local r = check(B1, B2, 3)
+
+local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
+local B2 = vecmath.bezier({-200,0},{199,0})
+local r = check(B1, B2, 3)
+
+local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
+local B2 = vecmath.bezier({-200,0},{200,-0})
+local r = check(B1, B2, 3)
+
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
+local B2 = vecmath.bezier({-200,0},{-100,200},{100,-200},{200,0})
+local r = check(B1, B2, 5)
+
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
+local B2 = vecmath.bezier({-200,0},{-50,100},{50,-100},{200,0})
+local r = check(B1, B2, 3)
+
+--local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
+--local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
+--local r = check(B1, B2, 3)
+
+--local B1 = vecmath.bezier({-200,0},{-50,200+1e-9},{50,200+1e-9},{200,0})
+--local B2 = vecmath.bezier({-200,0},{-100,200},{100,200},{200,0})
+--if verbose then
+--  print("!1", tostring(B1:eval(0.5, point2())))
+--  print("!2", tostring(B2:eval(0.5, point2())))
+--end
+--local r = check(B1, B2, 3)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

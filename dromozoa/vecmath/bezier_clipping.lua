@@ -22,40 +22,48 @@ local vector2 = require "dromozoa.vecmath.vector2"
 local bezier = require "dromozoa.vecmath.bezier"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
-local sqrt = math.sqrt
-
 -- by experimentations
-local t_epsilon = 1e-14
-local d_epsilon = 1e-15
+local epsilon = 1e-11
 
-local function fat_line(B)
-  local n = B:size()
+local function fat_line(B1, B2)
+  local n = B1:size()
   local p = point2()
 
-  B:get(1, p)
+  B1:get(1, p)
   local px = p[1]
   local py = p[2]
 
-  B:get(n, p)
-  local x = p[1] - px
-  local y = p[2] - py
-  local d = sqrt(x * x + y * y)
-  if d == 0 then
-    print "fat line not determined"
-    return
-  end
-  x = x / d
-  y = y / d
-  d = d * d_epsilon
+  B1:get(n, p)
+  local a = p[2] - py
+  local b = px - p[1]
+  local c = -(a * px + b * py)
 
-  local a = y
-  local b = -x
-  local c = x * py - y * px
+  if a == 0 and b == 0 then
+    print "fat line is point"
+    B2:get(1, p)
+    local qx = p[1]
+    local qy = p[2]
+    B2:get(B2:size(), p)
+    local ux = p[1] - qx
+    local uy = p[2] - qy
+    if ux == 0 and uy == 0 then
+      a = 0
+      b = 0
+      c = 0
+    else
+      ux, uy = -uy, ux
+      a = uy
+      b = -ux
+      c = -uy * px + ux * py
+      print("F", a, b, c)
+    end
+  end
 
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
-    B:get(i, p)
+  -- for i = 1, n do
+    B1:get(i, p)
     local d = a * p[1] + b * p[2] + c
     if d_min > d then
       d_min = d
@@ -65,7 +73,7 @@ local function fat_line(B)
     end
   end
 
-  if not B:is_rational() then
+  if not B1:is_rational() then
     if n == 3 then
       d_min = d_min / 2
       d_max = d_max / 2
@@ -81,8 +89,7 @@ local function fat_line(B)
     end
   end
 
-  d_min = d_min - d
-  d_max = d_max + d
+  print(("X= %.17g\t%.17g\t%.17g\t| %.17g %.17g"):format(a, b, c, d_min, d_max))
 
   return a, b, c, d_min, d_max
 end
@@ -96,11 +103,16 @@ local function clip_both(H, d_min, d_max)
   local pt = p[1]
   local pd = p[2]
 
+  print(("pd %.17g"):format(pd))
+
   for i = 1, n do
     local q = H[i]
     local qt = q[1]
     local qd = q[2]
 
+    print(("qd %.17g / %.17g [%d]"):format(qd, pd - qd, i))
+
+    -- if d_min - 1e-11 <= pd and pd <= d_max + 1e-11 then
     if d_min <= pd and pd <= d_max then
       if t1 > pt then
         t1 = pt
@@ -111,24 +123,26 @@ local function clip_both(H, d_min, d_max)
     end
 
     local d = pd - qd
-    local a = (pd - d_min) / d
-    if 0 < a and a < 1 then
-      local t = pt * (1 - a) + qt * a
-      if t1 > t then
-        t1 = t
+    if d ~= 0 then
+      local a = (pd - d_min) / d
+      if 0 < a and a < 1 then
+        local t = pt * (1 - a) + qt * a
+        if t1 > t then
+          t1 = t
+        end
+        if t2 < t then
+          t2 = t
+        end
       end
-      if t2 < t then
-        t2 = t
-      end
-    end
-    local a = (pd - d_max) / d
-    if 0 < a and a < 1 then
-      local t = pt * (1 - a) + qt * a
-      if t1 > t then
-        t1 = t
-      end
-      if t2 < t then
-        t2 = t
+      local a = (pd - d_max) / d
+      if 0 < a and a < 1 then
+        local t = pt * (1 - a) + qt * a
+        if t1 > t then
+          t1 = t
+        end
+        if t2 < t then
+          t2 = t
+        end
       end
     end
 
@@ -228,10 +242,7 @@ local function clip_max(H)
 end
 
 local function clip(B1, B2)
-  local a, b, c, d_min, d_max = fat_line(B2)
-  if not a then
-    return 0, 1
-  end
+  local a, b, c, d_min, d_max = fat_line(B2, B1)
 
   local n = B1:size()
   local m = n - 1
@@ -278,14 +289,13 @@ local function clip(B1, B2)
   end
 end
 
-local function iterate(b1, b2, u1, u2, u3, u4, m, result)
-  assert(0 <= u1 and u1 <= 1)
-  assert(0 <= u2 and u2 <= 1)
-  assert(u1 <= u2)
-  assert(0 <= u3 and u3 <= 1)
-  assert(0 <= u4 and u4 <= 1)
-  assert(u3 <= u4)
+local function print_bezier(b)
+  for i = 1, b:size() do
+    print("B", i, tostring(b:get(i, point2())))
+  end
+end
 
+local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   local U1 = result[1]
   local n = #U1
   if n > m then
@@ -295,87 +305,72 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   print(u1, u2, u3, u4)
 
   local B1 = bezier(b1):clip(u1, u2)
+  -- print_bezier(B1)
   local B2 = bezier(b2):clip(u3, u4)
+  -- print_bezier(B2)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
-    print "empty clipped (1)"
+    print "NOT CLIPPED (1)"
     return result
   end
-  assert(0 <= t1 and t1 <= 1)
-  assert(0 <= t2 and t2 <= 1)
-  assert(t1 <= t2)
   local a = u2 - u1
   u2 = u1 + a * t2
   u1 = u1 + a * t1
 
-  -- local B1 = bezier(b1):clip(u1, u2)
-
   local t3, t4 = clip(B2, B1)
   if not t3 then
-    print "empty clipped (2)"
+    print "NOT CLIPPED (2)"
     return result
   end
-  assert(0 <= t3 and t3 <= 1)
-  assert(0 <= t4 and t4 <= 1)
-  assert(t3 <= t4)
   local b = u4 - u3
   u4 = u3 + b * t4
   u3 = u3 + b * t3
 
-  local done = false
-
-  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
+  if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
     local t1 = (u1 + u2) / 2
     local t2 = (u3 + u4) / 2
-    local p1 = b1:eval(t1, point2())
-    local p2 = b2:eval(t2, point2())
-    if true then
-      local U2 = result[2]
-      local U3 = result[3]
-      if not U3 then
-        U3 = {}
-        result[3] = U3
+    local U2 = result[2]
+
+    for i = 1, n do
+      local a = U1[i] - t1
+      if a < 0 then
+        a = -a
       end
-
-      p1:interpolate(p2, 0.5)
-
-      for i = 1, n do
-        local a = U1[i] - t1
-        if a < 0 then
-          a = -a
+      if a <= epsilon then
+        local b = U2[i] - t2
+        if b < 0 then
+          b = -b
         end
-        if a <= t_epsilon then
-          local b = U2[i] - t2
-          if b < 0 then
-            b = -b
-          end
-          if b <= t_epsilon then
-            return result
-          end
+        if b <= epsilon then
+          return result
         end
       end
-
-      n = n + 1
-      U1[n] = t1
-      U2[n] = t2
-      U3[n] = p1:interpolate(p2, 0.5)
-      print("done", t1, t2)
-      return result
     end
+
+    n = n + 1
+    U1[n] = t1
+    U2[n] = t2
+    print("DONE", t1, t2)
+    return result
   end
+
+  local d_epsilon = 1e-16
+  local d_epsilon = 2.22044604925031e-16 / 2
+  u1 = u1 - d_epsilon if u1 < 0 then u1 = 0 end
+  u2 = u2 + d_epsilon if u2 > 1 then u2 = 1 end
+  u3 = u3 - d_epsilon if u3 < 0 then u3 = 0 end
+  u4 = u4 + d_epsilon if u4 > 1 then u4 = 1 end
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
-      print "split (1)"
+      print "SPLIT (1)"
       local u5 = (u3 + u4) / 2
-      assert(u3 <= u5 and u5 <= u4)
       iterate(b1, b2, u1, u2, u3, u5, m, result)
       return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
-      print "split (2)"
+      print "SPLIT (2)"
       local u5 = (u1 + u2) / 2
-      assert(u1 <= u5 and u5 <= u2)
       iterate(b1, b2, u1, u5, u3, u4, m, result)
       return iterate(b1, b2, u5, u2, u3, u4, m, result)
     end
@@ -399,7 +394,7 @@ return function (b1, b2, result)
 
   local n = #U1
   if n > m then
-    print "IS_IDENTICAL"
+    print("IS_IDENTICAL", n, m)
 
     local t_min = U1[1]
     local t_max = t_min
@@ -430,7 +425,6 @@ return function (b1, b2, result)
     local b4 = bezier(b2):reverse()
     iterate(b3, b4, 0, 1, 0, 1, 1, result)
 
-    assert(#U1 == 2)
     for i = 1, #U1 do
       local t = 1 - U1[i]
       local u = 1 - U2[i]
