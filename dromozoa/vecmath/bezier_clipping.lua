@@ -289,12 +289,6 @@ local function clip(B1, B2)
   end
 end
 
-local function print_bezier(b)
-  for i = 1, b:size() do
-    print("B", i, tostring(b:get(i, point2())))
-  end
-end
-
 local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   local U1 = result[1]
   local n = #U1
@@ -305,9 +299,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   print(u1, u2, u3, u4)
 
   local B1 = bezier(b1):clip(u1, u2)
-  -- print_bezier(B1)
   local B2 = bezier(b2):clip(u3, u4)
-  -- print_bezier(B2)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
