@@ -353,26 +353,25 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
 
-  local d_epsilon = 2.22044604925031e-16 / 2
-  v1 = v1 - d_epsilon if v1 < 0 then v1 = 0 end
-  v2 = v2 + d_epsilon if v2 > 1 then v2 = 1 end
-  v3 = v3 - d_epsilon if v3 < 0 then v3 = 0 end
-  v4 = v4 + d_epsilon if v4 > 1 then v4 = 1 end
-
-  if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
+  if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
     if a < b then
-      -- print "SPLIT (1)"
+      print "SPLIT (1)"
       -- local u5 = focus(b1, b2, u1, u2, u3, u4)
-      local v5 = (v3 + v4) / 2
-      iterate(b1, b2, v1, v2, v3, v5, m, result)
-      return iterate(b1, b2, v1, v2, v5, v4, m, result)
+      local u5 = (u3 + u4) / 2
+      iterate(b1, b2, u1, u2, u3, u5, m, result)
+      return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
       print "SPLIT (2)"
-      local v5 = (v1 + v2) / 2
-      iterate(b1, b2, v1, v5, v3, v4, m, result)
-      return iterate(b1, b2, v5, v2, v3, v4, m, result)
+      local u5 = (u1 + u2) / 2
+      iterate(b1, b2, u1, u5, u3, u4, m, result)
+      return iterate(b1, b2, u5, u2, u3, u4, m, result)
     end
   else
+    local d_epsilon = 2.22044604925031e-16 / 2
+    v1 = v1 - d_epsilon if v1 < 0 then v1 = 0 end
+    v2 = v2 + d_epsilon if v2 > 1 then v2 = 1 end
+    v3 = v3 - d_epsilon if v3 < 0 then v3 = 0 end
+    v4 = v4 + d_epsilon if v4 > 1 then v4 = 1 end
     return iterate(b1, b2, v1, v2, v3, v4, m, result)
   end
 end

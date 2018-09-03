@@ -27,7 +27,7 @@ local bezier = vecmath.bezier
 
 local verbose = os.getenv "VERBOSE" == "1"
 local epsilon = 1e-9
-local epsilon_identical = 1e-6
+local epsilon_identical = 1e-5
 local not_check = os.getenv "NOT_CHECK" == "1"
 
 local _ = element
@@ -151,6 +151,12 @@ local r = check(B1, B4, 3)
 local r = check(B1, B5, 1)
 local r = check(B4, B6, 9)
 local r = check(B7, B8, 2, true)
+if verbose then
+  print(math.abs(r[1][1] - 1/3))
+  print(math.abs(r[1][2] - 1/1))
+  print(math.abs(r[2][1] - 0/1))
+  print(math.abs(r[2][2] - 1/2))
+end
 if not not_check then
   assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
   assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
