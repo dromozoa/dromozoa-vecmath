@@ -355,7 +355,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
 
-  local d_epsilon = 1e-16
   local d_epsilon = 2.22044604925031e-16 / 2
   u1 = u1 - d_epsilon if u1 < 0 then u1 = 0 end
   u2 = u2 + d_epsilon if u2 > 1 then u2 = 1 end
