@@ -194,9 +194,9 @@ local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
 local B2 = vecmath.bezier({-200,0},{-50,100},{50,-100},{200,0})
 local r = check(B1, B2, 3)
 
-local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
-local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
-local r = check(B1, B2, 3)
+--local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
+--local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
+--local r = check(B1, B2, 3)
 
 --local B1 = vecmath.bezier({-200,0},{-50,200+1e-9},{50,200+1e-9},{200,0})
 --local B2 = vecmath.bezier({-200,0},{-100,200},{100,200},{200,0})

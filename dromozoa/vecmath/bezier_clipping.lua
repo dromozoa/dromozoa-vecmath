@@ -289,6 +289,12 @@ local function clip(B1, B2)
   end
 end
 
+local function focus(B1, B2)
+  -- focus F of B2
+  -- distance B1 and F
+  -- B1 range
+end
+
 local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   local U1 = result[1]
   local n = #U1
@@ -307,8 +313,8 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
   local a = u2 - u1
-  u2 = u1 + a * t2
-  u1 = u1 + a * t1
+  local v2 = u1 + a * t2
+  local v1 = u1 + a * t1
 
   local t3, t4 = clip(B2, B1)
   if not t3 then
@@ -316,12 +322,12 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
   local b = u4 - u3
-  u4 = u3 + b * t4
-  u3 = u3 + b * t3
+  local v4 = u3 + b * t4
+  local v3 = u3 + b * t3
 
-  if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
-    local t1 = (u1 + u2) / 2
-    local t2 = (u3 + u4) / 2
+  if v2 - v1 <= epsilon and v4 - v3 <= epsilon then
+    local t1 = (v1 + v2) / 2
+    local t2 = (v3 + v4) / 2
     local U2 = result[2]
 
     for i = 1, n do
@@ -348,25 +354,26 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   end
 
   local d_epsilon = 2.22044604925031e-16 / 2
-  u1 = u1 - d_epsilon if u1 < 0 then u1 = 0 end
-  u2 = u2 + d_epsilon if u2 > 1 then u2 = 1 end
-  u3 = u3 - d_epsilon if u3 < 0 then u3 = 0 end
-  u4 = u4 + d_epsilon if u4 > 1 then u4 = 1 end
+  v1 = v1 - d_epsilon if v1 < 0 then v1 = 0 end
+  v2 = v2 + d_epsilon if v2 > 1 then v2 = 1 end
+  v3 = v3 - d_epsilon if v3 < 0 then v3 = 0 end
+  v4 = v4 + d_epsilon if v4 > 1 then v4 = 1 end
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then
-      print "SPLIT (1)"
-      local u5 = (u3 + u4) / 2
-      iterate(b1, b2, u1, u2, u3, u5, m, result)
-      return iterate(b1, b2, u1, u2, u5, u4, m, result)
+      -- print "SPLIT (1)"
+      -- local u5 = focus(b1, b2, u1, u2, u3, u4)
+      local v5 = (v3 + v4) / 2
+      iterate(b1, b2, v1, v2, v3, v5, m, result)
+      return iterate(b1, b2, v1, v2, v5, v4, m, result)
     else
       print "SPLIT (2)"
-      local u5 = (u1 + u2) / 2
-      iterate(b1, b2, u1, u5, u3, u4, m, result)
-      return iterate(b1, b2, u5, u2, u3, u4, m, result)
+      local v5 = (v1 + v2) / 2
+      iterate(b1, b2, v1, v5, v3, v4, m, result)
+      return iterate(b1, b2, v5, v2, v3, v4, m, result)
     end
   else
-    return iterate(b1, b2, u1, u2, u3, u4, m, result)
+    return iterate(b1, b2, v1, v2, v3, v4, m, result)
   end
 end
 
