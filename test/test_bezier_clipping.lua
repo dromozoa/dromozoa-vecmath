@@ -152,7 +152,6 @@ local r = check(B1, B5, 1)
 local r = check(B4, B6, 9)
 local r = check(B7, B8, 2, true)
 if not not_check then
-  assert(r.is_identical)
   assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
   assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
   assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
@@ -171,7 +170,7 @@ local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
 local B2 = vecmath.bezier({200,0},{100,-100},{200,-200})
 local r = check(B1, B2, 1)
 
-local B1 = vecmath.bezier({-200, 0},{-50,200},{50,-200},{200,0})
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
 local B2 = vecmath.bezier({-200,0},{200,0})
 local r = check(B1, B2, 3)
 
@@ -186,6 +185,26 @@ local r = check(B1, B2, 3)
 local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
 local B2 = vecmath.bezier({-200,0},{200,-0})
 local r = check(B1, B2, 3)
+
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
+local B2 = vecmath.bezier({-200,0},{-100,200},{100,-200},{200,0})
+local r = check(B1, B2, 5)
+
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
+local B2 = vecmath.bezier({-200,0},{-50,100},{50,-100},{200,0})
+local r = check(B1, B2, 3)
+
+--local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
+--local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
+--local r = check(B1, B2, 3)
+
+--local B1 = vecmath.bezier({-200,0},{-50,200+1e-9},{50,200+1e-9},{200,0})
+--local B2 = vecmath.bezier({-200,0},{-100,200},{100,200},{200,0})
+--if verbose then
+--  print("!1", tostring(B1:eval(0.5, point2())))
+--  print("!2", tostring(B2:eval(0.5, point2())))
+--end
+--local r = check(B1, B2, 3)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
