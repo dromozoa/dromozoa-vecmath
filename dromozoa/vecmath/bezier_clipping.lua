@@ -62,6 +62,7 @@ local function fat_line(B1, B2)
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
+  -- for i = 1, n do
     B1:get(i, p)
     local d = a * p[1] + b * p[2] + c
     if d_min > d then
@@ -88,7 +89,7 @@ local function fat_line(B1, B2)
     end
   end
 
-  print(("|= %.17g\t%.17g\t%.17g\t| %.17g %.17g"):format(a, b, c, d_min, d_max))
+  print(("X= %.17g\t%.17g\t%.17g\t| %.17g %.17g"):format(a, b, c, d_min, d_max))
 
   return a, b, c, d_min, d_max
 end
@@ -102,13 +103,14 @@ local function clip_both(H, d_min, d_max)
   local pt = p[1]
   local pd = p[2]
 
+  print(("pd %.17g"):format(pd))
+
   for i = 1, n do
     local q = H[i]
     local qt = q[1]
     local qd = q[2]
 
-    print(("? %.17g %.17g"):format(d_min, d_max))
-    print("|", i, tostring(p), tostring(q), ("%.17g\t%.17g"):format(pd - d_min, d_max - pd))
+    print(("qd %.17g / %.17g [%d]"):format(qd, pd - qd, i))
 
     -- if d_min - 1e-11 <= pd and pd <= d_max + 1e-11 then
     if d_min <= pd and pd <= d_max then
@@ -280,7 +282,6 @@ local function clip(B1, B2)
     local p = point2()
     for i = 1, n do
       B1:get(i, p)
-      print("%", tostring(p))
       P[i] = point2((i - 1) / m, a * p[1] + b * p[2] + c)
     end
     quickhull(P, H)
@@ -304,9 +305,9 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   print(u1, u2, u3, u4)
 
   local B1 = bezier(b1):clip(u1, u2)
-  print_bezier(B1)
+  -- print_bezier(B1)
   local B2 = bezier(b2):clip(u3, u4)
-  print_bezier(B2)
+  -- print_bezier(B2)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
@@ -353,6 +354,13 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     print("DONE", t1, t2)
     return result
   end
+
+  local d_epsilon = 1e-16
+  local d_epsilon = 2.22044604925031e-16 / 2
+  u1 = u1 - d_epsilon if u1 < 0 then u1 = 0 end
+  u2 = u2 + d_epsilon if u2 > 1 then u2 = 1 end
+  u3 = u3 - d_epsilon if u3 < 0 then u3 = 0 end
+  u4 = u4 + d_epsilon if u4 > 1 then u4 = 1 end
 
   if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
     if a < b then

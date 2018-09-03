@@ -28,6 +28,7 @@ local bezier = vecmath.bezier
 local verbose = os.getenv "VERBOSE" == "1"
 local epsilon = 1e-9
 local epsilon_identical = 1e-6
+local not_check = os.getenv "NOT_CHECK" == "1"
 
 local _ = element
 local n = 64
@@ -115,21 +116,21 @@ local function check(B1, B2, n, is_identical)
   local e = math.sqrt(e2)
   if verbose then
     print("E", e)
-  end
-
-  if result.is_identical then
-    assert(is_identical)
-    assert(e <= epsilon_identical)
-  else
-    assert(not is_identical)
-    assert(e <= epsilon)
-  end
-
-  if verbose then
     print("!", #U1, n)
   end
-  assert(#U1 == n)
-  assert(#U2 == n)
+
+  if not not_check then
+    if result.is_identical then
+      assert(is_identical)
+      assert(e <= epsilon_identical)
+    else
+      assert(not is_identical)
+      assert(e <= epsilon)
+    end
+
+    assert(#U1 == n)
+    assert(#U2 == n)
+  end
   return result
 end
 
@@ -150,11 +151,13 @@ local r = check(B1, B4, 3)
 local r = check(B1, B5, 1)
 local r = check(B4, B6, 9)
 local r = check(B7, B8, 2, true)
-assert(r.is_identical)
-assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
-assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
-assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
-assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
+if not not_check then
+  assert(r.is_identical)
+  assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
+  assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
+  assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
+  assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
+end
 
 local B1 = vecmath.bezier({-200,0},{200,0})
 local B2 = vecmath.bezier({200,0},{200,-200})
@@ -176,13 +179,13 @@ local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
 local B2 = vecmath.bezier({-200,0},{200,0})
 local r = check(B1, B2, 3)
 
--- local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
--- local B2 = vecmath.bezier({-200,0},{199,0})
--- local r = check(B1, B2, 3)
+local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
+local B2 = vecmath.bezier({-200,0},{199,0})
+local r = check(B1, B2, 3)
 
--- local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
--- local B2 = vecmath.bezier({-200,0},{200,-0})
--- local r = check(B1, B2, 3)
+local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
+local B2 = vecmath.bezier({-200,0},{200,-0})
+local r = check(B1, B2, 3)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
