@@ -289,10 +289,26 @@ local function clip(B1, B2)
   end
 end
 
+local function focus(B2)
+  local p = point2()
+  local q = point2()
+  local u = vector2()
+  local v = vector2()
+
+
+
+
+
+end
+
 local function split(B1, B2)
   -- focus F of B2
   -- distance B1 and F
   -- B1 range
+
+  local F = focus(B2)
+
+
 
 
 
