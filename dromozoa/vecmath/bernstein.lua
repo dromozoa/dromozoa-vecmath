@@ -223,6 +223,36 @@ function class.elevate(a, b)
   end
 end
 
+-- a:deriv(bernstein b)
+-- a:deriv()
+function class.deriv(a, b)
+  if b then
+    local n = #b
+    local m = n - 1
+    local u = b[1]
+    for i = 2, n do
+      local v = b[i]
+      a[i - 1] = m * (v - u)
+      u = v
+    end
+    for i = n, #a do
+      a[i] = nil
+    end
+    return a
+  else
+    local n = #a
+    local m = n - 1
+    local u = a[1]
+    for i = 2, n do
+      local v = a[i]
+      a[i - 1] = m * (v - u)
+      u = v
+    end
+    a[n] = nil
+    return a
+  end
+end
+
 -- class(number b, ...)
 -- class(polynomial b)
 -- class(bernstein b)
