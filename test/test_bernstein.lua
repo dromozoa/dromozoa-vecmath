@@ -176,3 +176,25 @@ assert(b2[1] == 19)
 assert(b2[2] == 13)
 assert(b2[3] == 11)
 assert(b2[4] == 7)
+
+local b = bernstein(0, 4, 6, 12):elevate()
+if verbose then
+  print(table.concat(b, " "))
+end
+assert(#b == 5)
+assert(b[1] == 0)
+assert(b[2] == 3)
+assert(b[3] == 5)
+assert(b[4] == 7.5)
+assert(b[5] == 12)
+
+local b = bernstein(1,1,1,1,1,1,1,1,1):elevate{12, 6, 4, 0}
+if verbose then
+  print(table.concat(b, " "))
+end
+assert(#b == 5)
+assert(b[1] == 12)
+assert(b[2] == 7.5)
+assert(b[3] == 5)
+assert(b[4] == 3)
+assert(b[5] == 0)

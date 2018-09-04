@@ -191,6 +191,38 @@ function class.reverse(a, b)
   end
 end
 
+-- a:elevate(bernstein b)
+-- a:elevate()
+function class.elevate(a, b)
+  if b then
+    local n = #b
+    local t = b[1]
+    a[1] = t
+    for i = 2, n do
+      local u = b[i]
+      local v = (i - 1) / n
+      a[i] = v * t + (1 - v) * u
+      t = u
+    end
+    a[n + 1] = t
+    for i = n + 2, #a do
+      a[i] = nil
+    end
+    return a
+  else
+    local n = #a
+    local t = a[1]
+    for i = 2, n do
+      local u = a[i]
+      local v = (i - 1) / n
+      a[i] = v * t + (1 - v) * u
+      t = u
+    end
+    a[n + 1] = t
+    return a
+  end
+end
+
 -- class(number b, ...)
 -- class(polynomial b)
 -- class(bernstein b)
