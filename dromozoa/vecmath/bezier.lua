@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local bernstein = require "dromozoa.vecmath.bernstein"
+local polynomial = require "dromozoa.vecmath.polynomial"
 
 local setmetatable = setmetatable
 local type = type
@@ -273,6 +274,28 @@ function class.deriv(a, b)
     local Z = a[3]
 
     if Z[1] then
+      local PX = bernstein.get(X, {})
+      local PY = bernstein.get(Y, {})
+      local PZ = bernstein.get(Z, {})
+
+      local DX = polynomial.deriv({}, PX)
+      local DY = polynomial.deriv({}, PY)
+      local DZ = polynomial.deriv({}, PZ)
+
+      local DX_PZ = polynomial.mul({}, DX, PZ)
+      local PX_DZ = polynomial.mul({}, PX, DZ)
+      local DY_PZ = polynomial.mul({}, DY, PZ)
+      local PY_DZ = polynomial.mul({}, PY, DZ)
+
+      local QZ = polynomial.mul({}, PZ, PZ)
+      local QX = polynomial.sub(DX_PZ, PX_DZ)
+      local QY = polynomial.sub(DY_PZ, PY_DZ)
+      bernstein.set_polynomial(X, QX)
+      bernstein.elevate(X)
+      bernstein.set_polynomial(Y, QY)
+      bernstein.elevate(Y)
+      bernstein.set_polynomial(Z, QZ)
+      return a
     else
       bernstein.deriv(X)
       bernstein.deriv(Y)
