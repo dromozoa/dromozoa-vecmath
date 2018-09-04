@@ -289,10 +289,15 @@ local function clip(B1, B2)
   end
 end
 
-local function focus(B1, B2)
+local function split(B1, B2)
   -- focus F of B2
   -- distance B1 and F
   -- B1 range
+
+
+
+
+  return 0.5
 end
 
 local function iterate(b1, b2, u1, u2, u3, u4, m, result)
@@ -355,14 +360,16 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
 
   if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
     if a < b then
-      print "SPLIT (1)"
+      print "SPLIT (2)"
       -- local u5 = focus(b1, b2, u1, u2, u3, u4)
-      local u5 = (u3 + u4) / 2
+      local a = split(B2, B1)
+      local u5 = u3 * (1 - a) + u4 * a
       iterate(b1, b2, u1, u2, u3, u5, m, result)
       return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
-      print "SPLIT (2)"
-      local u5 = (u1 + u2) / 2
+      print "SPLIT (1)"
+      local a = split(B1, B2)
+      local u5 = u1 * (1 - a) + u2 * a
       iterate(b1, b2, u1, u5, u3, u4, m, result)
       return iterate(b1, b2, u5, u2, u3, u4, m, result)
     end
