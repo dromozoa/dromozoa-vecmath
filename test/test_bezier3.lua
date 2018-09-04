@@ -110,9 +110,9 @@ assert(b3:size() == 5) -- quartic
 
 for i = 0, N do
   local t = i / N
-  local v1 = b1:eval_point2(t, vector2())
-  local v2 = b2:eval_point2(t, vector2())
-  local v3 = b3:eval_point2(t, vector2())
+  local v1 = b1:eval(t, vector2())
+  local v2 = b2:eval(t, vector2())
+  local v3 = b3:eval(t, vector2())
   assert(math.abs(v1:dot(v2)) < epsilon)
   assert(math.abs(v1:dot(v3)) < epsilon)
 end

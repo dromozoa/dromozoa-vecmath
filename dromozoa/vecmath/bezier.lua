@@ -21,8 +21,8 @@ local polynomial = require "dromozoa.vecmath.polynomial"
 local setmetatable = setmetatable
 local type = type
 
--- a:get_point2(number b, point2 c)
-local function get_point2(a, b, c)
+-- a:get_tuple2(number b, point2 c)
+local function get_tuple2(a, b, c)
   local z = a[3][b]
   if z then
     c[1] = a[1][b] / z
@@ -35,16 +35,16 @@ local function get_point2(a, b, c)
   end
 end
 
--- a:get_point3(number b, point3 c)
-local function get_point3(a, b, c)
+-- a:get_tuple3(number b, point3 c)
+local function get_tuple3(a, b, c)
   c[1] = a[1][b]
   c[2] = a[2][b]
   c[3] = a[3][b] or 1
   return c
 end
 
--- a:eval_point2(number b, point2 c)
-local function eval_point2(a, b, c)
+-- a:eval_tuple2(number b, point2 c)
+local function eval_tuple2(a, b, c)
   local Z = a[3]
   local t = {}
   if Z[1] then
@@ -59,8 +59,8 @@ local function eval_point2(a, b, c)
   end
 end
 
--- a:eval_point3(number b, point3 c)
-local function eval_point3(a, b, c)
+-- a:eval_tuple3(number b, point3 c)
+local function eval_tuple3(a, b, c)
   local Z = a[3]
   local t = {}
   if Z[1] then
@@ -78,10 +78,10 @@ end
 
 local class = {
   is_bezier = true;
-  get_point2 = get_point2;
-  get_point3 = get_point3;
-  eval_point2 = eval_point2;
-  eval_point3 = eval_point3;
+  get_tuple2 = get_tuple2;
+  get_tuple3 = get_tuple3;
+  eval_tuple2 = eval_tuple2;
+  eval_tuple3 = eval_tuple3;
 }
 local metatable = { __index = class }
 
@@ -172,9 +172,9 @@ end
 -- a:get(number b, point3 c)
 function class.get(a, b, c)
   if #c == 2 then
-    return get_point2(a, b, c)
+    return get_tuple2(a, b, c)
   else
-    return get_point3(a, b, c)
+    return get_tuple3(a, b, c)
   end
 end
 
@@ -182,9 +182,9 @@ end
 -- a:eval(number b, point3 c)
 function class.eval(a, b, c)
   if #c == 2 then
-    return eval_point2(a, b, c)
+    return eval_tuple2(a, b, c)
   else
-    return eval_point3(a, b, c)
+    return eval_tuple3(a, b, c)
   end
 end
 
