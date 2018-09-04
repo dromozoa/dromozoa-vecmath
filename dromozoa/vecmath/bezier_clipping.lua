@@ -39,7 +39,6 @@ local function fat_line(B1, B2)
   local c = -(a * px + b * py)
 
   if a == 0 and b == 0 then
-    print "fat line is point"
     B2:get(1, p)
     local qx = p[1]
     local qy = p[2]
@@ -55,14 +54,12 @@ local function fat_line(B1, B2)
       a = uy
       b = -ux
       c = -uy * px + ux * py
-      print("F", a, b, c)
     end
   end
 
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
-  -- for i = 1, n do
     B1:get(i, p)
     local d = a * p[1] + b * p[2] + c
     if d_min > d then
@@ -89,8 +86,6 @@ local function fat_line(B1, B2)
     end
   end
 
-  print(("X= %.17g\t%.17g\t%.17g\t| %.17g %.17g"):format(a, b, c, d_min, d_max))
-
   return a, b, c, d_min, d_max
 end
 
@@ -103,16 +98,11 @@ local function clip_both(H, d_min, d_max)
   local pt = p[1]
   local pd = p[2]
 
-  print(("pd %.17g"):format(pd))
-
   for i = 1, n do
     local q = H[i]
     local qt = q[1]
     local qd = q[2]
 
-    print(("qd %.17g / %.17g [%d]"):format(qd, pd - qd, i))
-
-    -- if d_min - 1e-11 <= pd and pd <= d_max + 1e-11 then
     if d_min <= pd and pd <= d_max then
       if t1 > pt then
         t1 = pt
@@ -289,16 +279,11 @@ local function clip(B1, B2)
   end
 end
 
-local function focus(B2)
+local function focus(B1)
   local p = point2()
   local q = point2()
   local u = vector2()
   local v = vector2()
-
-
-
-
-
 end
 
 local function split(B1, B2)
@@ -307,11 +292,6 @@ local function split(B1, B2)
   -- B1 range
 
   local F = focus(B2)
-
-
-
-
-
 
   return 0.5
 end
@@ -323,14 +303,11 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
 
-  print(u1, u2, u3, u4)
-
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
-    print "NOT CLIPPED (1)"
     return result
   end
   local a = u2 - u1
@@ -339,7 +316,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
 
   local t3, t4 = clip(B2, B1)
   if not t3 then
-    print "NOT CLIPPED (2)"
     return result
   end
   local b = u4 - u3
@@ -370,20 +346,16 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     n = n + 1
     U1[n] = t1
     U2[n] = t2
-    print("DONE", t1, t2)
     return result
   end
 
   if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
     if a < b then
-      print "SPLIT (2)"
-      -- local u5 = focus(b1, b2, u1, u2, u3, u4)
       local a = split(B2, B1)
       local u5 = u3 * (1 - a) + u4 * a
       iterate(b1, b2, u1, u2, u3, u5, m, result)
       return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
-      print "SPLIT (1)"
       local a = split(B1, B2)
       local u5 = u1 * (1 - a) + u2 * a
       iterate(b1, b2, u1, u5, u3, u4, m, result)
@@ -414,8 +386,6 @@ return function (b1, b2, result)
 
   local n = #U1
   if n > m then
-    print("IS_IDENTICAL", n, m)
-
     local t_min = U1[1]
     local t_max = t_min
     local u_min = U2[1]
