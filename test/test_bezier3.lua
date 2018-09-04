@@ -78,3 +78,21 @@ local b2 = bezier(b1):clip(1, 1)
 assert(b2:get(1, point2()):equals {2,2})
 assert(b2:get(2, point2()):equals {2,2})
 assert(b2:get(3, point2()):equals {2,2})
+
+local b1 = bezier({2,1},{4,5},{8,6},{9,2})
+local b2 = bezier(b1):deriv()
+assert(b2:size() == 3)
+if verbose then
+  print(tostring(b2:get(1, point2())))
+  print(tostring(b2:get(2, point2())))
+  print(tostring(b2:get(3, point2())))
+end
+assert(b2:get(1, point2()):equals {6,12})
+assert(b2:get(2, point2()):equals {12,3})
+assert(b2:get(3, point2()):equals {3,-12})
+
+local b2 = bezier({1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1}):deriv(bezier({2,1},{4,5},{8,6},{9,2}))
+assert(b2:size() == 3)
+assert(b2:get(1, point2()):equals {6,12})
+assert(b2:get(2, point2()):equals {12,3})
+assert(b2:get(3, point2()):equals {3,-12})

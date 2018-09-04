@@ -249,6 +249,38 @@ function class.reverse(a, b)
   end
 end
 
+-- a:deriv(bezier b)
+-- a:deriv()
+function class.deriv(a, b)
+  if b then
+    local AX = a[1]
+    local AY = a[2]
+    local AZ = a[3]
+    local BX = b[1]
+    local BY = b[2]
+    local BZ = b[3]
+
+    if BZ[1] then
+    else
+      bernstein.deriv(AX, BX)
+      bernstein.deriv(AY, BY)
+      bernstein.set(AZ)
+      return a
+    end
+  else
+    local X = a[1]
+    local Y = a[2]
+    local Z = a[3]
+
+    if Z[1] then
+    else
+      bernstein.deriv(X)
+      bernstein.deriv(Y)
+      return a
+    end
+  end
+end
+
 -- a:size()
 function class.size(a)
   return #a[1]
