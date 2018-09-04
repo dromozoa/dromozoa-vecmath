@@ -102,13 +102,17 @@ assert(b2:get(3, point2()):equals {3,-12})
 local z = math.cos(math.pi / 4)
 local b1 = bezier({100,0,1}, {100*z,100*z,z}, {0,100,1})
 local b2 = bezier(b1):deriv()
+local b3 = bezier({1,1},{1,1},{1,1},{1,1},{1,1}):deriv(b1)
 
 assert(b1:size() == 3) -- quadratic
 assert(b2:size() == 5) -- quartic
+assert(b3:size() == 5) -- quartic
 
 for i = 0, N do
   local t = i / N
   local v1 = b1:eval_point2(t, vector2())
   local v2 = b2:eval_point2(t, vector2())
+  local v3 = b3:eval_point2(t, vector2())
   assert(math.abs(v1:dot(v2)) < epsilon)
+  assert(math.abs(v1:dot(v3)) < epsilon)
 end

@@ -262,6 +262,25 @@ function class.deriv(a, b)
     local BZ = b[3]
 
     if BZ[1] then
+      local PX = bernstein.get(BX, {})
+      local PY = bernstein.get(BY, {})
+      local PZ = bernstein.get(BZ, {})
+      local QX = polynomial.deriv({}, PX)
+      local QY = polynomial.deriv({}, PY)
+      local QZ = polynomial.deriv({}, PZ)
+      polynomial.mul(QX, PZ)
+      polynomial.mul(PX, QZ)
+      polynomial.mul(QY, PZ)
+      polynomial.mul(PY, QZ)
+      polynomial.sub(QX, PX)
+      polynomial.sub(QY, PY)
+      polynomial.mul(PZ, PZ)
+      bernstein.set_polynomial(AX, QX)
+      bernstein.elevate(AX)
+      bernstein.set_polynomial(AY, QY)
+      bernstein.elevate(AY)
+      bernstein.set_polynomial(AZ, PZ)
+      return a
     else
       bernstein.deriv(AX, BX)
       bernstein.deriv(AY, BY)
