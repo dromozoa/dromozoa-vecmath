@@ -280,10 +280,19 @@ local function clip(B1, B2)
 end
 
 local function focus(B1)
-  local p = point2()
-  local q = point2()
-  local u = vector2()
-  local v = vector2()
+  local B2 = bezier(B1):deriv()
+
+  local m = B1:size()
+  local n = B2:size()
+
+  local p = B1:get(1, point2())
+  local q = B1:get(m, point2())
+  local u = B2:get(1, vector2())
+  local v = B2:get(n, vector2())
+
+  print(tostring(p), tostring(q), tostring(u), tostring(v))
+
+
 end
 
 local function split(B1, B2)
