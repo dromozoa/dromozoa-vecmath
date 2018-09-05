@@ -254,8 +254,96 @@
     q_x - p_x \\
     q_y - p_y \\
   \end{pmatrix}
-
 \end{aligned}\]
+</p>
+
+<p>
+多項式のまま扱ったほうが良いかもしれない。
+\[\begin{aligned}
+  \bm{F}(t) &amp;= \bm{P}(t) + c(t) \bm{N}(t) \\
+
+  \bm{c}(t)
+  &amp;= c_0 (1 - t) + c_1 t \\
+
+  \bm{P}(t) &amp;= \begin{pmatrix}
+    p_x(t) \\
+    p_y(t) \\
+  \end{pmatrix} \\
+
+  \bm{P}'(t) &amp;= \begin{pmatrix}
+    d_x(t) \\
+    d_y(t) \\
+  \end{pmatrix} \\
+
+  \bm{N}(t)
+  &amp;= \begin{pmatrix}
+    0 &amp; -1 \\
+    1 &amp; 0 \\
+  \end{pmatrix} \bm{P}'(t) \\
+  &amp;= \begin{pmatrix}
+    -d_y(t) \\
+    d_x(t) \\
+  \end{pmatrix} \\
+
+  \bm{F}(t)
+  &amp;= \begin{pmatrix}
+    p_x(t) \\
+    p_y(t) \\
+  \end{pmatrix} + c(t) \begin{pmatrix}
+    -d_y(t) \\
+    d_x(t) \\
+  \end{pmatrix} \\
+  &amp;= \begin{pmatrix}
+    p_x(t) - c(t) d_y(t) \\
+    p_y(t) + c(t) d_x(t) \\
+  \end{pmatrix} \\
+
+  \bm{F}(0) &amp;= \bm{F}(1) \\
+  \begin{pmatrix}
+    p_x(0) - c_0 d_y(0) \\
+    p_y(0) + c_0 d_x(0) \\
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    p_x(1) - c_1 d_y(1) \\
+    p_y(1) + c_1 d_x(1) \\
+  \end{pmatrix} \\
+  \begin{pmatrix}
+    -c_0 d_y(0) + c_1 d_y(1) \\
+    c_0 d_x(0) - c_1 d_x(1) \\
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    p_x(1) - p_x(0) \\
+    p_y(1) - p_y(0)
+  \end{pmatrix} \\
+  M \begin{pmatrix}
+    c_0 \\
+    c_1 \\
+  \end{pmatrix} &amp;= \begin{pmatrix}
+    p_x(1) - p_x(0) \\
+    p_y(1) - p_y(0)
+  \end{pmatrix} \\
+  \begin{pmatrix}
+    c_0 \\
+    c_1 \\
+  \end{pmatrix} &amp;= M^{-1} \begin{pmatrix}
+    p_x(1) - p_x(0) \\
+    p_y(1) - p_y(0)
+  \end{pmatrix} \\
+
+  M &amp;= \begin{pmatrix}
+    -d_y(0) &amp; d_y(1) \\
+    d_x(0) &amp; -d_x(1) \\
+  \end{pmatrix} \\
+\end{aligned}\]
+\(\det(M) = 0\)の場合は支点と終点の垂線が平行なので、筋の良い焦点曲線が得られない。\(n\)次の有理ベジェ曲線の場合を考える。
+\[\begin{aligned}
+  p_x(t) &amp;= \frac{x(t)}{w(t)} \\
+  p_y(t) &amp;= \frac{y(t)}{w(t)} \\
+  d_x(t) &amp;= \frac{x'(t)w(t) - x(t)w'(t)}{w^2(t)} \\
+  d_y(t) &amp;= \frac{y'(t)w(t) - y(t)w'(t)}{w^2(t)} \\
+  F(t) &amp;= \begin{pmatrix} f_x(t) \\ f_y(t) \\ \end{pmatrix} \\
+  f_x(t) &amp;= \frac{x(t)w(t) + c(t)x'(t)w(t) - c(t)x(t)w'(t)}{w^2(t)} \\
+  f_y(t) &amp;= \frac{y(t)w(t) + c(t)y'(t)w(t) - c(t)y(t)w'(t)}{w^2(t)} \\
+\end{aligned}\]
+\(f_x(t),f_y(t)\)の分子と分母はどちらも\(2n\)次になるので次数上げは不要である。
 </p>
 
 </div>
