@@ -115,4 +115,7 @@ for i = 0, N do
   local v3 = b3:eval(t, vector2())
   assert(math.abs(v1:dot(v2)) < epsilon)
   assert(math.abs(v1:dot(v3)) < epsilon)
+  if verbose then
+    print(v2:length())
+  end
 end

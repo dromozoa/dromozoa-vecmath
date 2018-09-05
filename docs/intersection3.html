@@ -264,6 +264,7 @@
 
   \bm{c}(t)
   &amp;= c_0 (1 - t) + c_1 t \\
+  &amp;= (c_1 - c_0) t + c_0 \\
 
   \bm{P}(t) &amp;= \begin{pmatrix}
     p_x(t) \\
@@ -340,8 +341,8 @@
   d_x(t) &amp;= \frac{x'(t)w(t) - x(t)w'(t)}{w^2(t)} \\
   d_y(t) &amp;= \frac{y'(t)w(t) - y(t)w'(t)}{w^2(t)} \\
   F(t) &amp;= \begin{pmatrix} f_x(t) \\ f_y(t) \\ \end{pmatrix} \\
-  f_x(t) &amp;= \frac{x(t)w(t) + c(t)x'(t)w(t) - c(t)x(t)w'(t)}{w^2(t)} \\
-  f_y(t) &amp;= \frac{y(t)w(t) + c(t)y'(t)w(t) - c(t)y(t)w'(t)}{w^2(t)} \\
+  f_x(t) &amp;= \frac{x(t)w(t) - c(t)y'(t)w(t) + c(t)y(t)w'(t)}{w^2(t)} \\
+  f_y(t) &amp;= \frac{y(t)w(t) + c(t)x'(t)w(t) - c(t)x(t)w'(t)}{w^2(t)} \\
 \end{aligned}\]
 \(f_x(t),f_y(t)\)の分子と分母はどちらも\(2n\)次になるので次数上げは不要である。
 </p>

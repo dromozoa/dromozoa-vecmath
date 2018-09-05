@@ -15,6 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local matrix2 = require "dromozoa.vecmath.matrix2"
+local vector2 = require "dromozoa.vecmath.vector2"
+
 local bernstein = require "dromozoa.vecmath.bernstein"
 local polynomial = require "dromozoa.vecmath.polynomial"
 
@@ -262,24 +265,24 @@ function class.deriv(a, b)
     local BZ = b[3]
 
     if BZ[1] then
-      local PX = bernstein.get(BX, {})
-      local PY = bernstein.get(BY, {})
-      local PZ = bernstein.get(BZ, {})
-      local QX = polynomial.deriv({}, PX)
-      local QY = polynomial.deriv({}, PY)
-      local QZ = polynomial.deriv({}, PZ)
-      polynomial.mul(QX, PZ)
-      polynomial.mul(PX, QZ)
-      polynomial.mul(QY, PZ)
-      polynomial.mul(PY, QZ)
-      polynomial.sub(QX, PX)
-      polynomial.sub(QY, PY)
-      polynomial.mul(PZ, PZ)
-      bernstein.set_polynomial(AX, QX)
+      local PX = bernstein.get(BX, polynomial())
+      local PY = bernstein.get(BY, polynomial())
+      local PZ = bernstein.get(BZ, polynomial())
+      local QX = polynomial():deriv(PX)
+      local QY = polynomial():deriv(PY)
+      local QZ = polynomial():deriv(PZ)
+      QX:mul(PZ)
+      PX:mul(QZ)
+      QY:mul(PZ)
+      PY:mul(QZ)
+      QX:sub(PX)
+      QY:sub(PY)
+      PZ:mul(PZ)
+      bernstein.set(AX, QX)
       bernstein.elevate(AX)
-      bernstein.set_polynomial(AY, QY)
+      bernstein.set(AY, QY)
       bernstein.elevate(AY)
-      bernstein.set_polynomial(AZ, PZ)
+      bernstein.set(AZ, PZ)
       return a
     else
       bernstein.deriv(AX, BX)
@@ -293,28 +296,114 @@ function class.deriv(a, b)
     local Z = a[3]
 
     if Z[1] then
-      local PX = bernstein.get(X, {})
-      local PY = bernstein.get(Y, {})
-      local PZ = bernstein.get(Z, {})
-      local QX = polynomial.deriv({}, PX)
-      local QY = polynomial.deriv({}, PY)
-      local QZ = polynomial.deriv({}, PZ)
-      polynomial.mul(QX, PZ)
-      polynomial.mul(PX, QZ)
-      polynomial.mul(QY, PZ)
-      polynomial.mul(PY, QZ)
-      polynomial.sub(QX, PX)
-      polynomial.sub(QY, PY)
-      polynomial.mul(PZ, PZ)
-      bernstein.set_polynomial(X, QX)
+      local PX = bernstein.get(X, polynomial())
+      local PY = bernstein.get(Y, polynomial())
+      local PZ = bernstein.get(Z, polynomial())
+      local QX = polynomial():deriv(PX)
+      local QY = polynomial():deriv(PY)
+      local QZ = polynomial():deriv(PZ)
+      QX:mul(PZ)
+      PX:mul(QZ)
+      QY:mul(PZ)
+      PY:mul(QZ)
+      QX:sub(PX)
+      QY:sub(PY)
+      PZ:mul(PZ)
+      bernstein.set(X, QX)
       bernstein.elevate(X)
-      bernstein.set_polynomial(Y, QY)
+      bernstein.set(Y, QY)
       bernstein.elevate(Y)
-      bernstein.set_polynomial(Z, PZ)
+      bernstein.set(Z, PZ)
       return a
     else
       bernstein.deriv(X)
       bernstein.deriv(Y)
+      return a
+    end
+  end
+end
+
+-- a:focus(bezier b)
+-- a:focus()
+function class.focus(a, b)
+  if b then
+  else
+    local X = a[1]
+    local Y = a[2]
+    local Z = a[3]
+
+    if Z[1] then
+      local PX = bernstein.get(X, polynomial())
+      local PY = bernstein.get(Y, polynomial())
+      local PZ = bernstein.get(Z, polynomial())
+      local QX = polynomial():deriv(PX)
+      local QY = polynomial():deriv(PY)
+      local QZ = polynomial():deriv(PZ)
+
+      local px0 = PX:eval(0)
+      local px1 = PX:eval(1)
+      local py0 = PY:eval(0)
+      local py1 = PY:eval(1)
+      local pz0 = PZ:eval(0)
+      local pz1 = PZ:eval(1)
+      local qz0 = QZ:eval(0)
+      local qz1 = QZ:eval(1)
+      local rz0 = qz0 / pz0
+      local rz1 = qz1 / pz1
+
+      local dx0 = (QX:eval(0) - px0 * rz0) / pz0
+      local dy0 = (QY:eval(0) - py0 * rz0) / pz0
+      local dx1 = (QX:eval(1) - px1 * rz1) / pz1
+      local dy1 = (QY:eval(1) - py1 * rz1) / pz1
+
+      local M = matrix2(-dy0, dy1, dx0, -dx1)
+      if M:determinant() == 0 then
+        return
+      end
+      local u = vector2(px1 - px0, py1 - py0)
+      M:invert():transform(u)
+      local v = u[1]
+      local C = polynomial(v, u[2] - v)
+
+      local P1 = polynomial()
+      local P2 = polynomial()
+      P1:mul(PX, PZ)
+      P2:mul(C, QY):mul(PZ)
+      P1:sub(P2)
+      P2:mul(C, PY):mul(QZ)
+      P1:add(P2)
+      bernstein.set(X, P1)
+
+      P1:mul(PY, PZ)
+      P2:mul(C, QX):mul(PZ)
+      P1:add(P2)
+      P2:mul(C, PX):mul(QZ)
+      P1:sub(P2)
+      bernstein.set(Y, P1)
+
+      P1:mul(PZ, PZ)
+      bernstein.set(Z, P1)
+
+      return a
+    else
+      local PX = bernstein.get(X, polynomial())
+      local PY = bernstein.get(Y, polynomial())
+      local QX = polynomial():deriv(PX)
+      local QY = polynomial():deriv(PY)
+      local M = matrix2(-QY:eval(0), QY:eval(1), QX:eval(0), -QX:eval(1))
+      if M:determinant() == 0 then
+        return
+      end
+      local u = vector2(PX:eval(1) - PX:eval(0), PY:eval(1) - PY:eval(0))
+      M:invert():transform(u)
+      local v = u[1]
+      local C = polynomial(v, u[2] - v)
+      QX:mul(C)
+      QY:mul(C)
+      PX:sub(QY)
+      PY:add(QX)
+      bernstein.set(X, PX)
+      bernstein.set(Y, PY)
       return a
     end
   end

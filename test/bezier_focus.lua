@@ -73,6 +73,12 @@ local function draw(B)
 
   draw_bezier(node, B, "#666")
 
+  local F = bezier(B):focus()
+  if F then
+    draw_bezier(node, F, "#F33")
+  end
+
+--[[
   local D = bezier(B):deriv()
   local p = B:get(1, point2())
   local q = B:get(B:size(), point2())
@@ -88,7 +94,6 @@ local function draw(B)
 
   m:invert()
   m:transform(v)
-  print(tostring(v))
 
   local C = polynomial(v.x, v.y - v.x)
 
@@ -104,6 +109,10 @@ local function draw(B)
     PX:add(QX)
     PY:add(QY)
 
+    print("C", table.concat(C, " "))
+    print("PX", table.concat(PX, " "))
+    print("PY", table.concat(PY, " "))
+
     local F = bezier()
     F[1]:set(PX)
     F[2]:set(PY)
@@ -111,8 +120,9 @@ local function draw(B)
     print(tostring(F:get(1, point2())))
     print(tostring(F:get(F:size(), point2())))
 
-    draw_bezier(node, F, "#F33")
+    draw_bezier(node, F, "#33F")
   end
+]]
 end
 
 draw(bezier({-120,0}, {-40,40}, {40,-80}, {120,40}))
@@ -120,7 +130,7 @@ draw(bezier({145,-15}, {147.5,20}, {165,30}, {165,15}))
 draw(bezier({-150,-150}, {-25,200}, {25,200}, {150,-150}))
 draw(bezier({-50,-150}, {-25,400}, {25,-400}, {50,150}))
 local z = math.cos(math.pi / 4)
-draw(bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1}))
+draw(bezier({-100,-100,1}, {100*z,-100*z,z}, {100,100,1}))
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
