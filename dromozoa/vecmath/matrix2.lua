@@ -238,11 +238,13 @@ function class.invert(a, b)
   local b21 = b[3]
   local b22 = b[4]
   local d = b11 * b22 - b12 * b21
-  a[1] = b22 / d
-  a[2] = -b12 / d
-  a[3] = -b21 / d
-  a[4] = b11 / d
-  return a
+  if d ~= 0 then
+    a[1] = b22 / d
+    a[2] = -b12 / d
+    a[3] = -b21 / d
+    a[4] = b11 / d
+    return a
+  end
 end
 
 -- a:determinant()

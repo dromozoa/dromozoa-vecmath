@@ -521,16 +521,18 @@ function class.invert(a, b)
   local v = b23 * b31 - b21 * b33
   local w = b21 * b32 - b22 * b31
   local d = b11 * u + b12 * v + b13 * w
-  a[1] = u / d
-  a[2] = (b13 * b32 - b12 * b33) / d
-  a[3] = (b12 * b23 - b13 * b22) / d
-  a[4] = v / d
-  a[5] = (b11 * b33 - b13 * b31) / d
-  a[6] = (b13 * b21 - b11 * b23) / d
-  a[7] = w / d
-  a[8] = (b12 * b31 - b11 * b32) / d
-  a[9] = (b11 * b22 - b12 * b21) / d
-  return a
+  if d ~= 0 then
+    a[1] = u / d
+    a[2] = (b13 * b32 - b12 * b33) / d
+    a[3] = (b12 * b23 - b13 * b22) / d
+    a[4] = v / d
+    a[5] = (b11 * b33 - b13 * b31) / d
+    a[6] = (b13 * b21 - b11 * b23) / d
+    a[7] = w / d
+    a[8] = (b12 * b31 - b11 * b32) / d
+    a[9] = (b11 * b22 - b12 * b21) / d
+    return a
+  end
 end
 
 -- a:determinant()
