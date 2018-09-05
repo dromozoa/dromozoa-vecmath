@@ -326,86 +326,91 @@ end
 -- a:focus(bezier b)
 -- a:focus()
 function class.focus(a, b)
-  if b then
-  else
-    local X = a[1]
-    local Y = a[2]
-    local Z = a[3]
+  if not b then
+    b = a
+  end
 
-    if Z[1] then
-      local PX = bernstein.get(X, polynomial())
-      local PY = bernstein.get(Y, polynomial())
-      local PZ = bernstein.get(Z, polynomial())
-      local QX = polynomial():deriv(PX)
-      local QY = polynomial():deriv(PY)
-      local QZ = polynomial():deriv(PZ)
+  local AX = a[1]
+  local AY = a[2]
+  local AZ = a[3]
+  local BX = b[1]
+  local BY = b[2]
+  local BZ = b[3]
 
-      local px0 = PX:eval(0)
-      local px1 = PX:eval(1)
-      local py0 = PY:eval(0)
-      local py1 = PY:eval(1)
-      local pz0 = PZ:eval(0)
-      local pz1 = PZ:eval(1)
-      local qz0 = QZ:eval(0)
-      local qz1 = QZ:eval(1)
-      local rz0 = qz0 / pz0
-      local rz1 = qz1 / pz1
+  if BZ[1] then
+    local PX = bernstein.get(BX, polynomial())
+    local PY = bernstein.get(BY, polynomial())
+    local PZ = bernstein.get(BZ, polynomial())
+    local QX = polynomial():deriv(PX)
+    local QY = polynomial():deriv(PY)
+    local QZ = polynomial():deriv(PZ)
 
-      local dx0 = (QX:eval(0) - px0 * rz0) / pz0
-      local dy0 = (QY:eval(0) - py0 * rz0) / pz0
-      local dx1 = (QX:eval(1) - px1 * rz1) / pz1
-      local dy1 = (QY:eval(1) - py1 * rz1) / pz1
+    local px0 = PX:eval(0)
+    local px1 = PX:eval(1)
+    local py0 = PY:eval(0)
+    local py1 = PY:eval(1)
+    local pz0 = PZ:eval(0)
+    local pz1 = PZ:eval(1)
+    local qz0 = QZ:eval(0)
+    local qz1 = QZ:eval(1)
+    local rz0 = qz0 / pz0
+    local rz1 = qz1 / pz1
 
-      local M = matrix2(-dy0, dy1, dx0, -dx1)
-      if M:determinant() == 0 then
-        return
-      end
-      local u = vector2(px1 - px0, py1 - py0)
-      M:invert():transform(u)
-      local v = u[1]
-      local C = polynomial(v, u[2] - v)
+    local dx0 = (QX:eval(0) - px0 * rz0) / pz0
+    local dy0 = (QY:eval(0) - py0 * rz0) / pz0
+    local dx1 = (QX:eval(1) - px1 * rz1) / pz1
+    local dy1 = (QY:eval(1) - py1 * rz1) / pz1
 
-      local P1 = polynomial()
-      local P2 = polynomial()
-      P1:mul(PX, PZ)
-      P2:mul(C, QY):mul(PZ)
-      P1:sub(P2)
-      P2:mul(C, PY):mul(QZ)
-      P1:add(P2)
-      bernstein.set(X, P1)
-
-      P1:mul(PY, PZ)
-      P2:mul(C, QX):mul(PZ)
-      P1:add(P2)
-      P2:mul(C, PX):mul(QZ)
-      P1:sub(P2)
-      bernstein.set(Y, P1)
-
-      P1:mul(PZ, PZ)
-      bernstein.set(Z, P1)
-
-      return a
-    else
-      local PX = bernstein.get(X, polynomial())
-      local PY = bernstein.get(Y, polynomial())
-      local QX = polynomial():deriv(PX)
-      local QY = polynomial():deriv(PY)
-      local M = matrix2(-QY:eval(0), QY:eval(1), QX:eval(0), -QX:eval(1))
-      if M:determinant() == 0 then
-        return
-      end
-      local u = vector2(PX:eval(1) - PX:eval(0), PY:eval(1) - PY:eval(0))
-      M:invert():transform(u)
-      local v = u[1]
-      local C = polynomial(v, u[2] - v)
-      QX:mul(C)
-      QY:mul(C)
-      PX:sub(QY)
-      PY:add(QX)
-      bernstein.set(X, PX)
-      bernstein.set(Y, PY)
-      return a
+    local M = matrix2(-dy0, dy1, dx0, -dx1)
+    if M:determinant() == 0 then
+      return
     end
+    local u = vector2(px1 - px0, py1 - py0)
+    M:invert():transform(u)
+    local v = u[1]
+    local C = polynomial(v, u[2] - v)
+
+    local P1 = polynomial()
+    local P2 = polynomial()
+    P1:mul(PX, PZ)
+    P2:mul(C, QY):mul(PZ)
+    P1:sub(P2)
+    P2:mul(C, PY):mul(QZ)
+    P1:add(P2)
+    bernstein.set(AX, P1)
+
+    P1:mul(PY, PZ)
+    P2:mul(C, QX):mul(PZ)
+    P1:add(P2)
+    P2:mul(C, PX):mul(QZ)
+    P1:sub(P2)
+    bernstein.set(AY, P1)
+
+    P1:mul(PZ, PZ)
+    bernstein.set(AZ, P1)
+
+    return a
+  else
+    local PX = bernstein.get(BX, polynomial())
+    local PY = bernstein.get(BY, polynomial())
+    local QX = polynomial():deriv(PX)
+    local QY = polynomial():deriv(PY)
+    local M = matrix2(-QY:eval(0), QY:eval(1), QX:eval(0), -QX:eval(1))
+    if M:determinant() == 0 then
+      return
+    end
+    local u = vector2(PX:eval(1) - PX:eval(0), PY:eval(1) - PY:eval(0))
+    M:invert():transform(u)
+    local v = u[1]
+    local C = polynomial(v, u[2] - v)
+    QX:mul(C)
+    QY:mul(C)
+    PX:sub(QY)
+    PY:add(QX)
+    bernstein.set(AX, PX)
+    bernstein.set(AY, PY)
+    bernstein.set(AZ)
+    return a
   end
 end
 

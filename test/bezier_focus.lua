@@ -73,56 +73,16 @@ local function draw(B)
 
   draw_bezier(node, B, "#666")
 
-  local F = bezier(B):focus()
-  if F then
-    draw_bezier(node, F, "#F33")
+  local F1 = bezier(B):focus()
+  local F2 = bezier({1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1}):focus(B)
+  if F1 then
+    draw_bezier(node, F1, "#F33")
+    assert(F2)
+    assert(#F1[1] == #F2[1])
+    assert(#F1[2] == #F2[2])
+    assert(#F1[3] == #F2[3])
+    draw_bezier(node, F2, "#33F")
   end
-
---[[
-  local D = bezier(B):deriv()
-  local p = B:get(1, point2())
-  local q = B:get(B:size(), point2())
-  local u = D:get(1, vector2())
-  local v = D:get(D:size(), vector2())
-
-  local m = matrix2(-u.y, v.y, u.x, -v.x)
-  v:sub(q, p)
-  if m:determinant() == 0 then
-    print "skip"
-    return
-  end
-
-  m:invert()
-  m:transform(v)
-
-  local C = polynomial(v.x, v.y - v.x)
-
-  if not B:is_rational() then
-    local PX = B[1]:get(polynomial())
-    local PY = B[2]:get(polynomial())
-    local QX = D[2]:get(polynomial()):mul(-1)
-    local QY = D[1]:get(polynomial())
-
-    QX:mul(C, QX)
-    QY:mul(C, QY)
-
-    PX:add(QX)
-    PY:add(QY)
-
-    print("C", table.concat(C, " "))
-    print("PX", table.concat(PX, " "))
-    print("PY", table.concat(PY, " "))
-
-    local F = bezier()
-    F[1]:set(PX)
-    F[2]:set(PY)
-
-    print(tostring(F:get(1, point2())))
-    print(tostring(F:get(F:size(), point2())))
-
-    draw_bezier(node, F, "#33F")
-  end
-]]
 end
 
 draw(bezier({-120,0}, {-40,40}, {40,-80}, {120,40}))
