@@ -145,64 +145,68 @@ local B6 = vecmath.bezier({-150,-50}, {400,-25}, {-400,25}, {150,50})
 local B7 = vecmath.bezier(B1):clip(0, 0.6)
 local B8 = vecmath.bezier(B1):clip(0.2, 1)
 
-local r = check(B1, B2, 1)
-local r = check(B1, B3, 2)
-local r = check(B1, B4, 3)
-local r = check(B1, B5, 1)
-local r = check(B4, B6, 9)
-local r = check(B7, B8, 2, true)
-if verbose then
-  print(math.abs(r[1][1] - 1/3))
-  print(math.abs(r[1][2] - 1/1))
-  print(math.abs(r[2][1] - 0/1))
-  print(math.abs(r[2][2] - 1/2))
-end
-if not not_check then
-  assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
-  assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
-  assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
-  assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
-end
-
-local B1 = vecmath.bezier({-200,0},{200,0})
-local B2 = vecmath.bezier({200,0},{200,-200})
-local r = check(B1, B2, 1)
-
-local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
-local B2 = vecmath.bezier({200,0},{200,-200})
-local r = check(B1, B2, 1)
-
-local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
-local B2 = vecmath.bezier({200,0},{100,-100},{200,-200})
-local r = check(B1, B2, 1)
-
-local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
-local B2 = vecmath.bezier({-200,0},{200,0})
-local r = check(B1, B2, 3)
-
-local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
-local B2 = vecmath.bezier({-200,0},{200,0})
-local r = check(B1, B2, 3)
-
-local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
-local B2 = vecmath.bezier({-200,0},{199,0})
-local r = check(B1, B2, 3)
-
-local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
-local B2 = vecmath.bezier({-200,0},{200,-0})
-local r = check(B1, B2, 3)
-
-local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
-local B2 = vecmath.bezier({-200,0},{-100,200},{100,-200},{200,0})
-local r = check(B1, B2, 5)
-
-local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
-local B2 = vecmath.bezier({-200,0},{-50,100},{50,-100},{200,0})
-local r = check(B1, B2, 3)
-
---local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
---local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
+--local r = check(B1, B2, 1)
+--local r = check(B1, B3, 2)
+--local r = check(B1, B4, 3)
+--local r = check(B1, B5, 1)
+--local r = check(B4, B6, 9)
+--local r = check(B7, B8, 2, true)
+--if verbose then
+--  print(math.abs(r[1][1] - 1/3))
+--  print(math.abs(r[1][2] - 1/1))
+--  print(math.abs(r[2][1] - 0/1))
+--  print(math.abs(r[2][2] - 1/2))
+--end
+--if not not_check then
+--  assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
+--  assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
+--  assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
+--  assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
+--end
+--
+--local B1 = vecmath.bezier({-200,0},{200,0})
+--local B2 = vecmath.bezier({200,0},{200,-200})
+--local r = check(B1, B2, 1)
+--
+--local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
+--local B2 = vecmath.bezier({200,0},{200,-200})
+--local r = check(B1, B2, 1)
+--
+--local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
+--local B2 = vecmath.bezier({200,0},{100,-100},{200,-200})
+--local r = check(B1, B2, 1)
+--
+--local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
+--local B2 = vecmath.bezier({-200,0},{200,0})
 --local r = check(B1, B2, 3)
+--
+--local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
+--local B2 = vecmath.bezier({-200,0},{200,0})
+--local r = check(B1, B2, 3)
+--
+--local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
+--local B2 = vecmath.bezier({-200,0},{199,0})
+--local r = check(B1, B2, 3)
+--
+--local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
+--local B2 = vecmath.bezier({-200,0},{200,-0})
+--local r = check(B1, B2, 3)
+--
+--local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
+--local B2 = vecmath.bezier({-200,0},{-100,200},{100,-200},{200,0})
+--local r = check(B1, B2, 5)
+--
+--local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
+--local B2 = vecmath.bezier({-200,0},{-50,100},{50,-100},{200,0})
+--local r = check(B1, B2, 3)
+--
+--local B1 = vecmath.bezier({-200,-100},{0,240},{200,-100})
+--local B2 = vecmath.bezier({-200,100},{0,-200},{200,100})
+--local r = check(B1, B2, 2)
+
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
+local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
+local r = check(B1, B2, 3)
 
 --local B1 = vecmath.bezier({-200,0},{-50,200+1e-9},{50,200+1e-9},{200,0})
 --local B2 = vecmath.bezier({-200,0},{-100,200},{100,200},{200,0})

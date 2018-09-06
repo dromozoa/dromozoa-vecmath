@@ -20,6 +20,7 @@ local point3 = require "dromozoa.vecmath.point3"
 local vector2 = require "dromozoa.vecmath.vector2"
 
 local bezier = require "dromozoa.vecmath.bezier"
+local polynomial = require "dromozoa.vecmath.polynomial"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
 -- by experimentations
@@ -279,30 +280,135 @@ local function clip(B1, B2)
   end
 end
 
-local function focus(B1)
-  local B2 = bezier(B1):deriv()
+local function normal(B, p)
+  local N = bezier()
 
-  local m = B1:size()
-  local n = B2:size()
+  if B:is_rational() then
+    local X = B[1]
+    local Y = B[2]
+    local Z = B[3]
+  else
+    local X = B[1]
+    local Y = B[2]
+    local PX = X:get(polynomial())
+    local PY = Y:get(polynomial())
+    local QX = polynomial(PX):deriv()
+    local QY = polynomial(PY):deriv()
+    local FX = polynomial(p[1])
+    local FY = polynomial(p[2])
+    PX:sub(FX)
+    PY:sub(FY)
+    QX:mul(PX)
+    QY:mul(PY)
+    QX:add(QY)
 
-  local p = B1:get(1, point2())
-  local q = B1:get(m, point2())
-  local u = B2:get(1, vector2())
-  local v = B2:get(n, vector2())
+    local NX = N[1]
+    local NY = N[2]
 
-  print(tostring(p), tostring(q), tostring(u), tostring(v))
-
-
+    -- DEBUG HACK
+    if #PX > 1 then
+      NY:set(QX)
+      local n = #NY
+      local m = n - 1
+      for i = 1, n do
+        NX[i] = (i - 1) / m
+      end
+      return N
+    end
+  end
 end
 
-local function split(B1, B2)
+
+local function split(b1, b2, u1, u2, u3, u4)
   -- focus F of B2
   -- distance B1 and F
   -- B1 range
 
-  local F = focus(B2)
+  print("U", u1, u2, u3, u4)
 
-  return 0.5
+  local F = bezier()
+  local B = bezier()
+  local p = point2()
+  while true do
+    local clipped
+
+    -- print("S", u1, u2, u3, u4)
+
+    if F:clip(u3, u4, b2):focus() then
+      B:clip(u1, u2, b1)
+      local P = {}
+      for i = 1, F:size() do
+        local N = normal(B, F:get(i, p))
+        if N then
+          for j = 1, N:size() do
+            P[#P + 1] = N:get(j, point2())
+          end
+        end
+      end
+      -- DEBUG HACK
+      if #P > 0 then
+        local H = {}
+        quickhull(P, H)
+        for i = 1, #H do
+          print(i, tostring(H[i]))
+        end
+        local t1, t2 = clip_both(H, 0, 0)
+        print("T", t1, t2)
+        if t1 then
+          if t2 - t1 <= 0.8 then
+            local a = u2 - u1
+            u2 = u1 + a * t2
+            u1 = u1 + a * t1
+            if u2 - u1 <= epsilon then
+              return (u1 + u2) / 2, (u3 + u4) / 2, true
+            end
+            clipped = true
+          end
+        end
+      end
+    else
+      print "NO FOCUS"
+    end
+
+    if F:clip(u1, u2, b1):focus() then
+      B:clip(u3, u4, b2)
+      local P = {}
+      for i = 1, F:size() do
+        local N = normal(B, F:get(i, p))
+        if N then
+          for j = 1, N:size() do
+            P[#P + 1] = N:get(j, point2())
+          end
+        end
+      end
+      -- DEBUG HACK
+      if #P > 0 then
+        local H = {}
+        quickhull(P, H)
+        for i = 1, #H do
+          print(i, tostring(H[i]))
+        end
+        local t3, t4 = clip_both(H, 0, 0)
+        print("T", t3, t4)
+        if t3 then
+          if t4 - t3 <= 0.8 then
+            local a = u4 - u3
+            u4 = u3 + a * t4
+            u3 = u3 + a * t3
+            clipped = true
+          end
+        end
+      end
+    else
+      print "NO FOCUS"
+    end
+
+    if not clipped then
+      break
+    end
+  end
+
+  return (u1 + u2) / 2, (u3 + u4) / 2, false
 end
 
 local function iterate(b1, b2, u1, u2, u3, u4, m, result)
@@ -360,13 +466,77 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
 
   if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
     if a < b then
-      local a = split(B2, B1)
-      local u5 = u3 * (1 - a) + u4 * a
+      local u5, u6, converged = split(b2, b1, u3, u4, u1, u2)
+      if converged then
+        local t1 = u6
+        local t2 = u5
+        local p = b1:eval(t1, point2())
+        local q = b2:eval(t2, point2())
+        print(p:distance(q))
+        if p:epsilon_equals(q, epsilon) then
+          local U2 = result[2]
+          for i = 1, n do
+            local a = U1[i] - t1
+            if a < 0 then
+              a = -a
+            end
+            if a <= epsilon then
+              local b = U2[i] - t2
+              if b < 0 then
+                b = -b
+              end
+              if b <= epsilon then
+                return result
+              end
+            end
+          end
+          n = n + 1
+          U1[n] = t1
+          U2[n] = t2
+          return result
+        end
+      end
+      if u5 == u3 or u5 == u4 then
+        u5 = (u3 + u4) / 2
+      end
+      print(u6, u1, u2, "|", u5, u3, u4, "|", converged)
       iterate(b1, b2, u1, u2, u3, u5, m, result)
       return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
-      local a = split(B1, B2)
-      local u5 = u1 * (1 - a) + u2 * a
+      local u5, u6, converged = split(b1, b2, u1, u2, u3, u4)
+      if converged then
+        local t1 = u5
+        local t2 = u6
+        local p = b1:eval(t1, point2())
+        local q = b2:eval(t2, point2())
+        print(p:distance(q))
+        if p:epsilon_equals(q, epsilon) then
+          local U2 = result[2]
+          for i = 1, n do
+            local a = U1[i] - t1
+            if a < 0 then
+              a = -a
+            end
+            if a <= epsilon then
+              local b = U2[i] - t2
+              if b < 0 then
+                b = -b
+              end
+              if b <= epsilon then
+                return result
+              end
+            end
+          end
+          n = n + 1
+          U1[n] = t1
+          U2[n] = t2
+          return result
+        end
+      end
+      if u5 == u1 or u5 == u2 then
+        u5 = (u1 + u2) / 2
+      end
+      print(u5, u1, u2, "|", u6, u3, u4, "|", converged)
       iterate(b1, b2, u1, u5, u3, u4, m, result)
       return iterate(b1, b2, u5, u2, u3, u4, m, result)
     end
