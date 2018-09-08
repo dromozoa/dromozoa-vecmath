@@ -213,6 +213,15 @@ local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
 local B2 = vecmath.bezier({-200,-50},{200,-50})
 local r = check(B1, B2, 1)
 
+--TODO
+--local B1 = vecmath.bezier({-150,-200},{0,400},{150,-200})
+--local B2 = vecmath.bezier({-200,-50},{200,-50})
+--local r = check(B1, B2, 1)
+
+local B1 = vecmath.bezier({-150,-200},{0,600},{150,-200})
+local B2 = vecmath.bezier({-200,-150},{600,0},{-200,150})
+local r = check(B1, B2, 1)
+
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
   ["xmlns:xlink"] ="http://www.w3.org/1999/xlink";
