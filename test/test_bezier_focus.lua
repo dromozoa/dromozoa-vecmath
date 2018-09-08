@@ -20,14 +20,14 @@ local xml_document = require "dromozoa.dom.xml_document"
 local path_data = require "dromozoa.svg.path_data"
 
 local vecmath = require "dromozoa.vecmath"
-local bezier_clipping = require "dromozoa.vecmath.bezier_clipping"
+local bezier_focus = require "dromozoa.vecmath.bezier_focus"
 
 local point2 = vecmath.point2
+local vector2 = vecmath.vector2
 local bezier = vecmath.bezier
 
 local verbose = os.getenv "VERBOSE" == "1"
-local epsilon = 1e-9
-local epsilon_identical = 1e-5
+local epsilon = 1e-6
 local not_check = os.getenv "NOT_CHECK" == "1"
 
 local _ = element
@@ -48,24 +48,6 @@ local function draw_bezier(node, b, stroke, stroke_opacity)
     stroke = stroke;
     ["stroke-opacity"] = stroke_opacity;
   }
-end
-
-local function draw_points(node, B, U, fill)
-  if verbose then
-    print "--"
-  end
-  for i = 1, #U do
-    local p = B:eval(U[i], point2())
-    if verbose then
-      print(i, U[i], tostring(p))
-    end
-    node[#node + 1] = _"circle" {
-      cx = p.x;
-      cy = p.y;
-      r = 2;
-      fill = fill;
-    }
-  end
 end
 
 local root = _"g" {}
@@ -101,37 +83,53 @@ local function check(B1, B2, n, is_identical)
   local U1 = {}
   local U2 = {}
 
-  local result = bezier_clipping(B1, B2, { U1, U2 })
+  local result = bezier_focus(B1, B2, { U1, U2 })
 
-  draw_points(node, B1, U1, "#66C")
-  draw_points(node, B2, U2, "#C66")
-
-  local e2 = 0
   for i = 1, #U1 do
     local p = B1:eval(U1[i], point2())
     local q = B2:eval(U2[i], point2())
-    e2 = e2 + p:distance_squared(q)
+    if verbose then
+      print(tostring(p), tostring(q))
+    end
+    if p:epsilon_equals(q, 1) then
+      node[#node + 1] = _"circle" {
+        cx = (p.x + q.x) / 2;
+        cy = (p.y + q.y) / 2;
+        r = 2;
+        fill = "#33C";
+      }
+    else
+      node[#node + 1] = _"line" {
+        x1 = p.x;
+        y1 = p.y;
+        x2 = q.x;
+        y2 = q.y;
+        stroke = "#33C";
+      }
+    end
   end
-  e2 = e2 / #U1
-  local e = math.sqrt(e2)
+
   if verbose then
-    print("E", e)
-    print("!", #U1, n)
+    print("##", #U1, #U2)
   end
 
   if not not_check then
-    if result.is_identical then
-      assert(is_identical)
-      assert(e <= epsilon_identical)
-    else
-      assert(not is_identical)
-      assert(e <= epsilon)
-    end
-
     assert(#U1 == n)
     assert(#U2 == n)
   end
-  return result
+
+  local D1 = bezier(B1):deriv()
+  local D2 = bezier(B2):deriv()
+  for i = 1, #U1 do
+    local d1 = D1:eval(U1[i], vector2()):normalize()
+    local d2 = D2:eval(U2[i], vector2()):normalize()
+    if verbose then
+      print("D", i, tostring(d1), tostring(d2))
+    end
+    if not not_check then
+      assert(d1:epsilon_equals(d2, epsilon))
+    end
+  end
 end
 
 local B1 = vecmath.bezier({-240,0}, {-80,80}, {80,-160}, {240,80})
@@ -141,80 +139,79 @@ local B4 = vecmath.bezier({-50,-150}, {-25,400}, {25,-400}, {50,150})
 local z = math.cos(math.pi / 4)
 local B5 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
 local B6 = vecmath.bezier({-150,-50}, {400,-25}, {-400,25}, {150,50})
-
 local B7 = vecmath.bezier(B1):clip(0, 0.6)
 local B8 = vecmath.bezier(B1):clip(0.2, 1)
 
 local r = check(B1, B2, 1)
-local r = check(B1, B3, 2)
-local r = check(B1, B4, 3)
-local r = check(B1, B5, 1)
-local r = check(B4, B6, 9)
-local r = check(B7, B8, 2, true)
-if verbose then
-  print(math.abs(r[1][1] - 1/3))
-  print(math.abs(r[1][2] - 1/1))
-  print(math.abs(r[2][1] - 0/1))
-  print(math.abs(r[2][2] - 1/2))
-end
-if not not_check then
-  assert(math.abs(r[1][1] - 1/3) < epsilon_identical)
-  assert(math.abs(r[1][2] - 1/1) < epsilon_identical)
-  assert(math.abs(r[2][1] - 0/1) < epsilon_identical)
-  assert(math.abs(r[2][2] - 1/2) < epsilon_identical)
-end
+local r = check(B1, B3, 1)
+local r = check(B1, B4, 2)
 
-local B1 = vecmath.bezier({-200,0},{200,0})
-local B2 = vecmath.bezier({200,0},{200,-200})
-local r = check(B1, B2, 1)
+--TODO
+--local r = check(B1, B5, 1)
+
+--TODO
+--local r = check(B4, B6, 8)
+
+--TODO
+--local r = check(B7, B8, 2, true)
+
+--TODO
+--local B1 = vecmath.bezier({-200,0},{200,0})
+--local B2 = vecmath.bezier({200,0},{200,-200})
+--local r = check(B1, B2, 1)
 
 local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
 local B2 = vecmath.bezier({200,0},{200,-200})
-local r = check(B1, B2, 1)
+local r = check(B1, B2, 0)
 
 local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
 local B2 = vecmath.bezier({200,0},{100,-100},{200,-200})
-local r = check(B1, B2, 1)
+local r = check(B1, B2, 0)
 
 local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
 local B2 = vecmath.bezier({-200,0},{200,0})
-local r = check(B1, B2, 3)
+local r = check(B1, B2, 2)
 
 local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
 local B2 = vecmath.bezier({-200,0},{200,0})
-local r = check(B1, B2, 3)
+local r = check(B1, B2, 2)
 
-local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
-local B2 = vecmath.bezier({-200,0},{199,0})
-local r = check(B1, B2, 3)
+--TODO
+--local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
+--local B2 = vecmath.bezier({-200,0},{199,0})
+--local r = check(B1, B2, 2)
 
 local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
 local B2 = vecmath.bezier({-200,0},{200,-0})
-local r = check(B1, B2, 3)
+local r = check(B1, B2, 2)
 
 local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
 local B2 = vecmath.bezier({-200,0},{-100,200},{100,-200},{200,0})
-local r = check(B1, B2, 5)
+local r = check(B1, B2, 4)
 
 local B1 = vecmath.bezier({-200,0},{-50,200},{50,-200},{200,0})
 local B2 = vecmath.bezier({-200,0},{-50,100},{50,-100},{200,0})
-local r = check(B1, B2, 3)
+local r = check(B1, B2, 2)
 
 local B1 = vecmath.bezier({-200,-100},{0,240},{200,-100})
 local B2 = vecmath.bezier({-200,100},{0,-200},{200,100})
-local r = check(B1, B2, 2)
+local r = check(B1, B2, 1)
 
---local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
---local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
---local r = check(B1, B2, 3)
---
---local B1 = vecmath.bezier({-200,0},{-50,200+1e-9},{50,200+1e-9},{200,0})
---local B2 = vecmath.bezier({-200,0},{-100,200},{100,200},{200,0})
---if verbose then
---  print("!1", tostring(B1:eval(0.5, point2())))
---  print("!2", tostring(B2:eval(0.5, point2())))
---end
---local r = check(B1, B2, 3)
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
+local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
+local r = check(B1, B2, 3)
+
+local B1 = vecmath.bezier({-200,0},{-50,200+1e-9},{50,200+1e-9},{200,0})
+local B2 = vecmath.bezier({-200,0},{-100,200},{100,200},{200,0})
+local r = check(B1, B2, 3)
+
+local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
+local B2 = vecmath.bezier({-200,-50},{0,-100},{200,-50})
+local r = check(B1, B2, 1)
+
+local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
+local B2 = vecmath.bezier({-200,-50},{200,-50})
+local r = check(B1, B2, 1)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

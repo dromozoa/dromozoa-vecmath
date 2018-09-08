@@ -20,9 +20,11 @@ local bezier = require "dromozoa.vecmath.bezier"
 
 local point2 = vecmath.point2
 local point3 = vecmath.point3
+local vector2 = vecmath.vector2
 
 local verbose = os.getenv "VERBOSE" == "1"
 local epsilon = 1e-9
+local N = 256
 
 local t1 = 1/8
 local t2 = 3/4
@@ -78,3 +80,42 @@ local b2 = bezier(b1):clip(1, 1)
 assert(b2:get(1, point2()):equals {2,2})
 assert(b2:get(2, point2()):equals {2,2})
 assert(b2:get(3, point2()):equals {2,2})
+
+local b1 = bezier({2,1},{4,5},{8,6},{9,2})
+local b2 = bezier(b1):deriv()
+assert(b2:size() == 3)
+if verbose then
+  print(tostring(b2:get(1, point2())))
+  print(tostring(b2:get(2, point2())))
+  print(tostring(b2:get(3, point2())))
+end
+assert(b2:get(1, point2()):equals {6,12})
+assert(b2:get(2, point2()):equals {12,3})
+assert(b2:get(3, point2()):equals {3,-12})
+
+local b2 = bezier({1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1}):deriv(bezier({2,1},{4,5},{8,6},{9,2}))
+assert(b2:size() == 3)
+assert(b2:get(1, point2()):equals {6,12})
+assert(b2:get(2, point2()):equals {12,3})
+assert(b2:get(3, point2()):equals {3,-12})
+
+local z = math.cos(math.pi / 4)
+local b1 = bezier({100,0,1}, {100*z,100*z,z}, {0,100,1})
+local b2 = bezier(b1):deriv()
+local b3 = bezier({1,1},{1,1},{1,1},{1,1},{1,1}):deriv(b1)
+
+assert(b1:size() == 3) -- quadratic
+assert(b2:size() == 5) -- quartic
+assert(b3:size() == 5) -- quartic
+
+for i = 0, N do
+  local t = i / N
+  local v1 = b1:eval(t, vector2())
+  local v2 = b2:eval(t, vector2())
+  local v3 = b3:eval(t, vector2())
+  assert(math.abs(v1:dot(v2)) < epsilon)
+  assert(math.abs(v1:dot(v3)) < epsilon)
+  if verbose then
+    print(v2:length())
+  end
+end

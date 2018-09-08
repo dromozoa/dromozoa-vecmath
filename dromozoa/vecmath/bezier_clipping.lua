@@ -20,6 +20,7 @@ local point3 = require "dromozoa.vecmath.point3"
 local vector2 = require "dromozoa.vecmath.vector2"
 
 local bezier = require "dromozoa.vecmath.bezier"
+local polynomial = require "dromozoa.vecmath.polynomial"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
 -- by experimentations
@@ -39,7 +40,6 @@ local function fat_line(B1, B2)
   local c = -(a * px + b * py)
 
   if a == 0 and b == 0 then
-    print "fat line is point"
     B2:get(1, p)
     local qx = p[1]
     local qy = p[2]
@@ -55,14 +55,12 @@ local function fat_line(B1, B2)
       a = uy
       b = -ux
       c = -uy * px + ux * py
-      print("F", a, b, c)
     end
   end
 
   local d_min = 0
   local d_max = 0
   for i = 2, n - 1 do
-  -- for i = 1, n do
     B1:get(i, p)
     local d = a * p[1] + b * p[2] + c
     if d_min > d then
@@ -89,8 +87,6 @@ local function fat_line(B1, B2)
     end
   end
 
-  print(("X= %.17g\t%.17g\t%.17g\t| %.17g %.17g"):format(a, b, c, d_min, d_max))
-
   return a, b, c, d_min, d_max
 end
 
@@ -103,16 +99,11 @@ local function clip_both(H, d_min, d_max)
   local pt = p[1]
   local pd = p[2]
 
-  print(("pd %.17g"):format(pd))
-
   for i = 1, n do
     local q = H[i]
     local qt = q[1]
     local qd = q[2]
 
-    print(("qd %.17g / %.17g [%d]"):format(qd, pd - qd, i))
-
-    -- if d_min - 1e-11 <= pd and pd <= d_max + 1e-11 then
     if d_min <= pd and pd <= d_max then
       if t1 > pt then
         t1 = pt
@@ -289,10 +280,135 @@ local function clip(B1, B2)
   end
 end
 
-local function print_bezier(b)
-  for i = 1, b:size() do
-    print("B", i, tostring(b:get(i, point2())))
+local function normal(B, p)
+  local N = bezier()
+
+  if B:is_rational() then
+    local X = B[1]
+    local Y = B[2]
+    local Z = B[3]
+  else
+    local X = B[1]
+    local Y = B[2]
+    local PX = X:get(polynomial())
+    local PY = Y:get(polynomial())
+    local QX = polynomial(PX):deriv()
+    local QY = polynomial(PY):deriv()
+    local FX = polynomial(p[1])
+    local FY = polynomial(p[2])
+    PX:sub(FX)
+    PY:sub(FY)
+    QX:mul(PX)
+    QY:mul(PY)
+    QX:add(QY)
+
+    local NX = N[1]
+    local NY = N[2]
+
+    -- DEBUG HACK
+    if #PX > 1 then
+      NY:set(QX)
+      local n = #NY
+      local m = n - 1
+      for i = 1, n do
+        NX[i] = (i - 1) / m
+      end
+      return N
+    end
   end
+end
+
+
+local function split(b1, b2, u1, u2, u3, u4)
+  -- focus F of B2
+  -- distance B1 and F
+  -- B1 range
+
+  print("U", u1, u2, u3, u4)
+
+  local F = bezier()
+  local B = bezier()
+  local p = point2()
+  while true do
+    local clipped
+
+    -- print("S", u1, u2, u3, u4)
+
+    if F:clip(u3, u4, b2):focus() then
+      B:clip(u1, u2, b1)
+      local P = {}
+      for i = 1, F:size() do
+        local N = normal(B, F:get(i, p))
+        if N then
+          for j = 1, N:size() do
+            P[#P + 1] = N:get(j, point2())
+          end
+        end
+      end
+      -- DEBUG HACK
+      if #P > 0 then
+        local H = {}
+        quickhull(P, H)
+        for i = 1, #H do
+          print(i, tostring(H[i]))
+        end
+        local t1, t2 = clip_both(H, 0, 0)
+        print("T", t1, t2)
+        if t1 then
+          if t2 - t1 <= 0.8 then
+            local a = u2 - u1
+            u2 = u1 + a * t2
+            u1 = u1 + a * t1
+            if u2 - u1 <= epsilon then
+              return (u1 + u2) / 2, (u3 + u4) / 2, true
+            end
+            clipped = true
+          end
+        end
+      end
+    else
+      print "NO FOCUS"
+    end
+
+    if F:clip(u1, u2, b1):focus() then
+      B:clip(u3, u4, b2)
+      local P = {}
+      for i = 1, F:size() do
+        local N = normal(B, F:get(i, p))
+        if N then
+          for j = 1, N:size() do
+            P[#P + 1] = N:get(j, point2())
+          end
+        end
+      end
+      -- DEBUG HACK
+      if #P > 0 then
+        local H = {}
+        quickhull(P, H)
+        for i = 1, #H do
+          print(i, tostring(H[i]))
+        end
+        local t3, t4 = clip_both(H, 0, 0)
+        print("T", t3, t4)
+        if t3 then
+          if t4 - t3 <= 0.8 then
+            local a = u4 - u3
+            u4 = u3 + a * t4
+            u3 = u3 + a * t3
+            clipped = true
+          end
+        end
+      end
+    else
+      print "NO FOCUS"
+    end
+
+    if not clipped then
+      break
+    end
+  end
+
+  return (u1 + u2) / 2, (u3 + u4) / 2, false
 end
 
 local function iterate(b1, b2, u1, u2, u3, u4, m, result)
@@ -302,34 +418,28 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
 
-  print(u1, u2, u3, u4)
-
   local B1 = bezier(b1):clip(u1, u2)
-  -- print_bezier(B1)
   local B2 = bezier(b2):clip(u3, u4)
-  -- print_bezier(B2)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
-    print "NOT CLIPPED (1)"
     return result
   end
   local a = u2 - u1
-  u2 = u1 + a * t2
-  u1 = u1 + a * t1
+  local v2 = u1 + a * t2
+  local v1 = u1 + a * t1
 
   local t3, t4 = clip(B2, B1)
   if not t3 then
-    print "NOT CLIPPED (2)"
     return result
   end
   local b = u4 - u3
-  u4 = u3 + b * t4
-  u3 = u3 + b * t3
+  local v4 = u3 + b * t4
+  local v3 = u3 + b * t3
 
-  if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
-    local t1 = (u1 + u2) / 2
-    local t2 = (u3 + u4) / 2
+  if v2 - v1 <= epsilon and v4 - v3 <= epsilon then
+    local t1 = (v1 + v2) / 2
+    local t2 = (v3 + v4) / 2
     local U2 = result[2]
 
     for i = 1, n do
@@ -351,31 +461,92 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     n = n + 1
     U1[n] = t1
     U2[n] = t2
-    print("DONE", t1, t2)
     return result
   end
 
-  local d_epsilon = 1e-16
-  local d_epsilon = 2.22044604925031e-16 / 2
-  u1 = u1 - d_epsilon if u1 < 0 then u1 = 0 end
-  u2 = u2 + d_epsilon if u2 > 1 then u2 = 1 end
-  u3 = u3 - d_epsilon if u3 < 0 then u3 = 0 end
-  u4 = u4 + d_epsilon if u4 > 1 then u4 = 1 end
-
-  if t2 - t1 > 0.8 or t4 - t3 > 0.8 then
+  if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
     if a < b then
-      print "SPLIT (1)"
-      local u5 = (u3 + u4) / 2
+      local u5, u6, converged = split(b2, b1, u3, u4, u1, u2)
+      if converged then
+        local t1 = u6
+        local t2 = u5
+        local p = b1:eval(t1, point2())
+        local q = b2:eval(t2, point2())
+        print(p:distance(q))
+        if p:epsilon_equals(q, epsilon) then
+          local U2 = result[2]
+          for i = 1, n do
+            local a = U1[i] - t1
+            if a < 0 then
+              a = -a
+            end
+            if a <= epsilon then
+              local b = U2[i] - t2
+              if b < 0 then
+                b = -b
+              end
+              if b <= epsilon then
+                return result
+              end
+            end
+          end
+          n = n + 1
+          U1[n] = t1
+          U2[n] = t2
+          return result
+        end
+      end
+      if u5 == u3 or u5 == u4 then
+        u5 = (u3 + u4) / 2
+      end
+      print(u6, u1, u2, "|", u5, u3, u4, "|", converged)
       iterate(b1, b2, u1, u2, u3, u5, m, result)
       return iterate(b1, b2, u1, u2, u5, u4, m, result)
     else
-      print "SPLIT (2)"
-      local u5 = (u1 + u2) / 2
+      local u5, u6, converged = split(b1, b2, u1, u2, u3, u4)
+      if converged then
+        local t1 = u5
+        local t2 = u6
+        local p = b1:eval(t1, point2())
+        local q = b2:eval(t2, point2())
+        print(p:distance(q))
+        if p:epsilon_equals(q, epsilon) then
+          local U2 = result[2]
+          for i = 1, n do
+            local a = U1[i] - t1
+            if a < 0 then
+              a = -a
+            end
+            if a <= epsilon then
+              local b = U2[i] - t2
+              if b < 0 then
+                b = -b
+              end
+              if b <= epsilon then
+                return result
+              end
+            end
+          end
+          n = n + 1
+          U1[n] = t1
+          U2[n] = t2
+          return result
+        end
+      end
+      if u5 == u1 or u5 == u2 then
+        u5 = (u1 + u2) / 2
+      end
+      print(u5, u1, u2, "|", u6, u3, u4, "|", converged)
       iterate(b1, b2, u1, u5, u3, u4, m, result)
       return iterate(b1, b2, u5, u2, u3, u4, m, result)
     end
   else
-    return iterate(b1, b2, u1, u2, u3, u4, m, result)
+    local d_epsilon = 2.22044604925031e-16 / 2
+    v1 = v1 - d_epsilon if v1 < 0 then v1 = 0 end
+    v2 = v2 + d_epsilon if v2 > 1 then v2 = 1 end
+    v3 = v3 - d_epsilon if v3 < 0 then v3 = 0 end
+    v4 = v4 + d_epsilon if v4 > 1 then v4 = 1 end
+    return iterate(b1, b2, v1, v2, v3, v4, m, result)
   end
 end
 
@@ -394,8 +565,6 @@ return function (b1, b2, result)
 
   local n = #U1
   if n > m then
-    print("IS_IDENTICAL", n, m)
-
     local t_min = U1[1]
     local t_max = t_min
     local u_min = U2[1]

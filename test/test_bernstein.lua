@@ -176,3 +176,56 @@ assert(b2[1] == 19)
 assert(b2[2] == 13)
 assert(b2[3] == 11)
 assert(b2[4] == 7)
+
+local b = bernstein(0, 4, 6, 12):elevate()
+if verbose then
+  print(table.concat(b, " "))
+end
+assert(#b == 5)
+assert(b[1] == 0)
+assert(b[2] == 3)
+assert(b[3] == 5)
+assert(b[4] == 7.5)
+assert(b[5] == 12)
+
+local b = bernstein(1,1,1,1,1,1,1,1,1):elevate{12, 6, 4, 0}
+if verbose then
+  print(table.concat(b, " "))
+end
+assert(#b == 5)
+assert(b[1] == 12)
+assert(b[2] == 7.5)
+assert(b[3] == 5)
+assert(b[4] == 3)
+assert(b[5] == 0)
+
+-- 7*binomial(3,0)*(1-t)^3 + 11*binomial(3,1)*(1-t)^2*t + 13*binomial(3,2)*(1-t)*t^2 + 19*binomial(3,3)*t^3
+-- 12*binomial(2,0)*(1-t)^2 + 6*binomial(2,1)*(1-t)*t + 18*binomial(2,2)*t^2
+local b1 = bernstein(7,11,13,19)
+local b2 = bernstein(b1):deriv()
+local p1 = polynomial(b1)
+local p2 = polynomial(p1):deriv()
+local b3 = bernstein(p2)
+if verbose then
+  print(table.concat(b2, " "))
+  print(table.concat(b3, " "))
+end
+assert(#b2 == 3)
+assert(b2[1] == 12)
+assert(b2[2] == 6)
+assert(b2[3] == 18)
+
+assert(#b2 == #b3)
+for i = 1, #b3 do
+  assert(b2[i] == b3[i])
+end
+
+local b4 = bernstein():deriv(b1)
+local b5 = bernstein(1,1,1,1,1,1,1,1):deriv(b1)
+
+assert(#b4 == #b3)
+assert(#b5 == #b3)
+for i = 1, #b3 do
+  assert(b4[i] == b3[i])
+  assert(b5[i] == b3[i])
+end
