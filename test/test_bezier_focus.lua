@@ -146,13 +146,11 @@ local r = check(B1, B2, 1)
 local r = check(B1, B3, 1)
 local r = check(B1, B4, 2)
 
---TODO
 local r = check(B1, B5, 1)
 
 local r = check(B4, B6, 14)
 
---TODO
---local r = check(B7, B8, 2, true)
+local r = check(B7, B8, 2, true)
 
 local B1 = vecmath.bezier({-200,0},{200,0})
 local B2 = vecmath.bezier({200,0},{200,-200})
