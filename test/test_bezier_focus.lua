@@ -149,8 +149,7 @@ local r = check(B1, B4, 2)
 --TODO
 --local r = check(B1, B5, 1)
 
---TODO
---local r = check(B4, B6, 16)
+local r = check(B4, B6, 16)
 
 --TODO
 --local r = check(B7, B8, 2, true)
