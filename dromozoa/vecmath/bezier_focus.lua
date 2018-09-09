@@ -149,20 +149,16 @@ end
 local function focus(B1, B2)
   local F = bezier(B2):focus()
   if not F then
-    print "F == B2"
     F = B2
   end
 
   if F then
     local P = {}
-    print("#", F:size())
     for i = 1, F:size() do
-      print("-i", i, F:get(i, point2()))
       local D = explicit_bezier(B1, F:get(i, point2()))
       if D then
         for j = 1, D:size() do
           P[#P + 1] = D:get(j, point2())
-          print("ij", i, j, P[#P])
         end
       end
     end
@@ -171,9 +167,6 @@ local function focus(B1, B2)
     end
     local H = {}
     quickhull(P, H)
-    for j = 1, #H do
-      print("j", j, tostring(H[j]))
-    end
     return clip_both(H, 0, 0)
   end
   return 0, 1
@@ -186,23 +179,18 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     return result
   end
 
-  print("U", u1, u2, u3, u4)
-
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
   local t1, t2 = focus(B1, B2)
-  print("T12", t1, t2)
   if not t1 then
     return result
   end
   local a = u2 - u1
   u2 = u1 + a * t2
   u1 = u1 + a * t1
-  -- B1 = bezier(b1):clip(u1, u2)
 
   local t3, t4 = focus(B2, B1)
-  print("T34", t3, t4)
   if not t3 then
     return result
   end
@@ -217,7 +205,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
 
     local v1 = bezier(b1):deriv():eval(t1, vector2()):normalize()
     local v2 = bezier(b2):deriv():eval(t2, vector2()):normalize()
-    print("X", v1:cross(v2))
     if math.abs(v1:cross(v2)) <= epsilon then
       for i = 1, n do
         local a = U1[i] - t1
