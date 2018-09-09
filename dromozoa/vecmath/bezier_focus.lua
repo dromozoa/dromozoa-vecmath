@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local point2 = require "dromozoa.vecmath.point2"
+local vector2 = require "dromozoa.vecmath.vector2"
 
 local bezier = require "dromozoa.vecmath.bezier"
 local polynomial = require "dromozoa.vecmath.polynomial"
@@ -179,26 +180,33 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     local t2 = (u3 + u4) / 2
     local U2 = result[2]
 
-    for i = 1, n do
-      local a = U1[i] - t1
-      if a < 0 then
-        a = -a
-      end
-      if a <= epsilon then
-        local b = U2[i] - t2
-        if b < 0 then
-          b = -b
+    local v1 = bezier(b1):deriv():eval(t1, vector2()):normalize()
+    local v2 = bezier(b2):deriv():eval(t2, vector2()):normalize()
+    print("X", v1:cross(v2))
+    if math.abs(v1:cross(v2)) <= epsilon then
+      for i = 1, n do
+        local a = U1[i] - t1
+        if a < 0 then
+          a = -a
         end
-        if b <= epsilon then
-          return result
+        if a <= epsilon then
+          local b = U2[i] - t2
+          if b < 0 then
+            b = -b
+          end
+          if b <= epsilon then
+            return result
+          end
         end
       end
-    end
 
-    n = n + 1
-    U1[n] = t1
-    U2[n] = t2
-    return result
+      n = n + 1
+      U1[n] = t1
+      U2[n] = t2
+      return result
+    else
+      return result
+    end
   end
 
   if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
