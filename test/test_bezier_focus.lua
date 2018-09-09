@@ -147,7 +147,7 @@ local r = check(B1, B3, 1)
 local r = check(B1, B4, 2)
 
 --TODO
---local r = check(B1, B5, 1)
+local r = check(B1, B5, 1)
 
 local r = check(B4, B6, 14)
 
@@ -175,9 +175,9 @@ local B2 = vecmath.bezier({-200,0},{200,0})
 local r = check(B1, B2, 2)
 
 --TODO
---local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
---local B2 = vecmath.bezier({-200,0},{199,0})
---local r = check(B1, B2, 2)
+local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
+local B2 = vecmath.bezier({-200,0},{199,0})
+local r = check(B1, B2, 2)
 
 local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
 local B2 = vecmath.bezier({-200,0},{200,-0})

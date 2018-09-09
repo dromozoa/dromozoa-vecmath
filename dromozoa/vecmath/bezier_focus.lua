@@ -38,7 +38,7 @@ local function clip_both(H, d_min, d_max)
     local qt = q[1]
     local qd = q[2]
 
-    if d_min <= pd and pd <= d_max then
+    if d_min - 1e-9 <= pd and pd <= d_max + 1e-9 then
       if t1 > pt then
         t1 = pt
       end
@@ -84,6 +84,41 @@ local function explicit_bezier(B, p)
   local N = bezier()
 
   if B:is_rational() then
+    local X = B[1]
+    local Y = B[2]
+    local Z = B[3]
+    local PX = X:get(polynomial())
+    local PY = Y:get(polynomial())
+    local PZ = Z:get(polynomial())
+    local QX = polynomial(PX):deriv()
+    local QY = polynomial(PY):deriv()
+    local QZ = polynomial(PZ):deriv()
+    local FX = polynomial(p[1])
+    local FY = polynomial(p[2])
+
+    FX:mul(PZ)
+    FY:mul(PZ)
+    FX:sub(PX, FX)
+    FY:sub(PY, FY)
+    PX:mul(QZ)
+    PY:mul(QZ)
+    QX:mul(PZ)
+    QY:mul(PZ)
+    QX:sub(PX)
+    QY:sub(PY)
+    QX:mul(FX)
+    QY:mul(FY)
+    QX:add(QY)
+
+    local NX = N[1]
+    local NY = N[2]
+    NY:set(QX)
+    local n = #NY
+    local m = n - 1
+    for i = 1, n do
+      NX[i] = (i - 1) / m
+    end
+    return N
   else
     local X = B[1]
     local Y = B[2]
