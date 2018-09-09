@@ -127,7 +127,7 @@ local function check(B1, B2, n, is_identical)
       print("D", i, tostring(d1), tostring(d2))
     end
     if not not_check then
-      assert(d1:epsilon_equals(d2, epsilon))
+      assert(d1:epsilon_equals(d2, epsilon) or vector2(d1):negate():epsilon_equals(d2, epsilon))
     end
   end
 end
@@ -150,7 +150,7 @@ local r = check(B1, B4, 2)
 --local r = check(B1, B5, 1)
 
 --TODO
---local r = check(B4, B6, 8)
+--local r = check(B4, B6, 16)
 
 --TODO
 --local r = check(B7, B8, 2, true)
@@ -220,7 +220,20 @@ local r = check(B1, B2, 1)
 
 local B1 = vecmath.bezier({-150,-200},{0,600},{150,-200})
 local B2 = vecmath.bezier({-200,-150},{600,0},{-200,150})
-local r = check(B1, B2, 1)
+local r = check(B1, B2, 5)
+
+local B1 = vecmath.bezier({-150,-200},{0,600},{150,-200})
+local B2 = vecmath.bezier({-300,-150},{1200,-50},{-1200,50},{300,150})
+local r = check(B1, B2, 7)
+
+local B1 = vecmath.bezier({-150,-300},{-50,1200},{50,-1200},{150,300})
+local B2 = vecmath.bezier({-300,-150},{1200,-50},{-1200,50},{300,150})
+local r = check(B1, B2, 16)
+
+--TODO
+--local B1 = vecmath.bezier({-100,-300},{-50,1200},{0,-1800},{50,1200},{100,-300})
+--local B2 = vecmath.bezier({-300,-100},{1200,-50},{-1800,0},{1200,50},{-300,100})
+--local r = check(B1, B2, 27)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

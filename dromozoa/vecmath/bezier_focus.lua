@@ -217,9 +217,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
 end
 
 return function (b1, b2, result)
-  -- TODO 2x2 => 0
-  -- TODO 3x3 => 16?
-  local m = (b1:size() - 1) * (b2:size() - 1) - 1
-  local m = (b1:size() - 1) * (b2:size() - 1) + 10
+  local m = (b1:size() - 1) * (b2:size() - 1)
+  local m = m * (m - 1) / 2
   iterate(b1, b2, 0, 1, 0, 1, m, result)
 end
