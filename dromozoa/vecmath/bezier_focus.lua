@@ -165,7 +165,7 @@ local function focus(B1, B2)
       end
     end
     if #P == 0 then
-      return nil
+      return
     end
     local H = {}
     quickhull(P, H)
