@@ -22,7 +22,9 @@ local bezier = require "dromozoa.vecmath.bezier"
 local polynomial = require "dromozoa.vecmath.polynomial"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
-local epsilon = 1e-6
+-- by experimentations
+local t_epsilon = 1e-6
+local d_epsilon = 1e-11
 
 local function clip_both(H, d_min, d_max)
   local t1 = 1
@@ -38,7 +40,7 @@ local function clip_both(H, d_min, d_max)
     local qt = q[1]
     local qd = q[2]
 
-    if d_min - 1e-9 <= pd and pd <= d_max + 1e-9 then
+    if d_min <= pd and pd <= d_max then
       if t1 > pt then
         t1 = pt
       end
@@ -167,7 +169,7 @@ local function focus(B1, B2)
     end
     local H = {}
     quickhull(P, H)
-    return clip_both(H, 0, 0)
+    return clip_both(H, -d_epsilon, d_epsilon)
   end
   return 0, 1
 end
@@ -198,25 +200,25 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   u4 = u3 + b * t4
   u3 = u3 + b * t3
 
-  if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
+  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
     local t1 = (u1 + u2) / 2
     local t2 = (u3 + u4) / 2
     local U2 = result[2]
 
     local v1 = bezier(b1):deriv():eval(t1, vector2()):normalize()
     local v2 = bezier(b2):deriv():eval(t2, vector2()):normalize()
-    if math.abs(v1:cross(v2)) <= epsilon then
+    if math.abs(v1:cross(v2)) <= t_epsilon then
       for i = 1, n do
         local a = U1[i] - t1
         if a < 0 then
           a = -a
         end
-        if a <= epsilon then
+        if a <= t_epsilon then
           local b = U2[i] - t2
           if b < 0 then
             b = -b
           end
-          if b <= epsilon then
+          if b <= t_epsilon then
             return result
           end
         end
