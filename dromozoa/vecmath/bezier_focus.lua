@@ -29,7 +29,9 @@ local t_epsilon = 1e-6
 local d_epsilon = 1e-11
 
 local function explicit_bezier(B, p)
-  local N = bezier()
+  local D = bezier()
+  local DX = D[1]
+  local DY = D[2]
 
   if B:is_rational() then
     local X = B[1]
@@ -58,15 +60,7 @@ local function explicit_bezier(B, p)
     QY:mul(FY)
     QX:add(QY)
 
-    local NX = N[1]
-    local NY = N[2]
-    NY:set(QX)
-    local n = #NY
-    local m = n - 1
-    for i = 1, n do
-      NX[i] = (i - 1) / m
-    end
-    return N
+    DY:set(QX)
   else
     local X = B[1]
     local Y = B[2]
@@ -82,16 +76,15 @@ local function explicit_bezier(B, p)
     QY:mul(PY)
     QX:add(QY)
 
-    local NX = N[1]
-    local NY = N[2]
-    NY:set(QX)
-    local n = #NY
-    local m = n - 1
-    for i = 1, n do
-      NX[i] = (i - 1) / m
-    end
-    return N
+    DY:set(QX)
   end
+
+  local n = #DY
+  local m = n - 1
+  for i = 1, n do
+    DX[i] = (i - 1) / m
+  end
+  return D
 end
 
 local function focus(B1, B2)
