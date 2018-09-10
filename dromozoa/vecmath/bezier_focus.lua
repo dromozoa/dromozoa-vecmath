@@ -29,49 +29,40 @@ local t_epsilon = 1e-6
 local d_epsilon = 1e-11
 
 local function explicit_bezier(B, p)
+  local Z = B[3]
+  local PX = B[1]:get(polynomial())
+  local PY = B[2]:get(polynomial())
+  local QX = polynomial(PX):deriv()
+  local QY = polynomial(PY):deriv()
+  local RX = polynomial(p[1])
+  local RY = polynomial(p[2])
+
   local D = bezier()
   local DX = D[1]
   local DY = D[2]
 
-  if B:is_rational() then
-    local X = B[1]
-    local Y = B[2]
-    local Z = B[3]
-    local PX = X:get(polynomial())
-    local PY = Y:get(polynomial())
+  if Z[1] then
     local PZ = Z:get(polynomial())
-    local QX = polynomial(PX):deriv()
-    local QY = polynomial(PY):deriv()
     local QZ = polynomial(PZ):deriv()
-    local FX = polynomial(p[1])
-    local FY = polynomial(p[2])
 
-    FX:mul(PZ)
-    FY:mul(PZ)
-    FX:sub(PX, FX)
-    FY:sub(PY, FY)
+    RX:mul(PZ)
+    RY:mul(PZ)
+    RX:sub(PX, RX)
+    RY:sub(PY, RY)
     PX:mul(QZ)
     PY:mul(QZ)
     QX:mul(PZ)
     QY:mul(PZ)
     QX:sub(PX)
     QY:sub(PY)
-    QX:mul(FX)
-    QY:mul(FY)
+    QX:mul(RX)
+    QY:mul(RY)
     QX:add(QY)
 
     DY:set(QX)
   else
-    local X = B[1]
-    local Y = B[2]
-    local PX = X:get(polynomial())
-    local PY = Y:get(polynomial())
-    local QX = polynomial(PX):deriv()
-    local QY = polynomial(PY):deriv()
-    local FX = polynomial(p[1])
-    local FY = polynomial(p[2])
-    PX:sub(FX)
-    PY:sub(FY)
+    PX:sub(RX)
+    PY:sub(RY)
     QX:mul(PX)
     QY:mul(PY)
     QX:add(QY)
