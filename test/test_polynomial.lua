@@ -19,7 +19,7 @@ local polynomial = require "dromozoa.vecmath.polynomial"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
--- x^2 - 3x + 2
+-- x^2 - 3*x + 2
 local p = polynomial(2, -3, 1)
 assert(p:eval(0) == 2)
 assert(p:eval(1) == 0)
@@ -190,3 +190,14 @@ assert(#p == 3)
 assert(p[1] == 3)
 assert(p[2] == 6)
 assert(p[3] == 9)
+
+-- x^2 - 3*x + 2
+local p = polynomial(2, -3, 1)
+p:mul(p)
+assert(#p == 5)
+assert(p[1] == 4)
+assert(p[2] == -12)
+assert(p[3] == 13)
+assert(p[4] == -6)
+assert(p[5] == 1)
+

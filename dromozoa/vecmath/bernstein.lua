@@ -114,32 +114,47 @@ end
 -- a:eval(number b, bernstein c)
 -- a:eval(number b)
 function class.eval(a, b, c, d)
-  if c then
-    class.set(c, a)
-  else
-    c = class.set({}, a)
-  end
-
-  local n = #c
   if d then
-    local m = n + 2
-    for i = 2, n do
-      d[m - i] = c[n]
-      local t = (1 - b) * c[i - 1]
-      for j = i, n do
-        local u = c[j]
-        local v = b * u
-        c[j] = t + v
-        t = u - v
+    if c then
+      class.set(c, a)
+      local n = #c
+      local m = n + 2
+      for i = 2, n do
+        d[m - i] = c[n]
+        local t = (1 - b) * c[i - 1]
+        for j = i, n do
+          local u = c[j]
+          local v = b * u
+          c[j] = t + v
+          t = u - v
+        end
       end
+      local v = c[n]
+      d[1] = v
+      for i = n + 1, #d do
+        d[i] = nil
+      end
+      return v, c, d
+    else
+      class.set(d, a)
+      for i = #d, 2, -1 do
+        local t = b * d[i]
+        for j = i - 1, 1, -1 do
+          local u = d[j]
+          local v = b * u
+          d[j] = t + u - v
+          t = v
+        end
+      end
+      return d[1], nil, d
     end
-    local v = c[n]
-    d[1] = v
-    for i = n + 1, #d do
-      d[i] = nil
-    end
-    return v, c, d
   else
+    if c then
+      class.set(c, a)
+    else
+      c = class.set({}, a)
+    end
+    local n = #c
     for i = 2, n do
       local t = (1 - b) * c[i - 1]
       for j = i, n do
@@ -150,6 +165,91 @@ function class.eval(a, b, c, d)
       end
     end
     return c[n], c
+  end
+end
+
+-- a:reverse(bernstein b)
+-- a:reverse()
+function class.reverse(a, b)
+  if b then
+    local n = #b
+    local m = n + 1
+    for i = 1, n do
+      a[i] = b[m - i]
+    end
+    for i = m, #a do
+      a[i] = nil
+    end
+    return a
+  else
+    local n = #a
+    for i = 1, n / 2 do
+      a[i], a[n] = a[n], a[i]
+      n = n - 1
+    end
+    return a
+  end
+end
+
+-- a:elevate(bernstein b)
+-- a:elevate()
+function class.elevate(a, b)
+  if b then
+    local n = #b
+    local t = b[1]
+    a[1] = t
+    for i = 2, n do
+      local u = b[i]
+      local v = (i - 1) / n
+      a[i] = v * t + (1 - v) * u
+      t = u
+    end
+    a[n + 1] = t
+    for i = n + 2, #a do
+      a[i] = nil
+    end
+    return a
+  else
+    local n = #a
+    local t = a[1]
+    for i = 2, n do
+      local u = a[i]
+      local v = (i - 1) / n
+      a[i] = v * t + (1 - v) * u
+      t = u
+    end
+    a[n + 1] = t
+    return a
+  end
+end
+
+-- a:deriv(bernstein b)
+-- a:deriv()
+function class.deriv(a, b)
+  if b then
+    local n = #b
+    local m = n - 1
+    local u = b[1]
+    for i = 2, n do
+      local v = b[i]
+      a[i - 1] = m * (v - u)
+      u = v
+    end
+    for i = n, #a do
+      a[i] = nil
+    end
+    return a
+  else
+    local n = #a
+    local m = n - 1
+    local u = a[1]
+    for i = 2, n do
+      local v = a[i]
+      a[i - 1] = m * (v - u)
+      u = v
+    end
+    a[n] = nil
+    return a
   end
 end
 

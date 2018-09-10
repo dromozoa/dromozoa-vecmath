@@ -16,7 +16,6 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local element = require "dromozoa.dom.element"
-local space_separated = require "dromozoa.dom.space_separated"
 local xml_document = require "dromozoa.dom.xml_document"
 local path_data = require "dromozoa.svg.path_data"
 
@@ -159,6 +158,7 @@ local ex_root = _"g" {
 
 local q = point2(200, -200)
 local q = point2(100, 100)
+local q = point2(-200, 200)
 
 -- local points = {
 --   point3(-200, -200, 1);

@@ -140,6 +140,7 @@ local function normalize(a, b)
   return mul_transpose_right(a, u, v)
 end
 
+-- a:set_axis_angle4(axis_angle4 b)
 local function set_axis_angle4(a, b)
   local x = b[1]
   local y = b[2]
@@ -172,6 +173,7 @@ local function set_axis_angle4(a, b)
   return a
 end
 
+-- a:set_quat4(quat4 b)
 local function set_quat4(a, b)
   local x = b[1]
   local y = b[2]
@@ -206,6 +208,7 @@ local function set_quat4(a, b)
   return a
 end
 
+-- a:set_matrix2(matrix2 b) [EX]
 local function set_matrix2(a, b)
   a[1] = b[1]
   a[2] = b[2]
@@ -219,6 +222,8 @@ local function set_matrix2(a, b)
   return a
 end
 
+-- a:transform_point2(point2 b, point2 c) [EX]
+-- a:transform_point2(point2 b) [EX]
 local function transform_point2(a, b, c)
   if not c then
     c = b
@@ -230,6 +235,8 @@ local function transform_point2(a, b, c)
   return c
 end
 
+-- a:transform_vector2(vector2 b, vector2 c) [EX]
+-- a:transform_vector2(vector2 b) [EX]
 local function transform_vector2(a, b, c)
   if not c then
     c = b
@@ -514,16 +521,18 @@ function class.invert(a, b)
   local v = b23 * b31 - b21 * b33
   local w = b21 * b32 - b22 * b31
   local d = b11 * u + b12 * v + b13 * w
-  a[1] = u / d
-  a[2] = (b13 * b32 - b12 * b33) / d
-  a[3] = (b12 * b23 - b13 * b22) / d
-  a[4] = v / d
-  a[5] = (b11 * b33 - b13 * b31) / d
-  a[6] = (b13 * b21 - b11 * b23) / d
-  a[7] = w / d
-  a[8] = (b12 * b31 - b11 * b32) / d
-  a[9] = (b11 * b22 - b12 * b21) / d
-  return a
+  if d ~= 0 then
+    a[1] = u / d
+    a[2] = (b13 * b32 - b12 * b33) / d
+    a[3] = (b12 * b23 - b13 * b22) / d
+    a[4] = v / d
+    a[5] = (b11 * b33 - b13 * b31) / d
+    a[6] = (b13 * b21 - b11 * b23) / d
+    a[7] = w / d
+    a[8] = (b12 * b31 - b11 * b32) / d
+    a[9] = (b11 * b22 - b12 * b21) / d
+    return a
+  end
 end
 
 -- a:determinant()

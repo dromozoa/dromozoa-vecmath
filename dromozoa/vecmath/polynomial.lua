@@ -20,6 +20,7 @@ local bernstein = require "dromozoa.vecmath.bernstein"
 local setmetatable = setmetatable
 local type = type
 
+-- a:set_bernstein(bernstein b)
 local function set_bernstein(a, b)
   return bernstein.get(b, a)
 end
@@ -73,14 +74,7 @@ end
 -- a:deriv(polynomial b)
 -- a:deriv()
 function class.deriv(a, b)
-  if not b then
-    local n = #a
-    for i = 1, n - 1 do
-      a[i] = a[i + 1] * i
-    end
-    a[n] = nil
-    return a
-  else
+  if b then
     local n = #b
     for i = 1, n - 1 do
       a[i] = b[i + 1] * i
@@ -88,6 +82,13 @@ function class.deriv(a, b)
     for i = n, #a do
       a[i] = nil
     end
+    return a
+  else
+    local n = #a
+    for i = 1, n - 1 do
+      a[i] = a[i + 1] * i
+    end
+    a[n] = nil
     return a
   end
 end
@@ -97,22 +98,31 @@ end
 -- a:integ(number b)
 -- a:integ()
 function class.integ(a, b, c)
-  if not b or type(b) == "number" then
+  if b then
+    if type(b) == "number" then
+      local n = #a
+      for i = n, 1, -1 do
+        a[i + 1] = a[i] / i
+      end
+      a[1] = b
+      return a
+    else
+      local n = #b
+      for i = n, 1, -1 do
+        a[i + 1] = b[i] / i
+      end
+      a[1] = c or 0
+      for i = n + 2, #a do
+        a[i] = nil
+      end
+      return a
+    end
+  else
     local n = #a
     for i = n, 1, -1 do
       a[i + 1] = a[i] / i
     end
-    a[1] = b or 0
-    return a
-  else
-    local n = #b
-    for i = n, 1, -1 do
-      a[i + 1] = b[i] / i
-    end
-    a[1] = c or 0
-    for i = n + 2, #a do
-      a[i] = nil
-    end
+    a[1] = 0
     return a
   end
 end
@@ -120,24 +130,7 @@ end
 -- a:add(polynomial b, polynomial c)
 -- a:add(polynomial b)
 function class.add(a, b, c)
-  if not c then
-    local m = #a
-    local n = #b
-    if m < n then
-      for i = 1, m do
-        a[i] = a[i] + b[i]
-      end
-      for i = m + 1, n do
-        a[i] = b[i]
-      end
-      return a
-    else
-      for i = 1, n do
-        a[i] = a[i] + b[i]
-      end
-      return a
-    end
-  else
+  if c then
     local m = #b
     local n = #c
     if m < n then
@@ -163,30 +156,30 @@ function class.add(a, b, c)
       end
       return a
     end
+  else
+    local m = #a
+    local n = #b
+    if m < n then
+      for i = 1, m do
+        a[i] = a[i] + b[i]
+      end
+      for i = m + 1, n do
+        a[i] = b[i]
+      end
+      return a
+    else
+      for i = 1, n do
+        a[i] = a[i] + b[i]
+      end
+      return a
+    end
   end
 end
 
 -- a:sub(polynomial b, polynomial c)
 -- a:sub(polynomial b)
 function class.sub(a, b, c)
-  if not c then
-    local m = #a
-    local n = #b
-    if m < n then
-      for i = 1, m do
-        a[i] = a[i] - b[i]
-      end
-      for i = m + 1, n do
-        a[i] = -b[i]
-      end
-      return a
-    else
-      for i = 1, n do
-        a[i] = a[i] - b[i]
-      end
-      return a
-    end
-  else
+  if c then
     local m = #b
     local n = #c
     if m < n then
@@ -212,6 +205,23 @@ function class.sub(a, b, c)
       end
       return a
     end
+  else
+    local m = #a
+    local n = #b
+    if m < n then
+      for i = 1, m do
+        a[i] = a[i] - b[i]
+      end
+      for i = m + 1, n do
+        a[i] = -b[i]
+      end
+      return a
+    else
+      for i = 1, n do
+        a[i] = a[i] - b[i]
+      end
+      return a
+    end
   end
 end
 
@@ -221,18 +231,18 @@ end
 -- a:mul(polynomial b)
 function class.mul(a, b, c)
   if type(b) == "number" then
-    if not c then
-      for i = 1, #a do
-        a[i] = b * a[i]
-      end
-      return a
-    else
+    if c then
       local n = #c
       for i = 1, n do
         a[i] = b * c[i]
       end
       for i = n + 1, #a do
         a[i] = nil
+      end
+      return a
+    else
+      for i = 1, #a do
+        a[i] = b * a[i]
       end
       return a
     end

@@ -16,223 +16,91 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local element = require "dromozoa.dom.element"
-local space_separated = require "dromozoa.dom.space_separated"
 local xml_document = require "dromozoa.dom.xml_document"
 local path_data = require "dromozoa.svg.path_data"
+
 local vecmath = require "dromozoa.vecmath"
 
-local unpack = table.unpack or unpack
-
-local _ = element
 local point2 = vecmath.point2
 local vector2 = vecmath.vector2
 local matrix2 = vecmath.matrix2
-local curve = vecmath.curve
-local quickhull = vecmath.quickhull
+local bezier = vecmath.bezier
+local polynomial = vecmath.polynomial
 
-local n = 16
+local verbose = os.getenv "VERBOSE" == "1"
 
-local function draw_cubic_bezier(node, P)
-  local p1, p2, p3, p4 = unpack(P)
+local _ = element
+local n = 64
 
-  local d = path_data()
-  d:M(p1.x, p1.y):C(p2.x, p2.y, p3.x, p3.y, p4.x, p4.y)
-
-  node[#node + 1] = _"path" {
-    d = d;
-    fill = "none";
-    stroke = "#333";
-  }
-
-  local m = matrix2(p1.y - p2.y, p4.y - p3.y, p2.x - p1.x, p3.x - p4.x)
-  local c = { math.huge, math.huge }
-  if m:determinant() ~= 0 then
-    c = m:invert():transform(point2(p4.x - p1.x, p4.y - p1.y)):scale(1/3)
-  end
-
-  local F = { point2(), point2(), point2(), point2() }
-  curve.to_cubic_bezier(function (t, q)
-    curve.diff_cubic_bezier(P, t, q)
-    q.x, q.y = -q.y, q.x
-    q:scale(c[1] * (1 - t) + c[2] * t)
-    q:add(curve.cubic_bezier(P, t, point2()))
-    return q
-  end, F)
-
-  node[#node + 1] = _"path" {
-    d = path_data():M(F[1].x, F[1].y):C(F[2].x, F[2].y, F[3].x, F[3].y, F[4].x, F[4].y);
-    fill = "none";
-    stroke = "#333";
-  }
-
-  local d = path_data()
-  for i = 0, n do
+local function draw_bezier(node, b, stroke)
+  local p = b:eval(0, point2())
+  local pd = path_data()
+  pd:M(p.x, p.y)
+  for i = 1, n do
     local t = i / n
-    local p = curve.cubic_bezier(P, t, point2())
-    local f = curve.cubic_bezier(F, t, point2())
-    d:M(p.x, p.y):L(f.x, f.y)
+    b:eval(t, p)
+    pd:L(p.x, p.y)
   end
-
   node[#node + 1] = _"path" {
-    d = d;
+    d = pd;
     fill = "none";
-    stroke = "#F33";
-    ["stroke-opacity"] = 0.5;
+    stroke = stroke;
   }
-
-  return F
 end
 
-local function draw_td(node, P, F)
-  local p1, p2, p3, p4 = unpack(P)
+local root = _"g" {}
 
-  node[#node + 1] = _"path" {
-    d = path_data():M(0, 0):H(640);
-    fill = "none";
-    stroke = "#CCC";
+local y = 0
+
+local function draw(B)
+  local node = _"g" {
+    transform = "translate(320,320)";
   }
 
-  local x = 640
-  local y = 1/640
-
-  local m = 12
-  local n = 16
-
-  for j = 0, m do
-    local u = j / m
-
-    local d = path_data()
-    for k = 0, n do
-      local t = k / n
-      local a = curve.diff_cubic_bezier(P, t, vector2())
-      local b = curve.cubic_bezier(P, t, vector2()):sub(curve.cubic_bezier(F, u, vector2()))
-      if k == 0 then
-        d:M(t * x, a:dot(b) * y)
-      end
-        d:L(t * x, a:dot(b) * y)
-    end
-
-    node[#node + 1] = _"path" {
-      d = d;
+  root[#root + 1] = _"g" {
+    transform = "translate(0," .. y .. ")";
+    _"rect" {
+      x = 0;
+      y = 0;
+      width = 640;
+      height = 640;
       fill = "none";
-      stroke = "#F33";
-      ["stroke-opacity"] = 0.5;
-    }
-  end
-
-  local G = {}
-
-  for j = 0, 3 do
-    local u = j / 3
-    local d = path_data()
-
-    local Q = { point2(), point2(), point2(), point2(), point2(), point2() }
-    curve.to_quintic_bezier(function (t, q)
-      local a = curve.diff_cubic_bezier(P, t, vector2())
-      local b = curve.cubic_bezier(P, t, vector2()):sub(curve.cubic_bezier(F, u, vector2()))
-      return q:set(t, a:dot(b))
-    end, Q)
-
-    for i = 1, #Q do
-      G[#G + 1] = Q[i]
-    end
-
-    local d = path_data()
-    d:M(Q[1].x * x, Q[1].y * y)
-    for i = 2, 6 do
-      d:L(Q[i].x * x, Q[i].y * y)
-    end
-
-    -- node[#node + 1] = _"path" {
-    --   d = d;
-    --   fill = "none";
-    --   stroke = "#F33";
-    --   ["stroke-opacity"] = 0.5;
-    -- }
-  end
-
-  local H = quickhull(G, {})
-  local d = path_data():M(H[1].x * x, H[1].y * y)
-  for i = 2, #H do
-    d:L(H[i].x * x, H[i].y * y)
-  end
-  d:Z()
-
-  node[#node + 1] = _"path" {
-    d = d;
-    fill = "#333";
-    ["fill-opacity"] = 0.25;
-    stroke = "none";
+      stroke = "#CCC";
+    };
+    node;
   }
+  y = y + 640
+
+  draw_bezier(node, B, "#666")
+
+  local F1 = bezier(B):focus()
+  local F2 = bezier({1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1},{1,1,1}):focus(B)
+  if F1 then
+    draw_bezier(node, F1, "#F33")
+    assert(F2)
+    assert(#F1[1] == #F2[1])
+    assert(#F1[2] == #F2[2])
+    assert(#F1[3] == #F2[3])
+    draw_bezier(node, F2, "#33F")
+  end
 end
 
-local P = {
-  point2(-100, -100);
-  point2( -50,    0);
-  point2(  50,    0);
-  point2( 100, -100);
-}
-
-local Q = {
-  point2(-50, -100);
-  point2(  0,    0);
-  point2(100,    0);
-  point2(250, -100);
-}
-
--- local Q = {
---   point2(-100,    0);
---   point2( -50, -100);
---   point2(  50, -100);
---   point2( 100,    0);
--- }
-
-local F = point2(100, -50)
-
-local root = _"g" {
-  transform = "translate(320, 320)";
-}
-
-local td_root = _"g" {
-  transform = "translate(640, 320)";
-}
-
-local Fp = draw_cubic_bezier(root, P)
-local Fq = draw_cubic_bezier(root, Q)
--- draw_td(td_root, P, Fq)
-draw_td(td_root, Q, Fp)
-
--- root[#root + 1] = _"circle" {
---   cx = F.x;
---   cy = F.y;
---   r = 2;
--- }
--- draw_td_p(td_root, P, F)
+draw(bezier({-120,0}, {-40,40}, {40,-80}, {120,40}))
+draw(bezier({145,-15}, {147.5,20}, {165,30}, {165,15}))
+draw(bezier({-150,-150}, {-25,200}, {25,200}, {150,-150}))
+draw(bezier({-50,-150}, {-25,400}, {25,-400}, {50,150}))
+local z = math.cos(math.pi / 4)
+draw(bezier({-100,-100,1}, {100*z,-100*z,z}, {100,100,1}))
+draw(bezier({-200,0},{-50,200},{50,200},{200,0}))
+draw(bezier({-200,0},{-190,200},{190,200},{200,0}))
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
   ["xmlns:xlink"] ="http://www.w3.org/1999/xlink";
   version = "1.1";
-  width = 1280;
-  height = 640;
-  _"rect" {
-    x = 0;
-    y = 0;
-    width = 640;
-    height = 640;
-    fill = "none";
-    stroke = "#CCC";
-  };
-  _"rect" {
-    x = 640;
-    y = 0;
-    width = 640;
-    height = 640;
-    fill = "none";
-    stroke = "#CCC";
-  };
+  width = 640;
+  height = y;
   root;
-  td_root;
 }
 
 local doc = xml_document(svg)

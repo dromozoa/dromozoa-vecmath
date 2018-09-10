@@ -37,6 +37,7 @@ local function to_string(a)
       a[13], a[14], a[15], a[16])
 end
 
+-- a:set_axis_angle4(axis_angle4 b)
 local function set_axis_angle4(a, b)
   local m = matrix3.set_axis_angle4({}, b)
   a[ 1] = m[1]
@@ -58,6 +59,7 @@ local function set_axis_angle4(a, b)
   return a
 end
 
+-- a:set_quat4(quat4 b)
 local function set_quat4(a, b)
   local m = matrix3.set_quat4({}, b)
   a[ 1] = m[1]
@@ -79,6 +81,8 @@ local function set_quat4(a, b)
   return a
 end
 
+-- a:transform_point3(point3 b, point3 c)
+-- a:transform_point3(point3 b)
 local function transform_point3(a, b, c)
   if not c then
     c = b
@@ -92,6 +96,8 @@ local function transform_point3(a, b, c)
   return c
 end
 
+-- a:transform_vector3(vector3 b, vector3 c)
+-- a:transform_vector3(vector3 b)
 local function transform_vector3(a, b, c)
   if not c then
     c = b
@@ -105,6 +111,7 @@ local function transform_vector3(a, b, c)
   return c
 end
 
+-- a:set_rotation_axis_angle4(axis_angle4 b)
 local function set_rotation_axis_angle4(a, b)
   local sx, sy, sz = svd3{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
   local m = matrix3.set_axis_angle4({}, b)
@@ -120,6 +127,7 @@ local function set_rotation_axis_angle4(a, b)
   return a
 end
 
+-- a:set_rotation_quat4(quat4 b)
 local function set_rotation_quat4(a, b)
   local sx, sy, sz = svd3{ a[1], a[2], a[3], a[5], a[6], a[7], a[9], a[10], a[11] }
   local m = matrix3.set_quat4({}, b)
@@ -587,23 +595,25 @@ function class.invert(a, b)
   local n14 = m12 * (m24 * m33 - m23 * m34) + m13 * (m22 * m34 - m24 * m32) + m14 * (m23 * m32 - m22 * m33)
   local d = m11 * n11 + m21 * n12 + m31 * n13 + m41 * n14;
 
-  a[ 1] = n11 / d
-  a[ 2] = n12 / d
-  a[ 3] = n13 / d
-  a[ 4] = n14 / d
-  a[ 5] = (m23 * (m31 * m44 - m34 * m41) + m24 * (m33 * m41 - m31 * m43) + m21 * (m34 * m43 - m33 * m44)) / d
-  a[ 6] = (m33 * (m11 * m44 - m14 * m41) + m34 * (m13 * m41 - m11 * m43) + m31 * (m14 * m43 - m13 * m44)) / d
-  a[ 7] = (m43 * (m11 * m24 - m14 * m21) + m44 * (m13 * m21 - m11 * m23) + m41 * (m14 * m23 - m13 * m24)) / d
-  a[ 8] = (m13 * (m24 * m31 - m21 * m34) + m14 * (m21 * m33 - m23 * m31) + m11 * (m23 * m34 - m24 * m33)) / d
-  a[ 9] = (m24 * (m31 * m42 - m32 * m41) + m21 * (m32 * m44 - m34 * m42) + m22 * (m34 * m41 - m31 * m44)) / d
-  a[10] = (m34 * (m11 * m42 - m12 * m41) + m31 * (m12 * m44 - m14 * m42) + m32 * (m14 * m41 - m11 * m44)) / d
-  a[11] = (m44 * (m11 * m22 - m12 * m21) + m41 * (m12 * m24 - m14 * m22) + m42 * (m14 * m21 - m11 * m24)) / d
-  a[12] = (m14 * (m22 * m31 - m21 * m32) + m11 * (m24 * m32 - m22 * m34) + m12 * (m21 * m34 - m24 * m31)) / d
-  a[13] = (m21 * (m33 * m42 - m32 * m43) + m22 * (m31 * m43 - m33 * m41) + m23 * (m32 * m41 - m31 * m42)) / d
-  a[14] = (m31 * (m13 * m42 - m12 * m43) + m32 * (m11 * m43 - m13 * m41) + m33 * (m12 * m41 - m11 * m42)) / d
-  a[15] = (m41 * (m13 * m22 - m12 * m23) + m42 * (m11 * m23 - m13 * m21) + m43 * (m12 * m21 - m11 * m22)) / d
-  a[16] = (m11 * (m22 * m33 - m23 * m32) + m12 * (m23 * m31 - m21 * m33) + m13 * (m21 * m32 - m22 * m31)) / d
-  return a
+  if d ~= 0 then
+    a[ 1] = n11 / d
+    a[ 2] = n12 / d
+    a[ 3] = n13 / d
+    a[ 4] = n14 / d
+    a[ 5] = (m23 * (m31 * m44 - m34 * m41) + m24 * (m33 * m41 - m31 * m43) + m21 * (m34 * m43 - m33 * m44)) / d
+    a[ 6] = (m33 * (m11 * m44 - m14 * m41) + m34 * (m13 * m41 - m11 * m43) + m31 * (m14 * m43 - m13 * m44)) / d
+    a[ 7] = (m43 * (m11 * m24 - m14 * m21) + m44 * (m13 * m21 - m11 * m23) + m41 * (m14 * m23 - m13 * m24)) / d
+    a[ 8] = (m13 * (m24 * m31 - m21 * m34) + m14 * (m21 * m33 - m23 * m31) + m11 * (m23 * m34 - m24 * m33)) / d
+    a[ 9] = (m24 * (m31 * m42 - m32 * m41) + m21 * (m32 * m44 - m34 * m42) + m22 * (m34 * m41 - m31 * m44)) / d
+    a[10] = (m34 * (m11 * m42 - m12 * m41) + m31 * (m12 * m44 - m14 * m42) + m32 * (m14 * m41 - m11 * m44)) / d
+    a[11] = (m44 * (m11 * m22 - m12 * m21) + m41 * (m12 * m24 - m14 * m22) + m42 * (m14 * m21 - m11 * m24)) / d
+    a[12] = (m14 * (m22 * m31 - m21 * m32) + m11 * (m24 * m32 - m22 * m34) + m12 * (m21 * m34 - m24 * m31)) / d
+    a[13] = (m21 * (m33 * m42 - m32 * m43) + m22 * (m31 * m43 - m33 * m41) + m23 * (m32 * m41 - m31 * m42)) / d
+    a[14] = (m31 * (m13 * m42 - m12 * m43) + m32 * (m11 * m43 - m13 * m41) + m33 * (m12 * m41 - m11 * m42)) / d
+    a[15] = (m41 * (m13 * m22 - m12 * m23) + m42 * (m11 * m23 - m13 * m21) + m43 * (m12 * m21 - m11 * m22)) / d
+    a[16] = (m11 * (m22 * m33 - m23 * m32) + m12 * (m23 * m31 - m21 * m33) + m13 * (m21 * m32 - m22 * m31)) / d
+    return a
+  end
 end
 
 -- a:determinant()
@@ -1019,8 +1029,8 @@ end
 -- a:transform(point3 b, point3 c)
 -- a:transform(vector3 b, vector3 c)
 -- a:transform(tuple4 b, tuple4 c)
--- a:transform(vector3 b)
 -- a:transform(point3 b)
+-- a:transform(vector3 b)
 -- a:transform(tuple4 b)
 function class.transform(a, b, c)
   if #b == 3 then

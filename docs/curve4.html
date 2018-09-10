@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>曲線</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li><a href="http://web.mit.edu/hyperbook/Patrikalakis-Maekawa-Cho/node10.html">Arithmetic operations of polynomials in Bernstein form</a></li>
+</ul>
+
+<h2>バーンスタイン多項式の加算</h2>
+
+<p>
+次数上げして次数をそろえる。
+\[\begin{aligned}
+  p(t) &amp;= \sum_{i=0}^n p_i B_i^n(t) \\
+  q(t) &amp;= \sum_{i=0}^n q_i B_i^n(t) \\
+  p(t) + q(t) &amp;= \sum_{i=0}^n (p_i + q_i) B_i^n(t) \\
+\end{aligned}\]
+メモリ確保をともなうので基底変換をしてもよいのではないか。
+</p>
+
+</div>
+<script>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>

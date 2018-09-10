@@ -82,7 +82,7 @@ assert(point2.equals(Q[1], {0,0}))
 assert(point2.equals(Q[2], {1,1}))
 
 -- triangle1
-local P = { {0,0}, {1,1}, {1,0} }
+local P = { {1,0}, {0,0}, {1,1} }
 local Q = quickhull(P, {})
 assert(#Q == 3)
 assert(point2.equals(Q[1], {0,0}))
