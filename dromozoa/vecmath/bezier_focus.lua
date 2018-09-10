@@ -22,65 +22,11 @@ local bezier = require "dromozoa.vecmath.bezier"
 local polynomial = require "dromozoa.vecmath.polynomial"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
+local clip_both = require "dromozoa.vecmath.clip_both"
+
 -- by experimentations
 local t_epsilon = 1e-6
 local d_epsilon = 1e-11
-
-local function clip_both(H, d_min, d_max)
-  local t1 = 1
-  local t2 = 0
-
-  local n = #H
-  local p = H[n]
-  local pt = p[1]
-  local pd = p[2]
-
-  for i = 1, n do
-    local q = H[i]
-    local qt = q[1]
-    local qd = q[2]
-
-    if d_min <= pd and pd <= d_max then
-      if t1 > pt then
-        t1 = pt
-      end
-      if t2 < pt then
-        t2 = pt
-      end
-    end
-
-    local d = pd - qd
-    if d ~= 0 then
-      local a = (pd - d_min) / d
-      if 0 < a and a < 1 then
-        local t = pt * (1 - a) + qt * a
-        if t1 > t then
-          t1 = t
-        end
-        if t2 < t then
-          t2 = t
-        end
-      end
-      local a = (pd - d_max) / d
-      if 0 < a and a < 1 then
-        local t = pt * (1 - a) + qt * a
-        if t1 > t then
-          t1 = t
-        end
-        if t2 < t then
-          t2 = t
-        end
-      end
-    end
-
-    pt = qt
-    pd = qd
-  end
-
-  if t1 <= t2 then
-    return t1, t2
-  end
-end
 
 local function explicit_bezier(B, p)
   local N = bezier()
