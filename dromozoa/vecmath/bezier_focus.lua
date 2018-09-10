@@ -179,8 +179,7 @@ end
 return function (b1, b2, t1, t2, t3, t4, result)
   local U1 = result[1]
   local U2 = result[2]
-  local n = #U1
-  for i = 1, n do
+  for i = 1, #U1 do
     U1[i] = nil
     U2[i] = nil
   end
