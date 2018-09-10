@@ -321,48 +321,51 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
       is_identical = true
     else
       if #F1 > 0 then
+        local p = point2()
+        local q = point2()
         if a < b then
           local u5 = u3
           for i = 1, #F2 do
             local u6 = F1[i]
             local u7 = F2[i]
-            local p1 = b1:eval(u6, point2())
-            local p2 = b2:eval(u7, point2())
-            if p1:epsilon_equals(p2, p_epsilon) then
+            b1:eval(u6, p)
+            b2:eval(u7, q)
+            if p:epsilon_equals(q, p_epsilon) then
               merge(u6, u7, result)
               u5 = nil
             else
               if u5 then
-                iterate(b1, b2, u1, u2, u5, u7, m, false, result)
+                iterate(b1, b2, u1, u2, u5, u7, m, is_identical, result)
               end
               u5 = u7
             end
           end
           if u5 then
-            iterate(b1, b2, u1, u2, u5, u4, m, false, result)
+            iterate(b1, b2, u1, u2, u5, u4, m, is_identical, result)
           end
+          return result
         else
           local u5 = u1
           for i = 1, #F1 do
             local u6 = F1[i]
             local u7 = F2[i]
-            local p1 = b1:eval(u6, point2())
-            local p2 = b2:eval(u7, point2())
-            if p1:epsilon_equals(p2, p_epsilon) then
+            b1:eval(u6, p)
+            b2:eval(u7, q)
+            if p:epsilon_equals(q, p_epsilon) then
               merge(u6, u7, result)
               u5 = nil
             else
               if u5 then
-                iterate(b1, b2, u5, u6, u3, u4, m, false, result)
+                iterate(b1, b2, u5, u6, u3, u4, m, is_identical, result)
               end
               u5 = u6
             end
           end
           if u5 then
-            iterate(b1, b2, u5, u2, u3, u4, m, false, result)
+            iterate(b1, b2, u5, u2, u3, u4, m, is_identical, result)
           end
+          return result
         end
-        return result
       end
     end
   end
