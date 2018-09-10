@@ -324,18 +324,18 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
         if a < b then
           local u5 = u3
           for i = 1, #F2 do
-            local f1 = F1[i]
-            local f2 = F2[i]
-            local p1 = b1:eval(f1, point2())
-            local p2 = b2:eval(f2, point2())
+            local u6 = F1[i]
+            local u7 = F2[i]
+            local p1 = b1:eval(u6, point2())
+            local p2 = b2:eval(u7, point2())
             if p1:epsilon_equals(p2, p_epsilon) then
-              merge(f1, f2, result)
+              merge(u6, u7, result)
               u5 = nil
             else
               if u5 then
-                iterate(b1, b2, u1, u2, u5, f2, m, false, result)
+                iterate(b1, b2, u1, u2, u5, u7, m, false, result)
               end
-              u5 = f2
+              u5 = u7
             end
           end
           if u5 then
@@ -344,18 +344,18 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
         else
           local u5 = u1
           for i = 1, #F1 do
-            local f1 = F1[i]
-            local f2 = F2[i]
-            local p1 = b1:eval(f1, point2())
-            local p2 = b2:eval(f2, point2())
+            local u6 = F1[i]
+            local u7 = F2[i]
+            local p1 = b1:eval(u6, point2())
+            local p2 = b2:eval(u7, point2())
             if p1:epsilon_equals(p2, p_epsilon) then
-              merge(f1, f2, result)
+              merge(u6, u7, result)
               u5 = nil
             else
               if u5 then
-                iterate(b1, b2, u5, f1, u3, u4, m, false, result)
+                iterate(b1, b2, u5, u6, u3, u4, m, false, result)
               end
-              u5 = f1
+              u5 = u6
             end
           end
           if u5 then
