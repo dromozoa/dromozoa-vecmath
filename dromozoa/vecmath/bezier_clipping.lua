@@ -29,7 +29,6 @@ local clip_both = require "dromozoa.vecmath.clip_both"
 -- by experimentations
 local epsilon = 1e-11
 local p_epsilon = 1e-9
-local d_epsilon = 2.22044604925031e-16 / 2
 
 local function fat_line(B1, B2)
   local n = B1:size()
@@ -184,8 +183,6 @@ end
 local function clip(B1, B2)
   local a, b, c, d_min, d_max = fat_line(B2, B1)
 
-  print("D", d_min, d_max)
-
   local n = B1:size()
   local m = n - 1
   local H = {}
@@ -227,9 +224,6 @@ local function clip(B1, B2)
       P[i] = point2((i - 1) / m, a * p[1] + b * p[2] + c)
     end
     quickhull(P, H)
-    for i = 1, #H do
-      print("H", i, tostring(H[i]))
-    end
     return clip_both(H, d_min, d_max)
   end
 end
@@ -290,14 +284,11 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     return result
   end
 
-  print("U", u1, u2, u3, u4)
-
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
-    print "EMPTY1"
     return check_end_point(b1, b2, u1, u2, u3, u4, result)
   end
   local a = u2 - u1
@@ -306,7 +297,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
 
   local t3, t4 = clip(B2, B1)
   if not t3 then
-    print "EMPTY2"
     return check_end_point(b1, b2, u1, u2, u3, u4, result)
   end
   local b = u4 - u3
@@ -318,7 +308,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
   end
 
   if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
-    print("u", u1, u2, u3, u4, is_identical)
     if a < b then
       if is_identical then
         local u5 = (u3 + u4) / 2
@@ -333,25 +322,19 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
           iterate(b1, b2, u1, u2, u3, u5, m, true, result)
           return iterate(b1, b2, u1, u2, u5, u4, m, true, result)
         else
-          print("#", #F2)
           if #F2 == 0 then
             local u5 = (u3 + u4) / 2
             iterate(b1, b2, u1, u2, u3, u5, m, false, result)
             return iterate(b1, b2, u1, u2, u5, u4, m, false, result)
-            -- return result
           end
 
           local u5 = u3
-          assert(#F2 > 0)
           for i = 1, #F2 do
             local f1 = F1[i]
             local f2 = F2[i]
-            print("F12x", f1, f2)
             local p1 = b1:eval(f1, point2())
             local p2 = b2:eval(f2, point2())
             if p1:epsilon_equals(p2, p_epsilon) then
-              -- tangent
-              print "TANGENT"
               merge(f1, f2, result)
               u5 = nil
             else
@@ -364,9 +347,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
           if u5 then
             iterate(b1, b2, u1, u2, u5, u4, m, false, result)
           end
-          -- local u5 = (u3 + u4) / 2
-          -- iterate(b1, b2, u1, u2, u3, u5, m, false, result)
-          -- return iterate(b1, b2, u1, u2, u5, u4, m, false, result)
           return result
         end
       end
@@ -384,25 +364,19 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
           iterate(b1, b2, u1, u5, u3, u4, m, true, result)
           return iterate(b1, b2, u5, u2, u3, u4, m, true, result)
         else
-          print("#", #F1)
           if #F1 == 0 then
-            -- return result
             local u5 = (u1 + u2) / 2
             iterate(b1, b2, u1, u5, u3, u4, m, false, result)
             return iterate(b1, b2, u5, u2, u3, u4, m, false, result)
           end
 
           local u5 = u1
-          assert(#F1 > 0)
           for i = 1, #F1 do
             local f1 = F1[i]
             local f2 = F2[i]
-            print("F12y", f1, f2)
             local p1 = b1:eval(f1, point2())
             local p2 = b2:eval(f2, point2())
             if p1:epsilon_equals(p2, p_epsilon) then
-              -- tangent
-              print "TANGENT"
               merge(f1, f2, result)
               u5 = nil
             else
@@ -415,18 +389,11 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
           if u5 then
             iterate(b1, b2, u5, u2, u3, u4, m, false, result)
           end
-          -- local u5 = (u1 + u2) / 2
-          -- iterate(b1, b2, u1, u5, u3, u4, m, false, result)
-          -- return iterate(b1, b2, u5, u2, u3, u4, m, false, result)
           return result
         end
       end
     end
   else
-    --v1 = v1 - d_epsilon if v1 < 0 then v1 = 0 end
-    --v2 = v2 + d_epsilon if v2 > 1 then v2 = 1 end
-    --v3 = v3 - d_epsilon if v3 < 0 then v3 = 0 end
-    --v4 = v4 + d_epsilon if v4 > 1 then v4 = 1 end
     return iterate(b1, b2, v1, v2, v3, v4, m, is_identical, result)
   end
 end
