@@ -27,9 +27,9 @@ local clip_both = require "dromozoa.vecmath.clip_both"
 local sqrt = math.sqrt
 
 -- by experimentations
-local t_epsilon = 1e-6
 local d_epsilon = 1e-11
-local s_epsilon = 1e-6
+local t_epsilon = 1e-6
+local s_epsilon = 1e-5
 
 local function explicit_bezier(B, p)
   local Z = B[3]
