@@ -309,95 +309,19 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     return merge((v1 + v2) / 2, (v3 + v4) / 2, result)
   end
 
-  if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
+  if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
+    return iterate(b1, b2, v1, v2, v3, v4, m, is_identical, result)
+  end
 
--- [[
-    if not is_identical then
-      local F1 = {}
-      local F2 = {}
-      local focus = bezier_focus(b1, b2, u1, u2, u3, u4, { F1, F2 })
-      if not focus.is_identical then
-        if #F1 > 0 then
-          if a < b then
-            local u5 = u3
-            for i = 1, #F2 do
-              local f1 = F1[i]
-              local f2 = F2[i]
-              local p1 = b1:eval(f1, point2())
-              local p2 = b2:eval(f2, point2())
-              if p1:epsilon_equals(p2, p_epsilon) then
-                merge(f1, f2, result)
-                u5 = nil
-              else
-                if u5 then
-                  iterate(b1, b2, u1, u2, u5, f2, m, false, result)
-                end
-                u5 = f2
-              end
-            end
-            if u5 then
-              iterate(b1, b2, u1, u2, u5, u4, m, false, result)
-            end
-          else
-            local u5 = u1
-            for i = 1, #F1 do
-              local f1 = F1[i]
-              local f2 = F2[i]
-              local p1 = b1:eval(f1, point2())
-              local p2 = b2:eval(f2, point2())
-              if p1:epsilon_equals(p2, p_epsilon) then
-                merge(f1, f2, result)
-                u5 = nil
-              else
-                if u5 then
-                  iterate(b1, b2, u5, f1, u3, u4, m, false, result)
-                end
-                u5 = f1
-              end
-            end
-            if u5 then
-              iterate(b1, b2, u5, u2, u3, u4, m, false, result)
-            end
-          end
-          return result
-        end
-      else
-        is_identical = true
-      end
-    end
-    if a < b then
-      local u5 = (u3 + u4) / 2
-      iterate(b1, b2, u1, u2, u3, u5, m, is_identical, result)
-      return iterate(b1, b2, u1, u2, u5, u4, m, is_identical, result)
+  if not is_identical then
+    local F1 = {}
+    local F2 = {}
+    local F = bezier_focus(b1, b2, u1, u2, u3, u4, { F1, F2 })
+    if F.is_identical then
+      is_identical = true
     else
-      local u5 = (u1 + u2) / 2
-      iterate(b1, b2, u1, u5, u3, u4, m, is_identical, result)
-      return iterate(b1, b2, u5, u2, u3, u4, m, is_identical, result)
-    end
---]]
-
-
---[[
-    if a < b then
-      if is_identical then
-        local u5 = (u3 + u4) / 2
-        iterate(b1, b2, u1, u2, u3, u5, m, true, result)
-        return iterate(b1, b2, u1, u2, u5, u4, m, true, result)
-      else
-        local F1 = {}
-        local F2 = {}
-        local focus = bezier_focus(b1, b2, u1, u2, u3, u4, { F1, F2 })
-        if focus.is_identical then
-          local u5 = (u3 + u4) / 2
-          iterate(b1, b2, u1, u2, u3, u5, m, true, result)
-          return iterate(b1, b2, u1, u2, u5, u4, m, true, result)
-        else
-          if #F2 == 0 then
-            local u5 = (u3 + u4) / 2
-            iterate(b1, b2, u1, u2, u3, u5, m, false, result)
-            return iterate(b1, b2, u1, u2, u5, u4, m, false, result)
-          end
-
+      if #F1 > 0 then
+        if a < b then
           local u5 = u3
           for i = 1, #F2 do
             local f1 = F1[i]
@@ -417,29 +341,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
           if u5 then
             iterate(b1, b2, u1, u2, u5, u4, m, false, result)
           end
-          return result
-        end
-      end
-    else
-      if is_identical then
-        local u5 = (u1 + u2) / 2
-        iterate(b1, b2, u1, u5, u3, u4, m, true, result)
-        return iterate(b1, b2, u5, u2, u3, u4, m, true, result)
-      else
-        local F1 = {}
-        local F2 = {}
-        local focus = bezier_focus(b1, b2, u1, u2, u3, u4, { F1, F2 })
-        if focus.is_identical then
-          local u5 = (u1 + u2) / 2
-          iterate(b1, b2, u1, u5, u3, u4, m, true, result)
-          return iterate(b1, b2, u5, u2, u3, u4, m, true, result)
         else
-          if #F1 == 0 then
-            local u5 = (u1 + u2) / 2
-            iterate(b1, b2, u1, u5, u3, u4, m, false, result)
-            return iterate(b1, b2, u5, u2, u3, u4, m, false, result)
-          end
-
           local u5 = u1
           for i = 1, #F1 do
             local f1 = F1[i]
@@ -459,13 +361,20 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
           if u5 then
             iterate(b1, b2, u5, u2, u3, u4, m, false, result)
           end
-          return result
         end
+        return result
       end
     end
---]]
+  end
+
+  if a < b then
+    local u5 = (u3 + u4) / 2
+    iterate(b1, b2, u1, u2, u3, u5, m, is_identical, result)
+    return iterate(b1, b2, u1, u2, u5, u4, m, is_identical, result)
   else
-    return iterate(b1, b2, v1, v2, v3, v4, m, is_identical, result)
+    local u5 = (u1 + u2) / 2
+    iterate(b1, b2, u1, u5, u3, u4, m, is_identical, result)
+    return iterate(b1, b2, u5, u2, u3, u4, m, is_identical, result)
   end
 end
 

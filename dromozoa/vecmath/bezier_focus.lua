@@ -161,18 +161,18 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
     return result
   end
 
-  if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
-    if a < b then
-      local u5 = (u3 + u4) / 2
-      iterate(b1, b2, d1, d2, u1, u2, u3, u5, m, result)
-      return iterate(b1, b2, d1, d2, u1, u2, u5, u4, m, result)
-    else
-      local u5 = (u1 + u2) / 2
-      iterate(b1, b2, d1, d2, u1, u5, u3, u4, m, result)
-      return iterate(b1, b2, d1, d2, u5, u2, u3, u4, m, result)
-    end
-  else
+  if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
     return iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
+  end
+
+  if a < b then
+    local u5 = (u3 + u4) / 2
+    iterate(b1, b2, d1, d2, u1, u2, u3, u5, m, result)
+    return iterate(b1, b2, d1, d2, u1, u2, u5, u4, m, result)
+  else
+    local u5 = (u1 + u2) / 2
+    iterate(b1, b2, d1, d2, u1, u5, u3, u4, m, result)
+    return iterate(b1, b2, d1, d2, u5, u2, u3, u4, m, result)
   end
 end
 
