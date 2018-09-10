@@ -27,7 +27,7 @@ local vector2 = vecmath.vector2
 local bezier = vecmath.bezier
 
 local verbose = os.getenv "VERBOSE" == "1"
-local epsilon = 1e-6
+local epsilon = 1e-5
 local not_check = os.getenv "NOT_CHECK" == "1"
 
 local _ = element
@@ -83,7 +83,7 @@ local function check(B1, B2, n, is_identical)
   local U1 = {}
   local U2 = {}
 
-  local result = bezier_focus(B1, B2, { U1, U2 })
+  local result = bezier_focus(B1, B2, 0, 1, 0, 1, { U1, U2 })
 
   for i = 1, #U1 do
     local p = B1:eval(U1[i], point2())
@@ -127,7 +127,7 @@ local function check(B1, B2, n, is_identical)
       print("D", i, tostring(d1), tostring(d2))
     end
     if not not_check then
-      assert(d1:epsilon_equals(d2, epsilon))
+      assert(d1:epsilon_equals(d2, epsilon) or vector2(d1):negate():epsilon_equals(d2, epsilon))
     end
   end
 end
@@ -146,19 +146,15 @@ local r = check(B1, B2, 1)
 local r = check(B1, B3, 1)
 local r = check(B1, B4, 2)
 
---TODO
---local r = check(B1, B5, 1)
+local r = check(B1, B5, 1)
 
---TODO
---local r = check(B4, B6, 8)
+local r = check(B4, B6, 16)
 
---TODO
---local r = check(B7, B8, 2, true)
+local r = check(B7, B8, 2, true)
 
---TODO
---local B1 = vecmath.bezier({-200,0},{200,0})
---local B2 = vecmath.bezier({200,0},{200,-200})
---local r = check(B1, B2, 1)
+local B1 = vecmath.bezier({-200,0},{200,0})
+local B2 = vecmath.bezier({200,0},{200,-200})
+local r = check(B1, B2, 0)
 
 local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
 local B2 = vecmath.bezier({200,0},{200,-200})
@@ -177,9 +173,9 @@ local B2 = vecmath.bezier({-200,0},{200,0})
 local r = check(B1, B2, 2)
 
 --TODO
---local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
---local B2 = vecmath.bezier({-200,0},{199,0})
---local r = check(B1, B2, 2)
+local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,0})
+local B2 = vecmath.bezier({-200,0},{199,0})
+local r = check(B1, B2, 2)
 
 local B1 = vecmath.bezier({-150, 0},{-50,200},{50,-200},{150,10})
 local B2 = vecmath.bezier({-200,0},{200,-0})
@@ -212,6 +208,26 @@ local r = check(B1, B2, 1)
 local B1 = vecmath.bezier({-200,0},{0,200},{200,0})
 local B2 = vecmath.bezier({-200,-50},{200,-50})
 local r = check(B1, B2, 1)
+
+local B1 = vecmath.bezier({-150,-200},{0,400},{150,-200})
+local B2 = vecmath.bezier({-200,-50},{200,-50})
+local r = check(B1, B2, 1)
+
+local B1 = vecmath.bezier({-150,-200},{0,600},{150,-200})
+local B2 = vecmath.bezier({-200,-150},{600,0},{-200,150})
+local r = check(B1, B2, 5)
+
+local B1 = vecmath.bezier({-150,-200},{0,600},{150,-200})
+local B2 = vecmath.bezier({-300,-150},{1200,-50},{-1200,50},{300,150})
+local r = check(B1, B2, 7)
+
+local B1 = vecmath.bezier({-150,-300},{-50,1200},{50,-1200},{150,300})
+local B2 = vecmath.bezier({-300,-150},{1200,-50},{-1200,50},{300,150})
+local r = check(B1, B2, 16)
+
+local B1 = vecmath.bezier({-100,-300},{-50,1200},{0,-1800},{50,1200},{100,-300})
+local B2 = vecmath.bezier({-300,-100},{1200,-50},{-1800,0},{1200,50},{-300,100})
+local r = check(B1, B2, 29)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

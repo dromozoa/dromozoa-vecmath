@@ -1,9 +1,9 @@
 rockspec_format = "3.0"
 package = "dromozoa-vecmath"
-version = "1.7-1"
+version = "1.8-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.7.tar.gz";
-  file = "dromozoa-vecmath-1.7.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.8.tar.gz";
+  file = "dromozoa-vecmath-1.8.tar.gz";
 }
 description = {
   summary = "Pure-Lua implementation of javax.vecmath package";
@@ -22,6 +22,9 @@ build = {
     ["dromozoa.vecmath.axis_angle4"] = "dromozoa/vecmath/axis_angle4.lua";
     ["dromozoa.vecmath.bernstein"] = "dromozoa/vecmath/bernstein.lua";
     ["dromozoa.vecmath.bezier"] = "dromozoa/vecmath/bezier.lua";
+    ["dromozoa.vecmath.bezier_clipping"] = "dromozoa/vecmath/bezier_clipping.lua";
+    ["dromozoa.vecmath.bezier_focus"] = "dromozoa/vecmath/bezier_focus.lua";
+    ["dromozoa.vecmath.clip_both"] = "dromozoa/vecmath/clip_both.lua";
     ["dromozoa.vecmath.color3"] = "dromozoa/vecmath/color3.lua";
     ["dromozoa.vecmath.color4"] = "dromozoa/vecmath/color4.lua";
     ["dromozoa.vecmath.matrix2"] = "dromozoa/vecmath/matrix2.lua";

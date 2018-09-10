@@ -80,6 +80,15 @@
   &amp;= P_x'(t) Q_x(t) + P_y'(t) Q_y(t) = 0 \\
 \end{aligned}\]
 \(d(t)\)は分子が\(3n-1\)次、分母が\(3n\)次の多項式になる。
+\[\begin{aligned}
+  d(t)
+  &amp;= \frac{
+    (p_x'(t) p_z(t) - p_x(t) p_z'(t)) (p_x(t) - F_x p_z(t))
+    + (p_y'(t) p_z(t) - p_y(t) p_z'(t)) (p_y(t) - F_y p_z(t))
+  }{
+    p_z^3(t)
+  }
+\end{aligned}\]
 </p>
 
 <p>
@@ -334,7 +343,13 @@
     d_x(0) &amp; -d_x(1) \\
   \end{pmatrix} \\
 \end{aligned}\]
-\(\det(M) = 0\)の場合は支点と終点の垂線が平行なので、筋の良い焦点曲線が得られない。\(n\)次の有理ベジェ曲線の場合を考える。
+\(\det(M) = 0\)の場合は支点と終点の垂線が平行なので、筋の良い焦点曲線が得られない。
+このような場合、もう片方の曲線\(\bm{Q}(u)\)と交差しないように焦点曲線\(\bm{F}(t)\)を定めると良いかもしれない。
+曲線\(\bm{Q}(u)\)と焦点曲線\(\bm{F}(t)\)が交差しても余計に分割されるだけで問題ないとも考えられる。
+</p>
+
+<p>
+\(n\)次の有理ベジェ曲線の場合を考える。
 \[\begin{aligned}
   p_x(t) &amp;= \frac{x(t)}{w(t)} \\
   p_y(t) &amp;= \frac{y(t)}{w(t)} \\
@@ -346,6 +361,61 @@
 \end{aligned}\]
 \(f_x(t),f_y(t)\)の分子と分母はどちらも\(2n\)次になるので次数上げは不要である。
 </p>
+
+<h2>Collinear Normalの上限</h2>
+
+<p>
+\(m\)次の曲線\(\bm{P}(t)\)と\(n\)次の曲線\(\bm{Q}(u)\)が存在するとき、
+B&eacute;zout's Theoremから交点は最大で\(N=mn\)個である。
+Collinear Normal Theroremの逆を考えて、
+交点\(\bm{P}_i, \bm{P}_j\)を分けるようなCollinear Normalが存在するとすると、
+上限\(\frac{N (N - 1)}{2}\)が得られる。
+</p>
+
+<table>
+  <tr>
+    <th>\(m\)次</th>
+    <th>\(n\)次</th>
+    <th>\(N\)</th>
+    <th>個数</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>2</td>
+    <td>4</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>3</td>
+    <td>6</td>
+    <td>7</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>3</td>
+    <td>9</td>
+    <td>16</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>4</td>
+    <td>16</td>
+    <td>29</td>
+  </tr>
+</table>
 
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>

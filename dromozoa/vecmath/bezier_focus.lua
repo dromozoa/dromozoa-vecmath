@@ -16,157 +16,109 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local point2 = require "dromozoa.vecmath.point2"
+local vector2 = require "dromozoa.vecmath.vector2"
 
 local bezier = require "dromozoa.vecmath.bezier"
 local polynomial = require "dromozoa.vecmath.polynomial"
 local quickhull = require "dromozoa.vecmath.quickhull"
 
-local epsilon = 1e-6
+local clip_both = require "dromozoa.vecmath.clip_both"
 
-local function clip_both(H, d_min, d_max)
-  local t1 = 1
-  local t2 = 0
+local sqrt = math.sqrt
 
-  local n = #H
-  local p = H[n]
-  local pt = p[1]
-  local pd = p[2]
-
-  for i = 1, n do
-    local q = H[i]
-    local qt = q[1]
-    local qd = q[2]
-
-    if d_min <= pd and pd <= d_max then
-      if t1 > pt then
-        t1 = pt
-      end
-      if t2 < pt then
-        t2 = pt
-      end
-    end
-
-    local d = pd - qd
-    if d ~= 0 then
-      local a = (pd - d_min) / d
-      if 0 < a and a < 1 then
-        local t = pt * (1 - a) + qt * a
-        if t1 > t then
-          t1 = t
-        end
-        if t2 < t then
-          t2 = t
-        end
-      end
-      local a = (pd - d_max) / d
-      if 0 < a and a < 1 then
-        local t = pt * (1 - a) + qt * a
-        if t1 > t then
-          t1 = t
-        end
-        if t2 < t then
-          t2 = t
-        end
-      end
-    end
-
-    pt = qt
-    pd = qd
-  end
-
-  if t1 <= t2 then
-    return t1, t2
-  end
-end
+-- by experimentations
+local d_epsilon = 1e-11
+local t_epsilon = 1e-6
+local s_epsilon = 1e-5
 
 local function explicit_bezier(B, p)
-  local N = bezier()
+  local Z = B[3]
+  local PX = B[1]:get(polynomial())
+  local PY = B[2]:get(polynomial())
+  local QX = polynomial(PX):deriv()
+  local QY = polynomial(PY):deriv()
+  local RX = polynomial(p[1])
+  local RY = polynomial(p[2])
 
-  if B:is_rational() then
+  local D = bezier()
+  local DX = D[1]
+  local DY = D[2]
+
+  if Z[1] then
+    local PZ = Z:get(polynomial())
+    local QZ = polynomial(PZ):deriv()
+
+    RX:mul(PZ)
+    RY:mul(PZ)
+    RX:sub(PX, RX)
+    RY:sub(PY, RY)
+    PX:mul(QZ)
+    PY:mul(QZ)
+    QX:mul(PZ)
+    QY:mul(PZ)
+    QX:sub(PX)
+    QY:sub(PY)
+    QX:mul(RX)
+    QY:mul(RY)
+    QX:add(QY)
+
+    DY:set(QX)
   else
-    local X = B[1]
-    local Y = B[2]
-    local PX = X:get(polynomial())
-    local PY = Y:get(polynomial())
-    local QX = polynomial(PX):deriv()
-    local QY = polynomial(PY):deriv()
-    local FX = polynomial(p[1])
-    local FY = polynomial(p[2])
-    PX:sub(FX)
-    PY:sub(FY)
+    PX:sub(RX)
+    PY:sub(RY)
     QX:mul(PX)
     QY:mul(PY)
     QX:add(QY)
 
-    local NX = N[1]
-    local NY = N[2]
-    NY:set(QX)
-    local n = #NY
-    local m = n - 1
-    for i = 1, n do
-      NX[i] = (i - 1) / m
-    end
-    return N
+    DY:set(QX)
   end
+
+  local n = #DY
+  local m = n - 1
+  for i = 1, n do
+    DX[i] = (i - 1) / m
+  end
+  return D
 end
 
-local function focus(B1, B2)
+local function clip(B1, B2)
   local F = bezier(B2):focus()
   if not F then
-    print "F == B2"
     F = B2
   end
-
-  if F then
-    local P = {}
-    print("#", F:size())
-    for i = 1, F:size() do
-      print("-i", i, F:get(i, point2()))
-      local D = explicit_bezier(B1, F:get(i, point2()))
-      if D then
-        for j = 1, D:size() do
-          P[#P + 1] = D:get(j, point2())
-          print("ij", i, j, P[#P])
-        end
-      end
+  local P = {}
+  for i = 1, F:size() do
+    local D = explicit_bezier(B1, F:get(i, point2()))
+    for j = 1, D:size() do
+      P[#P + 1] = D:get(j, point2())
     end
-    if #P == 0 then
-      return nil
-    end
+  end
+  if #P ~= 0 then
     local H = {}
     quickhull(P, H)
-    for j = 1, #H do
-      print("j", j, tostring(H[j]))
-    end
-    return clip_both(H, 0, 0)
+    return clip_both(H, -d_epsilon, d_epsilon)
   end
-  return 0, 1
 end
 
-local function iterate(b1, b2, u1, u2, u3, u4, m, result)
+local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   local U1 = result[1]
   local n = #U1
   if n > m then
     return result
   end
 
-  print("U", u1, u2, u3, u4)
-
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
-  local t1, t2 = focus(B1, B2)
-  print("T12", t1, t2)
+  local t1, t2 = clip(B1, B2)
   if not t1 then
     return result
   end
   local a = u2 - u1
   u2 = u1 + a * t2
   u1 = u1 + a * t1
-  -- B1 = bezier(b1):clip(u1, u2)
 
-  local t3, t4 = focus(B2, B1)
-  print("T34", t3, t4)
+  local t3, t4 = clip(B2, B1)
   if not t3 then
     return result
   end
@@ -174,52 +126,124 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   u4 = u3 + b * t4
   u3 = u3 + b * t3
 
-  if u2 - u1 <= epsilon and u4 - u3 <= epsilon then
+  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
     local t1 = (u1 + u2) / 2
     local t2 = (u3 + u4) / 2
     local U2 = result[2]
 
-    for i = 1, n do
-      local a = U1[i] - t1
-      if a < 0 then
-        a = -a
-      end
-      if a <= epsilon then
-        local b = U2[i] - t2
-        if b < 0 then
-          b = -b
-        end
-        if b <= epsilon then
-          return result
-        end
-      end
+    local v1 = d1:eval(t1, vector2())
+    local v2 = d2:eval(t2, vector2())
+    local s = v1:cross(v2) / sqrt(v1:length_squared() * v2:length_squared())
+    if s < 0 then
+      s = -s
     end
+    if s <= s_epsilon then
+      for i = 1, n do
+        local a = U1[i] - t1
+        if a < 0 then
+          a = -a
+        end
+        if a <= t_epsilon then
+          local b = U2[i] - t2
+          if b < 0 then
+            b = -b
+          end
+          if b <= t_epsilon then
+            return result
+          end
+        end
+      end
 
-    n = n + 1
-    U1[n] = t1
-    U2[n] = t2
+      n = n + 1
+      U1[n] = t1
+      U2[n] = t2
+    end
     return result
   end
 
-  if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
-    if a < b then
-      local u5 = (u3 + u4) / 2
-      iterate(b1, b2, u1, u2, u3, u5, m, result)
-      return iterate(b1, b2, u1, u2, u5, u4, m, result)
-    else
-      local u5 = (u1 + u2) / 2
-      iterate(b1, b2, u1, u5, u3, u4, m, result)
-      return iterate(b1, b2, u5, u2, u3, u4, m, result)
-    end
+  if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
+    return iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
+  end
+
+  if a < b then
+    local u5 = (u3 + u4) / 2
+    iterate(b1, b2, d1, d2, u1, u2, u3, u5, m, result)
+    return iterate(b1, b2, d1, d2, u1, u2, u5, u4, m, result)
   else
-    return iterate(b1, b2, u1, u2, u3, u4, m, result)
+    local u5 = (u1 + u2) / 2
+    iterate(b1, b2, d1, d2, u1, u5, u3, u4, m, result)
+    return iterate(b1, b2, d1, d2, u5, u2, u3, u4, m, result)
   end
 end
 
-return function (b1, b2, result)
-  -- TODO 2x2 => 0
-  -- TODO 3x3 => 16?
-  local m = (b1:size() - 1) * (b2:size() - 1) - 1
-  local m = (b1:size() - 1) * (b2:size() - 1) + 10
-  iterate(b1, b2, 0, 1, 0, 1, m, result)
+return function (b1, b2, t1, t2, t3, t4, result)
+  local U1 = result[1]
+  local U2 = result[2]
+  for i = 1, #U1 do
+    U1[i] = nil
+    U2[i] = nil
+  end
+
+  local d1 = bezier(b1):deriv()
+  local d2 = bezier(b2):deriv()
+  local m = (b1:size() - 1) * (b2:size() - 1)
+  local m = m * (m - 1) / 2
+  iterate(b1, b2, d1, d2, t1, t2, t3, t4, m, result)
+
+  local n = #U1
+  if n <= m then
+    result.is_identical = nil
+    return result
+  end
+
+  local t_min = U1[1]
+  local t_max = t_min
+  local u_min = U2[1]
+  local u_max = u_min
+
+  U1[1] = nil
+  U2[1] = nil
+
+  for i = 2, n do
+    local t = U1[i]
+    local u = U2[i]
+    U1[i] = nil
+    U2[i] = nil
+    if t_min > t then
+      t_min = t
+      u_min = u
+    end
+    if t_max < t then
+      t_max = t
+      u_max = u
+    end
+  end
+
+  local b3 = bezier(b1):reverse()
+  local b4 = bezier(b2):reverse()
+  local d3 = bezier(d1):reverse()
+  local d4 = bezier(d2):reverse()
+  iterate(b3, b4, d3, d4, 1 - t2, 1 - t1, 1 - t4, 1 - t3, 1, result)
+
+  for i = 1, #U1 do
+    local t = 1 - U1[i]
+    local u = 1 - U2[i]
+    U1[i] = nil
+    U2[i] = nil
+    if t_min > t then
+      t_min = t
+      u_min = u
+    end
+    if t_max < t then
+      t_max = t
+      u_max = u
+    end
+  end
+
+  U1[1] = t_min
+  U1[2] = t_max
+  U2[1] = u_min
+  U2[2] = u_max
+  result.is_identical = true
+  return result
 end

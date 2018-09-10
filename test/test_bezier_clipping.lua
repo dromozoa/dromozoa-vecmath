@@ -101,7 +101,7 @@ local function check(B1, B2, n, is_identical)
   local U1 = {}
   local U2 = {}
 
-  local result = bezier_clipping(B1, B2, { U1, U2 })
+  local result = bezier_clipping(B1, B2, 0, 1, 0, 1, { U1, U2 })
 
   draw_points(node, B1, U1, "#66C")
   draw_points(node, B2, U2, "#C66")
@@ -204,17 +204,17 @@ local B1 = vecmath.bezier({-200,-100},{0,240},{200,-100})
 local B2 = vecmath.bezier({-200,100},{0,-200},{200,100})
 local r = check(B1, B2, 2)
 
---local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
---local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
---local r = check(B1, B2, 3)
---
---local B1 = vecmath.bezier({-200,0},{-50,200+1e-9},{50,200+1e-9},{200,0})
---local B2 = vecmath.bezier({-200,0},{-100,200},{100,200},{200,0})
---if verbose then
---  print("!1", tostring(B1:eval(0.5, point2())))
---  print("!2", tostring(B2:eval(0.5, point2())))
---end
---local r = check(B1, B2, 3)
+local B1 = vecmath.bezier({-200,0},{-50,200},{50,200},{200,0})
+local B2 = vecmath.bezier({-200,0},{-200,200},{200,200},{200,0})
+local r = check(B1, B2, 3)
+
+local B1 = vecmath.bezier({-200,0},{-50,200+1e-9},{50,200+1e-9},{200,0})
+local B2 = vecmath.bezier({-200,0},{-100,200},{100,200},{200,0})
+if verbose then
+  print("!1", tostring(B1:eval(0.5, point2())))
+  print("!2", tostring(B2:eval(0.5, point2())))
+end
+local r = check(B1, B2, 3)
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";

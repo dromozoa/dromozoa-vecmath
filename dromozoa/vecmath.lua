@@ -37,6 +37,8 @@ return {
 
   bernstein = require "dromozoa.vecmath.bernstein";
   bezier = require "dromozoa.vecmath.bezier";
+  bezier_clipping = require "dromozoa.vecmath.bezier_clipping";
+  bezier_focus = require "dromozoa.vecmath.bezier_focus";
   matrix2 = require "dromozoa.vecmath.matrix2";
   polynomial = require "dromozoa.vecmath.polynomial";
   quickhull = require "dromozoa.vecmath.quickhull";
