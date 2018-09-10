@@ -83,28 +83,21 @@ local function focus(B1, B2)
   if not F then
     F = B2
   end
-
-  if F then
-    local P = {}
-    for i = 1, F:size() do
-      local D = explicit_bezier(B1, F:get(i, point2()))
-      if D then
-        for j = 1, D:size() do
-          P[#P + 1] = D:get(j, point2())
-        end
-      end
+  local P = {}
+  for i = 1, F:size() do
+    local D = explicit_bezier(B1, F:get(i, point2()))
+    for j = 1, D:size() do
+      P[#P + 1] = D:get(j, point2())
     end
-    if #P == 0 then
-      return
-    end
+  end
+  if #P ~= 0 then
     local H = {}
     quickhull(P, H)
     return clip_both(H, -d_epsilon, d_epsilon)
   end
-  return 0, 1
 end
 
-local function iterate(b1, b2, u1, u2, u3, u4, m, result)
+local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   local U1 = result[1]
   local n = #U1
   if n > m then
@@ -135,8 +128,8 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
     local t2 = (u3 + u4) / 2
     local U2 = result[2]
 
-    local v1 = bezier(b1):deriv():eval(t1, vector2()):normalize()
-    local v2 = bezier(b2):deriv():eval(t2, vector2()):normalize()
+    local v1 = d1:eval(t1, vector2()):normalize()
+    local v2 = d2:eval(t2, vector2()):normalize()
     if math.abs(v1:cross(v2)) <= t_epsilon then
       for i = 1, n do
         local a = U1[i] - t1
@@ -166,15 +159,15 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, result)
   if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
     if a < b then
       local u5 = (u3 + u4) / 2
-      iterate(b1, b2, u1, u2, u3, u5, m, result)
-      return iterate(b1, b2, u1, u2, u5, u4, m, result)
+      iterate(b1, b2, d1, d2, u1, u2, u3, u5, m, result)
+      return iterate(b1, b2, d1, d2, u1, u2, u5, u4, m, result)
     else
       local u5 = (u1 + u2) / 2
-      iterate(b1, b2, u1, u5, u3, u4, m, result)
-      return iterate(b1, b2, u5, u2, u3, u4, m, result)
+      iterate(b1, b2, d1, d2, u1, u5, u3, u4, m, result)
+      return iterate(b1, b2, d1, d2, u5, u2, u3, u4, m, result)
     end
   else
-    return iterate(b1, b2, u1, u2, u3, u4, m, result)
+    return iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   end
 end
 
@@ -188,9 +181,12 @@ return function (b1, b2, result)
   end
   result.is_identical = nil
 
+  local d1 = bezier(b1):deriv()
+  local d2 = bezier(b2):deriv()
+
   local m = (b1:size() - 1) * (b2:size() - 1)
   local m = m * (m - 1) / 2
-  iterate(b1, b2, 0, 1, 0, 1, m, result)
+  iterate(b1, b2, d1, d2, 0, 1, 0, 1, m, result)
 
   local n = #U1
   if n > m then
@@ -221,7 +217,9 @@ return function (b1, b2, result)
 
     local b3 = bezier(b1):reverse()
     local b4 = bezier(b2):reverse()
-    iterate(b3, b4, 0, 1, 0, 1, 1, result)
+    local d3 = bezier(d1):reverse()
+    local d4 = bezier(d2):reverse()
+    iterate(b3, b4, d3, d4, 0, 1, 0, 1, 1, result)
 
     for i = 1, #U1 do
       local t = 1 - U1[i]
