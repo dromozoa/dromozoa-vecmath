@@ -176,7 +176,7 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   end
 end
 
-return function (b1, b2, result)
+return function (b1, b2, t1, t2, t3, t4, result)
   local U1 = result[1]
   local U2 = result[2]
   local n = #U1
@@ -189,7 +189,7 @@ return function (b1, b2, result)
   local d2 = bezier(b2):deriv()
   local m = (b1:size() - 1) * (b2:size() - 1)
   local m = m * (m - 1) / 2
-  iterate(b1, b2, d1, d2, 0, 1, 0, 1, m, result)
+  iterate(b1, b2, d1, d2, t1, t2, t3, t4, m, result)
 
   local n = #U1
   if n <= m then
@@ -224,7 +224,7 @@ return function (b1, b2, result)
   local b4 = bezier(b2):reverse()
   local d3 = bezier(d1):reverse()
   local d4 = bezier(d2):reverse()
-  iterate(b3, b4, d3, d4, 0, 1, 0, 1, 1, result)
+  iterate(b3, b4, d3, d4, 1 - t2, 1 - t1, 1 - t4, 1 - t3, 1, result)
 
   for i = 1, #U1 do
     local t = 1 - U1[i]

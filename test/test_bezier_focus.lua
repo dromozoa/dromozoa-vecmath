@@ -83,7 +83,7 @@ local function check(B1, B2, n, is_identical)
   local U1 = {}
   local U2 = {}
 
-  local result = bezier_focus(B1, B2, { U1, U2 })
+  local result = bezier_focus(B1, B2, 0, 1, 0, 1, { U1, U2 })
 
   for i = 1, #U1 do
     local p = B1:eval(U1[i], point2())
