@@ -24,6 +24,8 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 
 local clip_both = require "dromozoa.vecmath.clip_both"
 
+local sqrt = math.sqrt
+
 -- by experimentations
 local t_epsilon = 1e-6
 local d_epsilon = 1e-11
@@ -129,9 +131,9 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
     local t2 = (u3 + u4) / 2
     local U2 = result[2]
 
-    local v1 = d1:eval(t1, vector2()):normalize()
-    local v2 = d2:eval(t2, vector2()):normalize()
-    local s = v1:cross(v2)
+    local v1 = d1:eval(t1, vector2())
+    local v2 = d2:eval(t2, vector2())
+    local s = v1:cross(v2) / sqrt(v1:length_squared() * v2:length_squared())
     if s < 0 then
       s = -s
     end
@@ -155,10 +157,8 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
       n = n + 1
       U1[n] = t1
       U2[n] = t2
-      return result
-    else
-      return result
     end
+    return result
   end
 
   if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
