@@ -27,6 +27,7 @@ local clip_both = require "dromozoa.vecmath.clip_both"
 -- by experimentations
 local t_epsilon = 1e-6
 local d_epsilon = 1e-11
+local s_epsilon = 1e-6
 
 local function explicit_bezier(B, p)
   local Z = B[3]
@@ -130,7 +131,11 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
 
     local v1 = d1:eval(t1, vector2()):normalize()
     local v2 = d2:eval(t2, vector2()):normalize()
-    if math.abs(v1:cross(v2)) <= t_epsilon then
+    local s = v1:cross(v2)
+    if s < 0 then
+      s = -s
+    end
+    if s <= s_epsilon then
       for i = 1, n do
         local a = U1[i] - t1
         if a < 0 then
