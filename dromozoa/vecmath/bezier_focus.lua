@@ -81,7 +81,7 @@ local function explicit_bezier(B, p)
   return D
 end
 
-local function focus(B1, B2)
+local function clip(B1, B2)
   local F = bezier(B2):focus()
   if not F then
     F = B2
@@ -110,7 +110,7 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
-  local t1, t2 = focus(B1, B2)
+  local t1, t2 = clip(B1, B2)
   if not t1 then
     return result
   end
@@ -118,7 +118,7 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   u2 = u1 + a * t2
   u1 = u1 + a * t1
 
-  local t3, t4 = focus(B2, B1)
+  local t3, t4 = clip(B2, B1)
   if not t3 then
     return result
   end

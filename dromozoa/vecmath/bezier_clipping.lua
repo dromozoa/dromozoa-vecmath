@@ -27,7 +27,7 @@ local bezier_focus = require "dromozoa.vecmath.bezier_focus"
 local clip_both = require "dromozoa.vecmath.clip_both"
 
 -- by experimentations
-local epsilon = 1e-11
+local t_epsilon = 1e-11
 local p_epsilon = 1e-9
 
 local function fat_line(B1, B2)
@@ -238,12 +238,12 @@ local function merge(t1, t2, result)
     if a < 0 then
       a = -a
     end
-    if a <= epsilon then
+    if a <= t_epsilon then
       local b = U2[i] - t2
       if b < 0 then
         b = -b
       end
-      if b <= epsilon then
+      if b <= t_epsilon then
         return result
       end
     end
@@ -255,22 +255,24 @@ local function merge(t1, t2, result)
   return result
 end
 
-local function check_end_point(b1, b2, u1, u2, u3, u4, result)
+local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
   local p1 = b1:eval(u1, point2())
   local p2 = b1:eval(u2, point2())
-  local q1 = b2:eval(u3, point2())
-  local q2 = b2:eval(u4, point2())
+  local q = b2:eval(u3, point2())
 
-  if p1:epsilon_equals(q1, p_epsilon) then
+  if p1:epsilon_equals(q, p_epsilon) then
     merge(u1, u3, result)
   end
-  if p1:epsilon_equals(q2, p_epsilon) then
-    merge(u1, u4, result)
-  end
-  if p2:epsilon_equals(q1, p_epsilon) then
+  if p2:epsilon_equals(q, p_epsilon) then
     merge(u2, u3, result)
   end
-  if p2:epsilon_equals(q2, p_epsilon) then
+
+  b2:eval(u4, q)
+
+  if p1:epsilon_equals(q, p_epsilon) then
+    merge(u1, u4, result)
+  end
+  if p2:epsilon_equals(q, p_epsilon) then
     merge(u2, u4, result)
   end
 
@@ -289,25 +291,93 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
 
   local t1, t2 = clip(B1, B2)
   if not t1 then
-    return check_end_point(b1, b2, u1, u2, u3, u4, result)
+    return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
   local a = u2 - u1
-  local v2 = u1 + a * t2
   local v1 = u1 + a * t1
+  local v2 = u1 + a * t2
 
   local t3, t4 = clip(B2, B1)
   if not t3 then
-    return check_end_point(b1, b2, u1, u2, u3, u4, result)
+    return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
   local b = u4 - u3
-  local v4 = u3 + b * t4
   local v3 = u3 + b * t3
+  local v4 = u3 + b * t4
 
-  if v2 - v1 <= epsilon and v4 - v3 <= epsilon then
+  if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
     return merge((v1 + v2) / 2, (v3 + v4) / 2, result)
   end
 
   if t2 - t1 > 0.8 and t4 - t3 > 0.8 then
+
+-- [[
+    if not is_identical then
+      local F1 = {}
+      local F2 = {}
+      local focus = bezier_focus(b1, b2, u1, u2, u3, u4, { F1, F2 })
+      if not focus.is_identical then
+        if #F1 > 0 then
+          if a < b then
+            local u5 = u3
+            for i = 1, #F2 do
+              local f1 = F1[i]
+              local f2 = F2[i]
+              local p1 = b1:eval(f1, point2())
+              local p2 = b2:eval(f2, point2())
+              if p1:epsilon_equals(p2, p_epsilon) then
+                merge(f1, f2, result)
+                u5 = nil
+              else
+                if u5 then
+                  iterate(b1, b2, u1, u2, u5, f2, m, false, result)
+                end
+                u5 = f2
+              end
+            end
+            if u5 then
+              iterate(b1, b2, u1, u2, u5, u4, m, false, result)
+            end
+          else
+            local u5 = u1
+            for i = 1, #F1 do
+              local f1 = F1[i]
+              local f2 = F2[i]
+              local p1 = b1:eval(f1, point2())
+              local p2 = b2:eval(f2, point2())
+              if p1:epsilon_equals(p2, p_epsilon) then
+                merge(f1, f2, result)
+                u5 = nil
+              else
+                if u5 then
+                  iterate(b1, b2, u5, f1, u3, u4, m, false, result)
+                end
+                u5 = f1
+              end
+            end
+            if u5 then
+              iterate(b1, b2, u5, u2, u3, u4, m, false, result)
+            end
+          end
+          return result
+        end
+      else
+        is_identical = true
+      end
+    end
+    if a < b then
+      local u5 = (u3 + u4) / 2
+      iterate(b1, b2, u1, u2, u3, u5, m, is_identical, result)
+      return iterate(b1, b2, u1, u2, u5, u4, m, is_identical, result)
+    else
+      local u5 = (u1 + u2) / 2
+      iterate(b1, b2, u1, u5, u3, u4, m, is_identical, result)
+      return iterate(b1, b2, u5, u2, u3, u4, m, is_identical, result)
+    end
+--]]
+
+
+--[[
     if a < b then
       if is_identical then
         local u5 = (u3 + u4) / 2
@@ -393,6 +463,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
         end
       end
     end
+--]]
   else
     return iterate(b1, b2, v1, v2, v3, v4, m, is_identical, result)
   end
