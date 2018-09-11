@@ -93,10 +93,8 @@ local function clip(B1, B2)
       P[#P + 1] = D:get(j, point2())
     end
   end
-  if #P ~= 0 then
-    local H = {}
-    quickhull(P, H)
-    return clip_both(H, -d_epsilon, d_epsilon)
+  if P[1] then
+    return clip_both(quickhull(P), -d_epsilon, d_epsilon)
   end
 end
 

@@ -183,7 +183,6 @@ local function clip(B1, B2)
 
   local n = B1:size()
   local m = n - 1
-  local H = {}
 
   if B1:is_rational() then
     local c1 = c + d_min
@@ -199,13 +198,12 @@ local function clip(B1, B2)
       P1[i] = point2(t, u + w * c1)
       P2[i] = point2(t, u + w * c2)
     end
-    quickhull(P1, H)
-    local t1, t2 = clip_min(H)
+    local H = {}
+    local t1, t2 = clip_min(quickhull(P1, H))
     if not t1 then
       return
     end
-    quickhull(P2, H)
-    local t3, t4 = clip_max(H)
+    local t3, t4 = clip_max(quickhull(P2, H))
     if not t3 then
       return
     end
@@ -221,8 +219,7 @@ local function clip(B1, B2)
       B1:get(i, p)
       P[i] = point2((i - 1) / m, a * p[1] + b * p[2] + c)
     end
-    quickhull(P, H)
-    return clip_both(H, d_min, d_max)
+    return clip_both(quickhull(P), d_min, d_max)
   end
 end
 
