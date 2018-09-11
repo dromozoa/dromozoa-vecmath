@@ -101,6 +101,10 @@ end
 
 -- clockwise
 return function (source, result)
+  if not result then
+    result = {}
+  end
+
   local n = #source
   local p1 = source[1]
   local p1i = 1

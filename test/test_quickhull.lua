@@ -42,7 +42,7 @@ for i = 1, m do
   R[#R + 1] = point2(math.cos(t) * 300, math.sin(t) * 300)
 end
 
-local Q = quickhull(P, {})
+local Q = quickhull(P)
 
 assert(#Q == #R)
 for i = 1, #Q do
