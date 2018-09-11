@@ -93,10 +93,8 @@ local function clip(B1, B2)
       P[#P + 1] = D:get(j, point2())
     end
   end
-  if #P ~= 0 then
-    local H = {}
-    quickhull(P, H)
-    return clip_both(H, -d_epsilon, d_epsilon)
+  if P[1] then
+    return clip_both(quickhull(P), -d_epsilon, d_epsilon)
   end
 end
 
@@ -177,6 +175,22 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
 end
 
 return function (b1, b2, t1, t2, t3, t4, result)
+  if not t1 then
+    t1 = 0
+  end
+  if not t2 then
+    t2 = 1
+  end
+  if not t3 then
+    t3 = 0
+  end
+  if not t4 then
+    t4 = 1
+  end
+  if not result then
+    result = { {}, {} }
+  end
+
   local U1 = result[1]
   local U2 = result[2]
   for i = 1, #U1 do
