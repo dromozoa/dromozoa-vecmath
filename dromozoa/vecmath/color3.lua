@@ -25,8 +25,6 @@ local super = tuple3
 local class = { is_color3 = true }
 local metatable = { __tostring = super.to_string }
 
--- TODO impl get()
-
 function metatable.__index(a, key)
   local value = class[key]
   if value then
