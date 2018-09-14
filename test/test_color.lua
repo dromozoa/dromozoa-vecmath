@@ -33,12 +33,42 @@ assert(tostring(color4b(255, 34, 0, 255)) == "#F20")
 assert(tostring(color4f(1, 0, 0x33/0xFF, 1)) == "#F03")
 assert(tostring(color4f(1, 0.5, 0.25, 1)) == "rgb(100%,50%,25%)")
 assert(tostring(color4f(1, 0.5, 0.25, 0.75)) == "rgba(100%,50%,25%,0.75)")
+
+local c = color4f(42, -69, 0x66/0xFF, 0.5)
+if verbose then
+  print(tostring(c))
+end
+assert(tostring(c) == "rgba(255,0,102,0.5)")
 -- assert(tostring(colors.blue) == "#00F")
 -- assert(tostring(colors.silver) == "#C0C0C0")
 -- assert(tostring(colors.transparent) == "rgba(0,0,0,0)")
 -- assert(tostring(color4f(1, 0, 0, 0.5):interpolate(colors.lime, 0.5)) == "rgba(50%,50%,0%,0.75)")
 
 -- TODO check color?b with noninteger
+
+local c = color3b(25.5, 12.75, 255)
+if verbose then
+  print(tostring(c))
+end
+assert(tostring(c) == "rgb(10%,5%,100%)")
+
+local c = color3f(-42, 0.5, 666)
+if verbose then
+  print(tostring(c))
+end
+assert(tostring(c) == "rgb(0%,50%,100%)")
+
+local c = color4b(25.5, 12.75, 255, 255)
+if verbose then
+  print(tostring(c))
+end
+assert(tostring(c) == "rgb(10%,5%,100%)")
+
+local c = color4b(25.5, 12.75, 255, 127.5)
+if verbose then
+  print(tostring(c))
+end
+assert(tostring(c) == "rgba(10%,5%,100%,0.5)")
 
 local c = color3f(1, 0, 0x33/0xFF)
 assert(c.is_color3f)

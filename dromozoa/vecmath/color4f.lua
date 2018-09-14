@@ -28,6 +28,10 @@ local function to_string(a)
   local z = a[3]
   local w = a[4]
 
+  if x < 0 then x = 0 elseif x > 1 then x = 1 end
+  if y < 0 then y = 0 elseif y > 1 then y = 1 end
+  if z < 0 then z = 0 elseif z > 1 then z = 1 end
+
   local bx = x * 255
   if bx % 1 == 0 then
     local by = y * 255
@@ -41,12 +45,11 @@ local function to_string(a)
             return ("#%02X%02X%02X"):format(bx, by, bz)
           end
         else
-          return ("rgba(%d,%d,%d,%.17g"):format(bx, by, bz, w)
+          return ("rgba(%d,%d,%d,%.17g)"):format(bx, by, bz, w)
         end
       end
     end
   end
-
   if w == 1 then
     return ("rgb(%.17g%%,%.17g%%,%.17g%%)"):format(x * 100, y * 100, z * 100)
   else

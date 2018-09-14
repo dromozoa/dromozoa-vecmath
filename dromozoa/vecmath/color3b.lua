@@ -27,21 +27,26 @@ local function to_string(a)
   local y = a[2]
   local z = a[3]
 
-  if x % 17 == 0 and y % 17 == 0 and z % 17 == 0 then
-    return ("#%01X%01X%01X"):format(x / 17, y / 17, z / 17)
+  if x < 0 then x = 0 elseif x > 255 then x = 255 end
+  if y < 0 then y = 0 elseif y > 255 then y = 255 end
+  if z < 0 then z = 0 elseif z > 255 then z = 255 end
+
+  if x % 1 == 0 and y % 1 == 0 and z % 1 == 0 then
+    if x % 17 == 0 and y % 17 == 0 and z % 17 == 0 then
+      return ("#%01X%01X%01X"):format(x / 17, y / 17, z / 17)
+    else
+      return ("#%02X%02X%02X"):format(x, y, z)
+    end
   else
-    return ("#%02X%02X%02X"):format(x, y, z)
+    return ("rgb(%.17g%%,%.17g%%,%.17g%%)"):format(x / 2.55, y / 2.55, z / 2.55)
   end
 end
 
 -- a:set_color3f(color3f b)
 local function set_color3f(a, b)
-  local bx = b[1] * 255
-  local by = b[2] * 255
-  local bz = b[3] * 255
-  a[1] = bx - bx % 1
-  a[2] = by - by % 1
-  a[3] = bz - bz % 1
+  a[1] = b[1] * 255
+  a[2] = b[2] * 255
+  a[3] = b[3] * 255
   return a
 end
 
