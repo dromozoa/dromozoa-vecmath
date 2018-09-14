@@ -33,19 +33,19 @@ local function to_string(a)
   if z < 0 then z = 0 elseif z > 255 then z = 255 end
   if w < 0 then w = 0 elseif w > 255 then w = 255 end
 
-  if w == 255 then
-    if x % 1 == 0 and y % 1 == 0 and z % 1 == 0 then
+  if x % 1 == 0 and y % 1 == 0 and z % 1 == 0 then
+    if w == 255 then
       if x % 17 == 0 and y % 17 == 0 and z % 17 == 0 then
         return ("#%01X%01X%01X"):format(x / 17, y / 17, z / 17)
       else
         return ("#%02X%02X%02X"):format(x, y, z)
       end
     else
-      return ("rgb(%.17g%%,%.17g%%,%.17g%%)"):format(x / 2.55, y / 2.55, z / 2.55)
+      return ("rgba(%d,%d,%d,%.17g)"):format(x, y, z, w / 255)
     end
   else
-    if x % 1 == 0 and y % 1 == 0 and z % 1 == 0 then
-      return ("rgba(%d,%d,%d,%.17g)"):format(x, y, z, w / 255)
+    if w == 255 then
+      return ("rgb(%.17g%%,%.17g%%,%.17g%%)"):format(x / 2.55, y / 2.55, z / 2.55)
     else
       return ("rgba(%.17g%%,%.17g%%,%.17g%%,%.17g)"):format(x / 2.55, y / 2.55, z / 2.55, w / 255)
     end

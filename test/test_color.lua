@@ -44,8 +44,6 @@ assert(tostring(c) == "rgba(255,0,102,0.5)")
 -- assert(tostring(colors.transparent) == "rgba(0,0,0,0)")
 -- assert(tostring(color4f(1, 0, 0, 0.5):interpolate(colors.lime, 0.5)) == "rgba(50%,50%,0%,0.75)")
 
--- TODO check color?b with noninteger
-
 local c = color3b(25.5, 12.75, 255)
 if verbose then
   print(tostring(c))
