@@ -66,6 +66,15 @@ local function set_color4b(a, b)
   return a
 end
 
+-- a:set_color3b(color4b b)
+local function set_color3b(a, b)
+  a[1] = b[1] / 255
+  a[2] = b[2] / 255
+  a[3] = b[3] / 255
+  a[4] = 1
+  return a
+end
+
 local super = color4
 local class = {
   is_color4f = true;
@@ -80,6 +89,7 @@ local metatable = {
 -- a:set(number b, number y, number z, number w)
 -- a:set(color4b b)
 -- a:set(tuple4 b)
+-- a:set(color3b b)
 -- a:set(tuple3 b)
 -- a:set()
 function class.set(a, b, y, z, w)
@@ -93,6 +103,8 @@ function class.set(a, b, y, z, w)
     else
       if b.is_color4b then
         return set_color4b(a, b)
+      elseif b.is_color3b then
+        return set_color3b(a, b)
       else
         a[1] = b[1]
         a[2] = b[2]
@@ -126,6 +138,7 @@ end
 -- a:set(number b, number y, number z, number w)
 -- a:set(color4b b)
 -- a:set(tuple4 b)
+-- a:set(color3b b)
 -- a:set(tuple3 b)
 -- a:set()
 return setmetatable(class, {
