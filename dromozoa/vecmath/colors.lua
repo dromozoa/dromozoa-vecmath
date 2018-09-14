@@ -15,35 +15,22 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local tuple3 = require "dromozoa.vecmath.tuple3"
-
-local rawget = rawget
-local rawset = rawset
-local setmetatable = setmetatable
-
-local super = tuple3
-local class = { is_color3 = true }
-local metatable = { __tostring = super.to_string }
-
-function metatable.__index(a, key)
-  local value = class[key]
-  if value then
-    return value
-  else
-    return rawget(a, class.index[key])
-  end
-end
-
-function metatable.__newindex(a, key, value)
-  rawset(a, class.index[key], value)
-end
-
--- class(number b, number c, number d)
--- class(tuple3 b)
--- class()
-return setmetatable(class, {
-  __index = super;
-  __call = function (_, ...)
-    return setmetatable(class.set({}, ...), metatable)
-  end;
-})
+return {
+  black       = {   0,   0,   0, 255 };
+  silver      = { 192, 192, 192, 255 };
+  gray        = { 128, 128, 128, 255 };
+  white       = { 255, 255, 255, 255 };
+  maroon      = { 128,   0,   0, 255 };
+  red         = { 255,   0,   0, 255 };
+  purple      = { 128,   0, 128, 255 };
+  fuchsia     = { 255,   0, 255, 255 };
+  green       = {   0, 128,   0, 255 };
+  lime        = {   0, 255,   0, 255 };
+  olive       = { 128, 128,   0, 255 };
+  yellow      = { 255, 255,   0, 255 };
+  navy        = {   0,   0, 128, 255 };
+  blue        = {   0,   0, 255, 255 };
+  teal        = {   0, 128, 128, 255 };
+  aqua        = {   0, 255, 255, 255 };
+  transparent = {   0,   0,   0,   0 };
+}

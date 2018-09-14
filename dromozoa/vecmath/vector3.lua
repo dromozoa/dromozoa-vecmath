@@ -98,8 +98,8 @@ function class.angle(a, b)
 end
 
 -- a:set(number b, number y, number z)
--- a:set(tuple2 b) [EX]
 -- a:set(tuple3 b)
+-- a:set(tuple2 b) [EX]
 -- a:set()
 function class.set(a, b, y, z)
   if b then
@@ -136,8 +136,8 @@ function metatable.__newindex(a, key, value)
 end
 
 -- class(number b, number y, number z)
--- class(tuple2 b) [EX]
 -- class(tuple3 b)
+-- class(tuple2 b) [EX]
 -- class()
 return setmetatable(class, {
   __index = super;

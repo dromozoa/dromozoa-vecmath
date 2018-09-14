@@ -28,8 +28,8 @@ local class = { is_vector4 = true }
 local metatable = { __tostring = super.to_string }
 
 -- a:set(number b, number y, number z, number w)
--- a:set(tuple3 b)
 -- a:set(tuple4 b)
+-- a:set(tuple3 b)
 -- a:set()
 function class.set(a, b, y, z, w)
   if b then
@@ -38,19 +38,21 @@ function class.set(a, b, y, z, w)
       a[2] = y
       a[3] = z
       a[4] = w
+      return a
     else
       a[1] = b[1]
       a[2] = b[2]
       a[3] = b[3]
       a[4] = b[4] or 0
+      return a
     end
   else
     a[1] = 0
     a[2] = 0
     a[3] = 0
     a[4] = 0
+    return a
   end
-  return a
 end
 
 -- a:length()
@@ -124,8 +126,8 @@ function metatable.__newindex(a, key, value)
 end
 
 -- class(number b, number y, number z, number w)
--- class(tuple3 b)
 -- class(tuple4 b)
+-- class(tuple3 b)
 -- class()
 return setmetatable(class, {
   __index = super;

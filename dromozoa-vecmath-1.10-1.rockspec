@@ -1,9 +1,9 @@
 rockspec_format = "3.0"
 package = "dromozoa-vecmath"
-version = "1.9-1"
+version = "1.10-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.9.tar.gz";
-  file = "dromozoa-vecmath-1.9.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.10.tar.gz";
+  file = "dromozoa-vecmath-1.10.tar.gz";
 }
 description = {
   summary = "Pure-Lua implementation of javax.vecmath package";
@@ -26,7 +26,12 @@ build = {
     ["dromozoa.vecmath.bezier_focus"] = "dromozoa/vecmath/bezier_focus.lua";
     ["dromozoa.vecmath.clip_both"] = "dromozoa/vecmath/clip_both.lua";
     ["dromozoa.vecmath.color3"] = "dromozoa/vecmath/color3.lua";
+    ["dromozoa.vecmath.color3b"] = "dromozoa/vecmath/color3b.lua";
+    ["dromozoa.vecmath.color3f"] = "dromozoa/vecmath/color3f.lua";
     ["dromozoa.vecmath.color4"] = "dromozoa/vecmath/color4.lua";
+    ["dromozoa.vecmath.color4b"] = "dromozoa/vecmath/color4b.lua";
+    ["dromozoa.vecmath.color4f"] = "dromozoa/vecmath/color4f.lua";
+    ["dromozoa.vecmath.colors"] = "dromozoa/vecmath/colors.lua";
     ["dromozoa.vecmath.matrix2"] = "dromozoa/vecmath/matrix2.lua";
     ["dromozoa.vecmath.matrix3"] = "dromozoa/vecmath/matrix3.lua";
     ["dromozoa.vecmath.matrix4"] = "dromozoa/vecmath/matrix4.lua";
