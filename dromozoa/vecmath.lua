@@ -18,7 +18,11 @@
 return {
   axis_angle4 = require "dromozoa.vecmath.axis_angle4";
   color3 = require "dromozoa.vecmath.color3";
+  color3b = require "dromozoa.vecmath.color3b";
+  color3f = require "dromozoa.vecmath.color3f";
   color4 = require "dromozoa.vecmath.color4";
+  color4b = require "dromozoa.vecmath.color4b";
+  color4f = require "dromozoa.vecmath.color4f";
   matrix3 = require "dromozoa.vecmath.matrix3";
   matrix4 = require "dromozoa.vecmath.matrix4";
   point2 = require "dromozoa.vecmath.point2";
@@ -39,6 +43,7 @@ return {
   bezier = require "dromozoa.vecmath.bezier";
   bezier_clipping = require "dromozoa.vecmath.bezier_clipping";
   bezier_focus = require "dromozoa.vecmath.bezier_focus";
+  colors = require "dromozoa.vecmath.colors";
   matrix2 = require "dromozoa.vecmath.matrix2";
   polynomial = require "dromozoa.vecmath.polynomial";
   quickhull = require "dromozoa.vecmath.quickhull";
