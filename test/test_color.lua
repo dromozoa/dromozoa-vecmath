@@ -39,10 +39,6 @@ if verbose then
   print(tostring(c))
 end
 assert(tostring(c) == "rgba(255,0,102,0.5)")
--- assert(tostring(colors.blue) == "#00F")
--- assert(tostring(colors.silver) == "#C0C0C0")
--- assert(tostring(colors.transparent) == "rgba(0,0,0,0)")
--- assert(tostring(color4f(1, 0, 0, 0.5):interpolate(colors.lime, 0.5)) == "rgba(50%,50%,0%,0.75)")
 
 local c = color3b(25.5, 12.75, 255)
 if verbose then
@@ -114,3 +110,23 @@ assert(tostring(c) == "#F03")
 
 assert(color4b(color3f(0, 0x33/0xFF, 0x66/0xFF)):equals {0x00,0x33,0x66,0xFF})
 assert(color4f(color3b(0, 0x33, 0x66)):equals {0,0x33/0xFF,0x66/0xFF,1})
+
+assert(tostring(color4b "blue") == "#00F")
+assert(tostring(color4b "silver") == "#C0C0C0")
+assert(tostring(color4b "transparent") == "rgba(0,0,0,0)")
+assert(tostring(color4b "no-such-color") == "rgba(0,0,0,0)")
+
+assert(tostring(color4f "blue") == "#00F")
+assert(tostring(color4f "silver") == "#C0C0C0")
+assert(tostring(color4f "transparent") == "rgba(0,0,0,0)")
+assert(tostring(color4f "no-such-color") == "rgba(0,0,0,0)")
+
+assert(tostring(color3b "blue") == "#00F")
+assert(tostring(color3b "silver") == "#C0C0C0")
+assert(tostring(color3b "transparent") == "#000")
+assert(tostring(color3b "no-such-color") == "#000")
+
+assert(tostring(color3f "blue") == "#00F")
+assert(tostring(color3f "silver") == "#C0C0C0")
+assert(tostring(color3f "transparent") == "#000")
+assert(tostring(color3f "no-such-color") == "#000")

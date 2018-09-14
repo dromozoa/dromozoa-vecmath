@@ -16,10 +16,12 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local color3 = require "dromozoa.vecmath.color3"
+local colors = require "dromozoa.vecmath.colors"
 
 local rawget = rawget
 local rawset = rawset
 local setmetatable = setmetatable
+local type = type
 
 -- a:to_string()
 local function to_string(a)
@@ -68,6 +70,7 @@ local metatable = {
 }
 
 -- a:set(number b, number y, number z)
+-- a:set(string b)
 -- a:set(color3b b)
 -- a:set(tuple3 b)
 -- a:set()
@@ -79,7 +82,13 @@ function class.set(a, b, y, z)
       a[3] = z
       return a
     else
-      if b.is_color3b then
+      if type(b) == "string" then
+        local c = colors[b] or colors.transparent
+        a[1] = c[1] / 255
+        a[2] = c[2] / 255
+        a[3] = c[3] / 255
+        return a
+      elseif b.is_color3b then
         return set_color3b(a, b)
       else
         a[1] = b[1]
@@ -110,6 +119,7 @@ function metatable.__newindex(a, key, value)
 end
 
 -- a:set(number b, number y, number z)
+-- a:set(string b)
 -- a:set(color3b b)
 -- a:set(tuple3 b)
 -- a:set()
