@@ -28,20 +28,20 @@ local function to_string(a)
   local z = a[3]
   local w = a[4]
 
-  local X = x * 255
-  if X % 1 == 0 then
-    local Y = y * 255
-    if Y % 1 == 0 then
-      local Z = z * 255
-      if Z % 1 == 0 then
+  local bx = x * 255
+  if bx % 1 == 0 then
+    local by = y * 255
+    if by % 1 == 0 then
+      local bz = z * 255
+      if bz % 1 == 0 then
         if w == 1 then
-          if X % 17 == 0 and Y % 17 == 0 and Z % 17 == 0 then
-            return ("#%01X%01X%01X"):format(X / 17, Y / 17, Z / 17)
+          if bx % 17 == 0 and by % 17 == 0 and bz % 17 == 0 then
+            return ("#%01X%01X%01X"):format(bx / 17, by / 17, bz / 17)
           else
-            return ("#%02X%02X%02X"):format(X, Y, Z)
+            return ("#%02X%02X%02X"):format(bx, by, bz)
           end
         else
-          return ("rgba(%d,%d,%d,%.17g"):format(X, Y, Z, w)
+          return ("rgba(%d,%d,%d,%.17g"):format(bx, by, bz, w)
         end
       end
     end
