@@ -15,10 +15,17 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local color3b = require "dromozoa.vecmath.color3b"
+local color3f = require "dromozoa.vecmath.color3f"
 local color4b = require "dromozoa.vecmath.color4b"
 local color4f = require "dromozoa.vecmath.color4f"
 
 local verbose = os.getenv "VERBOSE" == "1"
+
+assert(tostring(color3b(255, 127, 63)) == "#FF7F3F")
+assert(tostring(color3b(255, 34, 0)) == "#F20")
+assert(tostring(color3f(1, 0, 0x33/0xFF)) == "#F03")
+assert(tostring(color3f(1, 0.5, 0.25)) == "rgb(100%,50%,25%)")
 
 assert(tostring(color4b(0xFF, 0xFF, 0x00, 127.5)) == "rgba(255,255,0,0.5)")
 assert(tostring(color4b(255, 127, 63, 255)) == "#FF7F3F")
@@ -30,6 +37,29 @@ assert(tostring(color4f(1, 0.5, 0.25, 0.75)) == "rgba(100%,50%,25%,0.75)")
 -- assert(tostring(colors.silver) == "#C0C0C0")
 -- assert(tostring(colors.transparent) == "rgba(0,0,0,0)")
 -- assert(tostring(color4f(1, 0, 0, 0.5):interpolate(colors.lime, 0.5)) == "rgba(50%,50%,0%,0.75)")
+
+-- TODO check color?b with noninteger
+
+local c = color3f(1, 0, 0x33/0xFF)
+assert(c.is_color3f)
+local c = color3b(c)
+assert(c.is_color3b)
+assert(c.x == 0xFF)
+assert(c.y == 0x00)
+assert(c.z == 0x33)
+assert(tostring(c) == "#F03")
+
+local c = color3b(0xFF, 0x00, 0x33)
+assert(c.is_color3b)
+local c = color3f(c)
+assert(c.is_color3f)
+assert(c.x == 1)
+assert(c.y == 0)
+assert(c.z == 0x33/0xFF)
+if verbose then
+  print(tostring(c))
+end
+assert(tostring(c) == "#F03")
 
 local c = color4f(1, 0, 0x33/0xFF, 1)
 assert(c.is_color4f)
