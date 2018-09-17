@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+</head>
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+</style>
+<body>
+<div class="markdown-body">
+
+<h1>SVG, CSS</h1>
+
+<h2>リンク</h2>
+
+<ul>
+  <li>SVG
+    <ul>
+      <li><a href="https://www.w3.org/TR/SVG11/">Scalable Vector Graphics (SVG) 1.1 (Second Edition)</a></li>
+      <li><a href="https://www.w3.org/TR/SVG12/">Scalable Vector Graphics (SVG) Full 1.2 Specification</a></li>
+      <li><a href="https://www.w3.org/TR/SVG2/">Scalable Vector Graphics (SVG) 2</a></li>
+      <li><a href="https://www.w3.org/TR/svg-markers/">SVG Markers</a></li>
+      <li><a href="https://triple-underscore.github.io/SVG11/">SVG 1.1 仕様（第2版）日本語訳</a></li>
+    </ul>
+  </li>
+  <li>CSS
+    <ul>
+      <li><a href="https://www.w3.org/Style/CSS/">Cascading Style Sheets home page</a></li>
+      <li><a href="https://www.w3.org/TR/css-color-3/">CSS Color Module Level 3</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>SVGパスセグメント</h2>
+
+<table>
+  <tr><td>Z or z</td><td>closepath</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegClosePath">SVGPathSegClosePath</a></td></tr>
+  <tr><td>M</td><td>absolute moveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegMovetoAbs">SVGPathSegMovetoAbs</a></td></tr>
+  <tr><td>m</td><td>relative moveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegMovetoRel">SVGPathSegMovetoRel</a></td></tr>
+  <tr><td>L</td><td>absolute lineto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegLinetoAbs">SVGPathSegLinetoAbs</a></td></tr>
+  <tr><td>l</td><td>relative lineto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegLinetoRel">SVGPathSegLinetoRel</a></td></tr>
+  <tr><td>C</td><td>absolute cubic B&eacute;zier curveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegCurvetoCubicAbs">SVGPathSegCurvetoCubicAbs</a></td></tr>
+  <tr><td>c</td><td>relative cubic B&eacute;zier curveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegCurvetoCubicRel">SVGPathSegCurvetoCubicRel</a></td></tr>
+  <tr><td>Q</td><td>absolute quadratic B&eacute;zier curveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegCurvetoQuadraticAbs">SVGPathSegCurvetoQuadraticAbs</a></td></tr>
+  <tr><td>q</td><td>relative quadratic B&eacute;zier curveto"</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegCurvetoQuadraticRel">SVGPathSegCurvetoQuadraticRel</a></td></tr>
+  <tr><td>A</td><td>absolute arcto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegArcAbs">SVGPathSegArcAbs</a></td></tr>
+  <tr><td>a</td><td>relative arcto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegArcRel">SVGPathSegArcRel</a></td></tr>
+  <tr><td>H</td><td>absolute horizontal lineto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegLinetoHorizontalAbs">SVGPathSegLinetoHorizontalAbs</a></td></tr>
+  <tr><td>h</td><td>relative horizontal lineto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegLinetoHorizontalRel">SVGPathSegLinetoHorizontalRel</a></td></tr>
+  <tr><td>V</td><td>absolute vertical lineto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegLinetoVerticalAbs">SVGPathSegLinetoVerticalAbs</a></td></tr>
+  <tr><td>v</td><td>relative vertical lineto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegLinetoVerticalRel">SVGPathSegLinetoVerticalRel</a></td></tr>
+  <tr><td>S</td><td>absolute smooth cubic curveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegCurvetoCubicSmoothAbs">SVGPathSegCurvetoCubicSmoothAbs</a></td></tr>
+  <tr><td>s</td><td>relative smooth cubic curveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegCurvetoCubicSmoothRel">SVGPathSegCurvetoCubicSmoothRel</a></td></tr>
+  <tr><td>T</td><td>absolute smooth cubic curveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegCurvetoQuadraticSmoothAbs">SVGPathSegCurvetoQuadraticSmoothAbs</a></td></tr>
+  <tr><td>t</td><td>relative smooth cubic curveto</td><td><a href="https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSegCurvetoQuadraticSmoothRel">SVGPathSegCurvetoQuadraticSmoothRel</a></td></tr>
+</table>
+
+</script>
+</div>
+</body>
+</html>
