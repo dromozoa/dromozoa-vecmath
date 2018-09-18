@@ -22,6 +22,32 @@ local setmetatable = setmetatable
 local class = { is_lineto = true }
 local metatable = { __index = class }
 
+-- self:set(number a, number b)
+-- self:set(tuple2 a)
+-- self:set(lineto a)
+-- self:set()
+function class:set()
+  local p = self[1]
+  if a then
+    if b then
+      p:set(a, b)
+      return self
+    else
+      if #a == 2 then
+        p:set(a)
+        return self
+      else
+        p:set(a[1])
+        return self
+      end
+    end
+  else
+    p:set()
+    return self
+  end
+end
+
+-- tostring(self)
 function metatable:__tostring()
   local p = self[1]
   return ("L%.17g,%.17g"):format(p[1], p[2])
@@ -29,9 +55,10 @@ end
 
 -- class(number a, number b)
 -- class(tuple2 a)
+-- class(lineto a)
 -- class()
 return setmetatable(class, {
   __call = function (_, ...)
-    return setmetatable({ point2(...) }, metatable)
+    return setmetatable(class.set({ point2() }, ...), metatable)
   end;
 })

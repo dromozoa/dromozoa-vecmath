@@ -22,6 +22,42 @@ local setmetatable = setmetatable
 local class = { is_curveto = true }
 local metatable = { __index = class }
 
+-- self:set(number a, number b, number c, number d, numer e, number f)
+-- self:set(tuple2 a, tuple2 b, tuple2 c)
+-- self:set(cubic_curveto a)
+-- self:set()
+function class:set(a, b, c, d, e, f)
+  local p1 = self[1]
+  local p2 = self[2]
+  local p3 = self[3]
+  if a then
+    if b then
+      if d then
+        p1:set(a, b)
+        p2:set(c, d)
+        p3:set(e, f)
+        return self
+      else
+        p1:set(a)
+        p2:set(b)
+        p3:set(c)
+        return self
+      end
+    else
+      p1:set(b[1])
+      p2:set(b[2])
+      p3:set(b[3])
+      return self
+    end
+  else
+    p1:set()
+    p2:set()
+    p3:set()
+    return self
+  end
+end
+
+-- tostring(self)
 function metatable:__tostring()
   local p1 = self[1]
   local p2 = self[2]
@@ -31,13 +67,10 @@ end
 
 -- class(number a, number b, number c, number d, numer e, number f)
 -- class(tuple2 a, tuple2 b, tuple2 c)
+-- class(cubic_curveto a)
 -- class()
 return setmetatable(class, {
-  __call = function (_, a, b, c, d, e, f)
-    if d then
-      return setmetatable({ point2(a, b), point2(c, d), point2(e, f) }, metatable)
-    else
-      return setmetatable({ point2(a), point2(b), point2(c) }, metatable)
-    end
+  __call = function (_, ...)
+    return setmetatable(class.set({ point2(), point2(), point2() }, ...), metatable)
   end;
 })
