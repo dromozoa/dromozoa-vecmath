@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local matrix2 = require "dromozoa.vecmath.matrix2"
 local point2 = require "dromozoa.vecmath.point2"
 local point3 = require "dromozoa.vecmath.point3"
 local vector2 = require "dromozoa.vecmath.vector2"
@@ -85,7 +84,7 @@ function class:set(a, b, c, d, e, f, g)
   end
 end
 
-function class:bezier(q)
+function class:bezier(q, result)
   local qx = q[1]
   local qy = q[2]
   local r = self[1]
@@ -168,26 +167,23 @@ function class:bezier(q)
     local x2 = m11 * x + m12 * y
     local y2 = m21 * x + m22 * y
 
-    local x = e * sa
-    local y = -e * ca
+    local x = e * s2
+    local y = -e * c2
     local x3 = m11 * x + m12 * y
     local y3 = m21 * x + m22 * y
 
-    local x = e * s2
-    local y = -e * c2
-    local x4 = m11 * x + m12 * y
-    local y4 = m21 * x + m22 * y
-
-    return bezier(
+    local n = #result
+    result[n + 1] = bezier(
         point3(qx, qy, 1),
         point3(qx + x1, qy + y1, 1):scale(w),
         point3(sx - x2, sy - y2, 1):scale(w),
-        point3(sx, sy, 1)),
-    bezier(
+        point3(sx, sy, 1))
+    result[n + 2] = bezier(
         point3(sx, sy, 1),
-        point3(sx + x3, sy + y3, 1):scale(w),
-        point3(px - x4, py - y4, 1):scale(w),
+        point3(sx + x2, sy + y2, 1):scale(w),
+        point3(px - x3, py - y3, 1):scale(w),
         point3(px, py, 1))
+    return result
   else
     local v = 1 + cb2
     local w = v / 3
@@ -203,11 +199,12 @@ function class:bezier(q)
     local x2 = m11 * x + m12 * y
     local y2 = m21 * x + m22 * y
 
-    return bezier(
+    result[#result + 1] = bezier(
         point3(qx, qy, 1),
         point3(qx + x1, qy + y1, 1):scale(w),
         point3(px - x2, py - y2, 1):scale(w),
         point3(px, py, 1))
+    return result
   end
 end
 
