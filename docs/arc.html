@@ -37,58 +37,6 @@
   </li>
 </ul>
 
-<h2>有理ベジェ曲線</h2>
-
-<p>
-有理ベジェ曲線で円弧を表現するとき、
-3次有理ベジェ曲線では180度、
-4次有理ベジェ曲線では240度が上限となる。
-ここでは4次有理ベジェ曲線を利用し、
-180度以上の場合は分割することにする。
-</p>
-
-<p>
-単位円の円弧を表現するような4次ベジェ曲線を考える。
-\[\begin{aligned}
-  \bm{P}_1
-  &amp;=
-  \begin{pmatrix}
-    \cos\theta_1 \\
-    \sin\theta_1 \\
-  \end{pmatrix}
-  \\
-  \bm{P}_2
-  &amp;=
-  \begin{pmatrix}
-    \cos\theta_2 \\
-    \sin\theta_2 \\
-  \end{pmatrix}
-  \\
-
-  \theta &amp;= \theta_1 - \theta_2 \\
-  e &amp;= \frac{
-    2\sin\frac{\theta}{2}
-  }{
-    1 + 2\cos\frac{\theta}{2}
-  } \\
-  w &amp;= \frac{1 + 2\cos\frac{\theta}{2}}{3} \\
-
-  \bm{Q}_1 &amp;= \begin{pmatrix}
-    \cos\theta_1 + e\sin\theta_1 \\
-    \sin\theta_1 - e\cos\theta_1 \\
-  \end{pmatrix}
-  \\
-  \bm{Q}_2 &amp;= \begin{pmatrix}
-    \cos\theta_2 - e\sin\theta_2 \\
-    \sin\theta_2 + e\cos\theta_2 \\
-  \end{pmatrix}
-  \\
-
-
-\end{aligned}\]
-
-</p>
-
 <h2>楕円弧</h2>
 
 <p>
@@ -348,6 +296,19 @@ SVGの実装ノートの式を整理する。
     \cos a \cos b \\
     \sin a \cos b \\
   \end{pmatrix} \\
+
+  \begin{pmatrix}
+    \cos \theta_i \\
+    \sin \theta_i \\
+  \end{pmatrix}
+  &amp;=
+  \bm{M}^{-1} \left(
+    \bm{P}_i - \begin{pmatrix}
+      c_x \\
+      c_y \\
+    \end{pmatrix}
+  \right) \\
+
 \end{aligned}\]
 </p>
 
@@ -392,6 +353,107 @@ SVGの実装ノートの式を整理する。
     <td>長いほうの弧が選択される。始点から終点は時計回り。</td>
   </tr>
 </table>
+
+<h2>有理ベジェ曲線</h2>
+
+<p>
+有理ベジェ曲線で円弧を表現するとき、
+3次有理ベジェ曲線では180度、
+4次有理ベジェ曲線では240度が上限となる。
+ここでは4次有理ベジェ曲線を利用し、
+180度以上の場合は分割することにする。
+</p>
+
+<p>
+単位円の円弧を表現するような4次ベジェ曲線を考える。
+\[\begin{aligned}
+  \bm{P}_i
+  &amp;=
+  \begin{pmatrix}
+    \cos\theta_i \\
+    \sin\theta_i \\
+  \end{pmatrix}
+  \\
+
+  e &amp;= \frac{
+    2 \sin b
+  }{
+    1 + 2 \cos b
+  } \\
+  w &amp;= \frac{1 + 2 \cos b}{3} \\
+
+  \bm{Q}_1
+  &amp;=
+  \bm{M} \begin{pmatrix}
+    \cos\theta_1 + e\sin\theta_1 \\
+    \sin\theta_1 - e\cos\theta_1 \\
+  \end{pmatrix}
+  +
+  \begin{pmatrix}
+    c_x \\
+    c_y \\
+  \end{pmatrix}
+  \\
+  &amp;= \bm{P}_1
+  +
+  \bm{M} \begin{pmatrix}
+    0 &amp; e \\
+    -e &amp; 0 \\
+  \end{pmatrix}
+  \begin{pmatrix}
+    \cos\theta_1 \\
+    \sin\theta_1 \\
+  \end{pmatrix}
+  \\
+
+  \bm{Q}_2
+  &amp;=
+  \bm{M} \begin{pmatrix}
+    \cos\theta_2 - e\sin\theta_2 \\
+    \sin\theta_2 + e\cos\theta_2 \\
+  \end{pmatrix}
+  +
+  \begin{pmatrix}
+    c_x \\
+    c_y \\
+  \end{pmatrix}
+  \\
+  &amp;= \bm{P}_2
+  -
+  \bm{M} \begin{pmatrix}
+    0 &amp; e \\
+    -e &amp; 0 \\
+  \end{pmatrix}
+  \begin{pmatrix}
+    \cos\theta_2 \\
+    \sin\theta_2 \\
+  \end{pmatrix}
+  \\
+\end{aligned}\]
+楕円弧が180度以上の場合、
+つまり<code>large-arc-flag</code>が<code>1</code>の場合は
+\[
+  \bm{P}_3 = \begin{pmatrix}
+    \cos b \\
+    \sin b \\
+  \end{pmatrix}
+\]
+で楕円弧を分割する。
+\[\begin{aligned}
+  b_1 &amp;= \frac{\theta_1 - b}{2} \\
+  X_1 &amp;= \cos\theta_1 - \cos b \\
+  Y_1 &amp;= \sin\theta_1 - \sin b \\
+  \sin b_1 &amp;= \pm \frac{\sqrt{X_1^2 + Y_1^2}}{2} \\
+  \cos b_1 &amp;= \frac{\sqrt{4 - (X_1^2 + Y_1^2)}}{2} \\
+
+  b_2 &amp;= \frac{b - \theta_2}{2} \\
+  X_2 &amp;= \cos b - \cos\theta_2 \\
+  Y_2 &amp;= \sin b - \sin\theta_2 \\
+  \sin b_2 &amp;= \pm \frac{\sqrt{X_2^2 + Y_2^2}}{2} \\
+  \cos b_2 &amp;= \frac{\sqrt{4 - (X_2^2 + Y_2^2)}}{2} \\
+\end{aligned}\]
+\(\sin b_1, \sin b_2\)の符号は<code>sweep-flag</code>によって定まる。
+</p>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
