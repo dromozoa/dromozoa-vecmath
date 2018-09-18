@@ -84,7 +84,7 @@ function class:set(a, b, c, d, e, f, g)
   end
 end
 
-function class:bezier(q, result)
+function class:bezier(s, q, result)
   local qx = q[1]
   local qy = q[2]
   local r = self[1]
@@ -141,8 +141,8 @@ function class:bezier(q, result)
   local s2 = n21 * x + n22 * y
 
   if large_arc then
-    local sx = m11 * ca + m12 * sa + cx
-    local sy = m21 * ca + m22 * sa + cy
+    local tx = m11 * ca + m12 * sa + cx
+    local ty = m21 * ca + m22 * sa + cy
 
     local X = c1 - ca
     local Y = s1 - sa
@@ -176,11 +176,11 @@ function class:bezier(q, result)
     result[n + 1] = bezier(
         point3(qx, qy, 1),
         point3((qx + x1) * w, (qy + y1) * w, w),
-        point3((sx - x2) * w, (sy - y2) * w, w),
-        point3(sx, sy, 1))
+        point3((tx - x2) * w, (ty - y2) * w, w),
+        point3(tx, ty, 1))
     result[n + 2] = bezier(
-        point3(sx, sy, 1),
-        point3((sx + x2) * w, (sy + y2) * w, w),
+        point3(tx, ty, 1),
+        point3((tx + x2) * w, (ty + y2) * w, w),
         point3((px - x3) * w, (py - y3) * w, w),
         point3(px, py, 1))
     return result
