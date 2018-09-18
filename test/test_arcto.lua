@@ -71,8 +71,8 @@ end
 
 local root = _"g" {}
 
--- f(root, 0, 0, "#333")
--- f(root, 0, 1, "#33C")
+f(root, 0, 0, "#333")
+f(root, 0, 1, "#33C")
 f(root, 1, 0, "#C33")
 f(root, 1, 1, "#C3C")
 
