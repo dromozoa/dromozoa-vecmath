@@ -47,6 +47,48 @@
 180度以上の場合は分割することにする。
 </p>
 
+<p>
+単位円の円弧を表現するような4次ベジェ曲線を考える。
+\[\begin{aligned}
+  \bm{P}_1
+  &amp;=
+  \begin{pmatrix}
+    \cos\theta_1 \\
+    \sin\theta_1 \\
+  \end{pmatrix}
+  \\
+  \bm{P}_2
+  &amp;=
+  \begin{pmatrix}
+    \cos\theta_2 \\
+    \sin\theta_2 \\
+  \end{pmatrix}
+  \\
+
+  \theta &amp;= \theta_1 - \theta_2 \\
+  e &amp;= \frac{
+    2\sin\frac{\theta}{2}
+  }{
+    1 + 2\cos\frac{\theta}{2}
+  } \\
+  w &amp;= \frac{1 + 2\cos\frac{\theta}{2}}{3} \\
+
+  \bm{Q}_1 &amp;= \begin{pmatrix}
+    \cos\theta_1 + e\sin\theta_1 \\
+    \sin\theta_1 - e\cos\theta_1 \\
+  \end{pmatrix}
+  \\
+  \bm{Q}_2 &amp;= \begin{pmatrix}
+    \cos\theta_2 - e\sin\theta_2 \\
+    \sin\theta_2 + e\cos\theta_2 \\
+  \end{pmatrix}
+  \\
+
+
+\end{aligned}\]
+
+</p>
+
 <h2>楕円弧</h2>
 
 <p>
@@ -163,6 +205,30 @@ SVGの実装ノートの式を整理する。
     0   &amp; r_y \\
   \end{pmatrix}
   \\
+  &amp;=
+  \begin{pmatrix}
+    r_x \cos\phi &amp; -r_y \sin\phi \\
+    r_x \sin\phi &amp;  r_y \cos\phi \\
+  \end{pmatrix}
+  \\
+
+  \bm{M}^{-1}
+  &amp;=
+  \begin{pmatrix}
+    \frac{1}{r_x} &amp; 0 \\
+    0 &amp; \frac{1}{r_y} \\
+  \end{pmatrix}
+  \begin{pmatrix}
+     \cos\phi &amp; \sin\phi \\
+    -\sin\phi &amp; \cos\phi \\
+  \end{pmatrix}
+  \\
+  &amp;=
+  \begin{pmatrix}
+     \frac{\cos\phi}{r_x} &amp; \frac{\sin\phi}{r_x} \\
+    -\frac{\sin\phi}{r_y} &amp; \frac{\cos\phi}{r_y} \\
+  \end{pmatrix}
+  \\
 
   \bm{P}_1 &amp;= \bm{M}
   \begin{pmatrix}
@@ -209,90 +275,17 @@ SVGの実装ノートの式を整理する。
   \end{pmatrix}
   \\
 
-  a &amp;= \frac{\theta_1 + \theta_2}{2} \\
-  b &amp;= \frac{\theta_1 - \theta_2}{2} \\
-
-  \bm{P}_1 - \bm{P}_2
-  &amp;=
-  \bm{M} \begin{pmatrix}
-    -2 \sin a \sin b \\
-     2 \sin b \cos a \\
+  \begin{pmatrix}
+    X \\
+    Y \\
+  \end{pmatrix}
+  &amp;= \bm{M}^{-1} (\bm{P}_1 - \bm{P}_2) \\
+  &amp;= \begin{pmatrix}
+    \cos\theta_1 - \cos\theta_2 \\
+    \sin\theta_1 - \sin\theta_2 \\
   \end{pmatrix}
   \\
 
-  \begin{pmatrix}
-    \sin a \sin b \\
-    \sin b \cos a \\
-  \end{pmatrix}
-  &amp;=
-  \begin{pmatrix}
-    -\frac{1}{2} &amp; 0 \\
-     0 &amp; \frac{1}{2} \\
-  \end{pmatrix}
-  \bm{M}^{-1}
-  (\bm{P}_1 - \bm{P}_2)
-  \\
-\end{aligned}\]
-</p>
-
-<p>
-  <svg width="320" height="320">
-    <rect x="0" y="0" width="320" height="320" fill="#CCC"></rect>
-    <g transform="translate(160,160)">
-      <g transform="rotate(20)">
-        <ellipse cx="0" cy="0" rx="160" ry="90" fill="#FCC"></ellipse>
-      </g>
-    </g>
-    <path d="
-      M 274.8167225662447 249.6778691715297
-      A 160 90 20 0 1
-        31.91988745949421 181.1065101713046
-    " fill="none" stroke="#F00"></path>
-  </svg>
-</p>
-
-<pre>
-rx:160;
-ry:90;
-t1:%pi/6; /* 30deg */
-t2:%pi*3/4; /* 135deg */
-p1:matrix([rx*cos(t1),ry*sin(t1),1]);
-p2:matrix([rx*cos(t2),ry*sin(t2),1]);
-float(p1);
-float(p2);
-t:%pi/9;
-cx:160;
-cy:160;
-M:matrix([cos(t),-sin(t),cx],[sin(t),cos(t),cy],[0,0,1]);
-float(M.p1);
-float(M.p2);
-</pre>
-
-<pre>
-M 274.8167225662447 249.6778691715297
-A 160 90 20 0 1
-  31.91988745949421 181.1065101713046
-</pre>
-
-<pre>
-phi:%pi/9;
-rx:160;
-ry:90;
-M:matrix([cos(phi),-sin(phi)],[sin(phi),cos(phi)]).matrix([rx,0],[0,ry]);
-p1:matrix([274.8167225662447],[249.6778691715297]);
-p2:matrix([31.91988745949421],[181.1065101713046]);
-q:float(invert(M).(p1-p2));
-a:float(atan((-q[1][1]/2) / (q[2][1]/2))/%pi*180) /* 82.5deg */
-b:float(asin(-q[1][1]/2/sin(a/180*%pi))/%pi*180) /* -52.5deg */
-t1:%pi/6; /* 30deg */
-t2:%pi*3/4; /* 135deg */
-float(p1-M.matrix([cos(t1)],[sin(t1)]));
-float(p2-M.matrix([cos(t2)],[sin(t2)]));
-float(asin(sqrt(q[1][1]^2+q[2][1]^2)/2)/%pi*180); /* 52.5deg */
-</pre>
-
-<p>
-\[\begin{aligned}
   a &amp;= \frac{\theta_1 + \theta_2}{2} \\
   b &amp;= \frac{\theta_1 - \theta_2}{2} \\
 

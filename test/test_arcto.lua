@@ -20,6 +20,9 @@ local element = require "dromozoa.dom.element"
 local space_separated = require "dromozoa.dom.space_separated"
 local xml_document = require "dromozoa.dom.xml_document"
 
+local arcto = require "dromozoa.svg.arcto"
+local path_data = require "dromozoa.svg.path_data"
+
 local verbose = os.getenv "VERBOSE" == "1"
 
 local _ = element
@@ -30,14 +33,23 @@ local rx = 200
 local ry = 50
 local r = 30
 
-local M = vecmath.matrix2():rot(r * math.pi / 180):mul {rx, 0, 0, ry}
-local N = vecmath.matrix2():invert(M)
-local P = vecmath.point2():add(p1, p2):scale(0.5)
-local V = vecmath.vector2():sub(p1, p2)
-N:transform(V)
-local X = V.x
-local Y = V.y
-local X2Y2 = X * X + Y * Y
+local function g(node, b, stroke)
+  local pd = path_data()
+  for i = 1, b:size() do
+    local p = b:get(i, vecmath.point2())
+    print(tostring(p))
+    if i == 1 then
+      pd:M(p)
+    else
+      pd:L(p)
+    end
+  end
+  node[#node + 1] = _"path" {
+    d = pd;
+    fill = "none";
+    stroke = stroke;
+  }
+end
 
 local function f(node, large_arc, sweep, stroke)
   node[#node + 1] = _"path" {
@@ -49,61 +61,17 @@ local function f(node, large_arc, sweep, stroke)
     stroke = stroke;
   }
 
-  local sin_b = math.sqrt(X2Y2) / 2
-  local cos_b = math.sqrt(4 - X2Y2) / 2
-
-  if large_arc == 1 then
-    cos_b = -cos_b
-  end
-  if sweep == 1 then
-    sin_b = -sin_b
-  end
-
-  -- if large_arc == 1 then
-  --   cos_b = -cos_b
-  -- end
-  -- if sweep == 0 then
-  --   sin_b = -sin_b
-  -- end
-
-  local sin_a = - X / (2 * sin_b)
-  local cos_a = Y / (2 * sin_b)
-
-  local v = vecmath.vector2(cos_a, sin_a):scale(cos_b)
-  M:transform(v)
-
-  local c = vecmath.point2(P):sub(v)
-  if verbose then
-    print(tostring(c))
-  end
-
-  node[#node + 1] = _"circle" {
-    cx = c.x;
-    cy = c.y;
-    r = large_arc == 1 and 4 or 2;
-    fill = "none";
-    stroke = stroke;
-  }
-
-  local p = vecmath.point2(cos_a, sin_a)
-  M:transform(p)
-  p:add(c)
-
-  node[#node + 1] = _"circle" {
-    cx = p.x;
-    cy = p.y;
-    r = 2;
-    fill = "none";
-    stroke = stroke;
-  }
+  local A = arcto(rx, ry, r, large_arc == 1, sweep == 1, p2)
+  local b1, b2 = A:bezier(p1)
+  g(node, b1, stroke)
 end
 
 local root = _"g" {}
 
-f(root, 0, 0, "#333")
-f(root, 0, 1, "#33C")
+-- f(root, 0, 0, "#333")
+-- f(root, 0, 1, "#33C")
 f(root, 1, 0, "#C33")
-f(root, 1, 1, "#C3C")
+-- f(root, 1, 1, "#C3C")
 
 local doc = xml_document(_"svg" {
   version = "1.1";

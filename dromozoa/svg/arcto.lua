@@ -16,10 +16,17 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local point2 = require "dromozoa.vecmath.point2"
+local point3 = require "dromozoa.vecmath.point3"
 local vector2 = require "dromozoa.vecmath.vector2"
+local bezier = require "dromozoa.vecmath.bezier"
 
 local setmetatable = setmetatable
 local type = type
+local cos = math.cos
+local sin = math.sin
+local sqrt = math.sqrt
+
+local deg_to_rad = math.pi / 180
 
 local class = { is_arcto = true }
 local metatable = { __index = class }
@@ -74,6 +81,83 @@ function class:set(a, b, c, d, e, f, g)
     self.sweep = false
     return self
   end
+end
+
+function class:bezier(q)
+  local qx = q[1]
+  local qy = q[2]
+  local r = self[1]
+  local rx = r[1]
+  local ry = r[2]
+  local p = self[2]
+  local px = p[1]
+  local py = p[2]
+  local angle = self.angle * deg_to_rad
+
+  local c = cos(angle)
+  local s = sin(angle)
+  local m11 = rx * c
+  local m12 = -ry * s
+  local m21 = rx * s
+  local m22 = ry * c
+  local n11 = c / rx
+  local n12 = s / rx
+  local n21 = -s / ry
+  local n22 = c / ry
+
+  local x = qx - px
+  local y = qy - py
+  local X = n11 * x + n12 * y
+  local Y = n21 * x + n22 * y
+  local Z = X * X + Y * Y
+
+  local sb = sqrt(Z)
+  if self.sweep then
+    sb = -sb
+  end
+  local sa = -X / sb
+  local ca = Y / sb
+  sb = sb / 2
+
+  local cb = sqrt(4 - Z) / 2
+  if self.large_arc then
+    cb = -cb
+  end
+
+  local x = ca * cb
+  local y = sa * cb
+  local cx = (qx + px) / 2 - (m11 * x + m12 * y)
+  local cy = (qy + py) / 2 - (m21 * x + m22 * y)
+
+  local x = qx - cx
+  local y = qy - cy
+  local c1 = n11 * x + n12 * y
+  local s1 = n21 * x + n22 * y
+
+  local x = px - cx
+  local y = py - cy
+  local c2 = n11 * x + n12 * y
+  local s2 = n21 * x + n22 * y
+
+  local w = 1 + 2 * cb -- TODO check
+  local e = 2 * sb / w -- TODO check
+  w = w / 3
+
+  local x = e * s1
+  local y = -e * c1
+  local x1 = m11 * x + m12 * y
+  local y1 = m21 * x + m22 * y
+
+  local x = -e * s2
+  local y = e * c2
+  local x2 = m11 * x + m12 * y
+  local y2 = m21 * x + m22 * y
+
+  return bezier(
+      point3(qx, qy, 1),
+      point3((qx + x1) * w, (qy + y1) * w, w),
+      point3((px + x2) * w, (py + y2) * w, w),
+      point3(px, py, 1))
 end
 
 -- tostring(self)
