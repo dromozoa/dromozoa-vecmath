@@ -37,7 +37,9 @@ local function g(node, b, stroke)
   local pd = path_data()
   for i = 1, b:size() do
     local p = b:get(i, vecmath.point2())
-    print(tostring(p))
+    if verbose then
+      print(tostring(p))
+    end
     if i == 1 then
       pd:M(p)
     else
