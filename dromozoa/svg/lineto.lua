@@ -26,7 +26,7 @@ local metatable = { __index = class }
 -- self:set(tuple2 a)
 -- self:set(lineto a)
 -- self:set()
-function class:set()
+function class:set(a, b)
   local p = self[1]
   if a then
     if b then

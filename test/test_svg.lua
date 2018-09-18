@@ -28,6 +28,8 @@ local pd = path_data()
   :C(100, 0, 100, 100, 200, 100)
   :M(0, 0)
   :Q(100, 0, 0, 100)
+  :M(0, 0)
+  :A(100, 200, 30, true, false, 50, 50)
 
 if verbose then
   print(tostring(pd))

@@ -19,7 +19,7 @@ local point2 = require "dromozoa.vecmath.point2"
 
 local setmetatable = setmetatable
 
-local class = { is_curveto = true }
+local class = { is_cubic_curveto = true }
 local metatable = { __index = class }
 
 -- self:set(number a, number b, number c, number d, numer e, number f)
