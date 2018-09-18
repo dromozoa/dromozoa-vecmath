@@ -117,14 +117,12 @@ function class:bezier(q)
 
   local sb2 = sqrt(Z)
   local cb2 = sqrt(4 - Z)
-
   if sweep then
     sb2 = -sb2
   end
   if large_arc then
     cb2 = -cb2
   end
-
   local sa = -X / sb2
   local ca = Y / sb2
 
@@ -144,31 +142,21 @@ function class:bezier(q)
   local s2 = n21 * x + n22 * y
 
   if large_arc then
-    local X = c1 - ca
-    local Y = s1 - sa
-    local Z = X * X + Y * Y
-
-    local sb2_1 = sqrt(Z)
-    local cb2_1 = sqrt(4 - Z)
-
-    local X = ca - c2
-    local Y = sa - s2
-    local Z = X * X + Y * Y
-
-    local sb2_2 = sqrt(Z)
-    local cb2_2 = sqrt(4 - Z)
-
-    if sweep then
-      sb2_1 = -sb2_1
-      sb2_2 = -sb2_2
-    end
-
     local sx = m11 * ca + m12 * sa + cx
     local sy = m21 * ca + m22 * sa + cy
 
-    local v = 1 + cb2_1
-    local w1 = v / 3
-    local e = sb2_1 / v
+    local X = c1 - ca
+    local Y = s1 - sa
+    local Z = X * X + Y * Y
+    local sb2 = sqrt(Z)
+    local cb2 = sqrt(4 - Z)
+    if sweep then
+      sb2 = -sb2
+    end
+
+    local v = 1 + cb2
+    local w = v / 3
+    local e = sb2 / v
 
     local x = e * s1
     local y = -e * c1
@@ -180,10 +168,6 @@ function class:bezier(q)
     local x2 = m11 * x + m12 * y
     local y2 = m21 * x + m22 * y
 
-    local v = 1 + cb2_2
-    local w2 = v / 3
-    local e = sb2_2 / v
-
     local x = e * sa
     local y = -e * ca
     local x3 = m11 * x + m12 * y
@@ -194,17 +178,15 @@ function class:bezier(q)
     local x4 = m11 * x + m12 * y
     local y4 = m21 * x + m22 * y
 
-    print("w", w1, w2)
-
     return bezier(
         point3(qx, qy, 1),
-        point3(qx + x1, qy + y1, 1):scale(w1),
-        point3(sx - x2, sy - y2, 1):scale(w1),
+        point3(qx + x1, qy + y1, 1):scale(w),
+        point3(sx - x2, sy - y2, 1):scale(w),
         point3(sx, sy, 1)),
     bezier(
         point3(sx, sy, 1),
-        point3(sx + x3, sy + y3, 1):scale(w2),
-        point3(px - x4, py - y4, 1):scale(w2),
+        point3(sx + x3, sy + y3, 1):scale(w),
+        point3(px - x4, py - y4, 1):scale(w),
         point3(px, py, 1))
   else
     local v = 1 + cb2
