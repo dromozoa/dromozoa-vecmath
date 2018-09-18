@@ -175,13 +175,13 @@ function class:bezier(q, result)
     local n = #result
     result[n + 1] = bezier(
         point3(qx, qy, 1),
-        point3(qx + x1, qy + y1, 1):scale(w),
-        point3(sx - x2, sy - y2, 1):scale(w),
+        point3((qx + x1) * w, (qy + y1) * w, w),
+        point3((sx - x2) * w, (sy - y2) * w, w),
         point3(sx, sy, 1))
     result[n + 2] = bezier(
         point3(sx, sy, 1),
-        point3(sx + x2, sy + y2, 1):scale(w),
-        point3(px - x3, py - y3, 1):scale(w),
+        point3((sx + x2) * w, (sy + y2) * w, w),
+        point3((px - x3) * w, (py - y3) * w, w),
         point3(px, py, 1))
     return result
   else
@@ -201,8 +201,8 @@ function class:bezier(q, result)
 
     result[#result + 1] = bezier(
         point3(qx, qy, 1),
-        point3(qx + x1, qy + y1, 1):scale(w),
-        point3(px - x2, py - y2, 1):scale(w),
+        point3((qx + x1) * w, (qy + y1) * w, w),
+        point3((px - x2) * w, (py - y2) * w, w),
         point3(px, py, 1))
     return result
   end
