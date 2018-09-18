@@ -15,10 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local curveto = require "dromozoa.svg.curveto"
-local quadratic_curveto = require "dromozoa.svg.quadratic_curveto"
+local cubic_curveto = require "dromozoa.svg.cubic_curveto"
 local lineto = require "dromozoa.svg.lineto"
 local moveto = require "dromozoa.svg.moveto"
+local quadratic_curveto = require "dromozoa.svg.quadratic_curveto"
 
 local setmetatable = setmetatable
 local tostring = tostring
@@ -41,7 +41,7 @@ function class:L(...)
 end
 
 function class:C(...)
-  self[#self + 1] = curveto(...)
+  self[#self + 1] = cubic_curveto(...)
   return self
 end
 
