@@ -24,11 +24,15 @@ local pd = path_data()
   :M(120, 240)
   :L(vecmath.point2(0,0))
   :L{0.5, 0.25}
+  :M(0, 0)
+  :C(100, 0, 100, 100, 200, 100)
+  :M(0, 0)
+  :Q(100, 0, 0, 100)
 
 if verbose then
   print(tostring(pd))
 end
-assert(tostring(pd) == "M120,240 L0,0 L0.5,0.25")
+-- assert(tostring(pd) == "M120,240 L0,0 L0.5,0.25")
 
 
 

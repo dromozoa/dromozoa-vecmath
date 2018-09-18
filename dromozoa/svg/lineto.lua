@@ -20,16 +20,15 @@ local point2 = require "dromozoa.vecmath.point2"
 local setmetatable = setmetatable
 
 local class = { is_lineto = true }
-local metatable = {}
+local metatable = { __index = class }
 
--- tostring(a)
-function metatable.__tostring(a)
-  local p = a[1]
+function metatable:__tostring()
+  local p = self[1]
   return ("L%.17g,%.17g"):format(p[1], p[2])
 end
 
--- class(number b, number c)
--- class(tuple2 b)
+-- class(number a, number b)
+-- class(tuple2 a)
 -- class()
 return setmetatable(class, {
   __call = function (_, ...)

@@ -19,19 +19,25 @@ local point2 = require "dromozoa.vecmath.point2"
 
 local setmetatable = setmetatable
 
-local class = { is_moveto = true }
+local class = { is_curveto = true }
 local metatable = { __index = class }
 
 function metatable:__tostring()
-  local p = self[1]
-  return ("M%.17g,%.17g"):format(p[1], p[2])
+  local p1 = self[1]
+  local p2 = self[2]
+  local p3 = self[3]
+  return ("C%.17g,%.17g %.17g,%.17g %.17g,%.17g"):format(p1[1], p1[2], p2[1], p2[2], p3[1], p3[2])
 end
 
--- class(number a, number b)
--- class(tuple2 a)
+-- class(number a, number b, number c, number d, numer e, number f)
+-- class(tuple2 a, tuple2 b, tuple2 c)
 -- class()
 return setmetatable(class, {
-  __call = function (_, ...)
-    return setmetatable({ point2(...) }, metatable)
+  __call = function (_, a, b, c, d, e, f)
+    if d then
+      return setmetatable({ point2(a, b), point2(c, d), point2(e, f) }, metatable)
+    else
+      return setmetatable({ point2(a), point2(b), point2(c) }, metatable)
+    end
   end;
 })

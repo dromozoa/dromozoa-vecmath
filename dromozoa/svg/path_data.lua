@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local curveto = require "dromozoa.svg.curveto"
+local quadratic_curveto = require "dromozoa.svg.quadratic_curveto"
 local lineto = require "dromozoa.svg.lineto"
 local moveto = require "dromozoa.svg.moveto"
 
@@ -35,6 +37,16 @@ end
 
 function class:L(...)
   self[#self + 1] = lineto(...)
+  return self
+end
+
+function class:C(...)
+  self[#self + 1] = curveto(...)
+  return self
+end
+
+function class:Q(...)
+  self[#self + 1] = quadratic_curveto(...)
   return self
 end
 
