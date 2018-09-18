@@ -440,19 +440,17 @@ SVGの実装ノートの式を整理する。
 \]
 で楕円弧を分割する。
 \[\begin{aligned}
-  b_1 &amp;= \frac{\theta_1 - a}{2} \\
-  X_1 &amp;= \cos\theta_1 - \cos a \\
-  Y_1 &amp;= \sin\theta_1 - \sin a \\
-  \sin b_1 &amp;= \pm \frac{\sqrt{X_1^2 + Y_1^2}}{2} \\
-  \cos b_1 &amp;= \frac{\sqrt{4 - (X_1^2 + Y_1^2)}}{2} \\
+  b_2
+  &amp;= \frac{\theta_1 - a}{2} \\
+  &amp;= \frac{a - \theta_2}{2} \\
+  &amp;= \frac{\theta_1 - \theta_2}{4} \\
 
-  b_2 &amp;= \frac{a - \theta_2}{2} \\
-  X_2 &amp;= \cos a - \cos\theta_2 \\
-  Y_2 &amp;= \sin a - \sin\theta_2 \\
+  X_2 &amp;= \cos\theta_1 - \cos a \\
+  Y_2 &amp;= \sin\theta_1 - \sin a \\
   \sin b_2 &amp;= \pm \frac{\sqrt{X_2^2 + Y_2^2}}{2} \\
   \cos b_2 &amp;= \frac{\sqrt{4 - (X_2^2 + Y_2^2)}}{2} \\
 \end{aligned}\]
-\(\sin b_1, \sin b_2\)の符号は<code>sweep-flag</code>によって定まる。
+\(\sin b', \sin b'\)の符号は<code>sweep-flag</code>によって定まる。
 </p>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
