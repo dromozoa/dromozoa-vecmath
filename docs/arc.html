@@ -434,21 +434,21 @@ SVGの実装ノートの式を整理する。
 つまり<code>large-arc-flag</code>が<code>1</code>の場合は
 \[
   \bm{P}_3 = \begin{pmatrix}
-    \cos b \\
-    \sin b \\
+    \cos a \\
+    \sin a \\
   \end{pmatrix}
 \]
 で楕円弧を分割する。
 \[\begin{aligned}
-  b_1 &amp;= \frac{\theta_1 - b}{2} \\
-  X_1 &amp;= \cos\theta_1 - \cos b \\
-  Y_1 &amp;= \sin\theta_1 - \sin b \\
+  b_1 &amp;= \frac{\theta_1 - a}{2} \\
+  X_1 &amp;= \cos\theta_1 - \cos a \\
+  Y_1 &amp;= \sin\theta_1 - \sin a \\
   \sin b_1 &amp;= \pm \frac{\sqrt{X_1^2 + Y_1^2}}{2} \\
   \cos b_1 &amp;= \frac{\sqrt{4 - (X_1^2 + Y_1^2)}}{2} \\
 
-  b_2 &amp;= \frac{b - \theta_2}{2} \\
-  X_2 &amp;= \cos b - \cos\theta_2 \\
-  Y_2 &amp;= \sin b - \sin\theta_2 \\
+  b_2 &amp;= \frac{a - \theta_2}{2} \\
+  X_2 &amp;= \cos a - \cos\theta_2 \\
+  Y_2 &amp;= \sin a - \sin\theta_2 \\
   \sin b_2 &amp;= \pm \frac{\sqrt{X_2^2 + Y_2^2}}{2} \\
   \cos b_2 &amp;= \frac{\sqrt{4 - (X_2^2 + Y_2^2)}}{2} \\
 \end{aligned}\]

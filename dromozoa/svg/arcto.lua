@@ -15,9 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
+local matrix2 = require "dromozoa.vecmath.matrix2"
 local point2 = require "dromozoa.vecmath.point2"
 local point3 = require "dromozoa.vecmath.point3"
 local vector2 = require "dromozoa.vecmath.vector2"
+
 local bezier = require "dromozoa.vecmath.bezier"
 
 local setmetatable = setmetatable
@@ -93,6 +95,8 @@ function class:bezier(q)
   local px = p[1]
   local py = p[2]
   local angle = self.angle * deg_to_rad
+  local sweep = self.sweep
+  local large_arc = self.large_arc
 
   local c = cos(angle)
   local s = sin(angle)
@@ -111,23 +115,23 @@ function class:bezier(q)
   local Y = n21 * x + n22 * y
   local Z = X * X + Y * Y
 
-  local sb = sqrt(Z)
-  if self.sweep then
-    sb = -sb
-  end
-  local sa = -X / sb
-  local ca = Y / sb
-  sb = sb / 2
+  local sb2 = sqrt(Z)
+  local cb2 = sqrt(4 - Z)
 
-  local cb = sqrt(4 - Z) / 2
-  if self.large_arc then
-    cb = -cb
+  if sweep then
+    sb2 = -sb2
+  end
+  if large_arc then
+    cb2 = -cb2
   end
 
-  local x = ca * cb
-  local y = sa * cb
-  local cx = (qx + px) / 2 - (m11 * x + m12 * y)
-  local cy = (qy + py) / 2 - (m21 * x + m22 * y)
+  local sa = -X / sb2
+  local ca = Y / sb2
+
+  local x = ca * cb2
+  local y = sa * cb2
+  local cx = (qx + px - m11 * x - m12 * y) / 2
+  local cy = (qy + py - m21 * x - m22 * y) / 2
 
   local x = qx - cx
   local y = qy - cy
@@ -139,25 +143,90 @@ function class:bezier(q)
   local c2 = n11 * x + n12 * y
   local s2 = n21 * x + n22 * y
 
-  local w = 1 + 2 * cb -- TODO check
-  local e = 2 * sb / w -- TODO check
-  w = w / 3
+  if large_arc then
+    local X = c1 - ca
+    local Y = s1 - sa
+    local Z = X * X + Y * Y
 
-  local x = e * s1
-  local y = -e * c1
-  local x1 = m11 * x + m12 * y
-  local y1 = m21 * x + m22 * y
+    local sb2_1 = sqrt(Z)
+    local cb2_1 = sqrt(4 - Z)
 
-  local x = -e * s2
-  local y = e * c2
-  local x2 = m11 * x + m12 * y
-  local y2 = m21 * x + m22 * y
+    local X = ca - c2
+    local Y = sa - s2
+    local Z = X * X + Y * Y
 
-  return bezier(
-      point3(qx, qy, 1),
-      point3((qx + x1) * w, (qy + y1) * w, w),
-      point3((px + x2) * w, (py + y2) * w, w),
-      point3(px, py, 1))
+    local sb2_2 = sqrt(Z)
+    local cb2_2 = sqrt(4 - Z)
+
+    if sweep then
+      sb2_1 = -sb2_1
+      sb2_2 = -sb2_2
+    end
+
+    local sx = m11 * ca + m12 * sa + cx
+    local sy = m21 * ca + m22 * sa + cy
+
+    local v = 1 + cb2_1
+    local w1 = v / 3
+    local e = sb2_1 / v
+
+    local x = e * s1
+    local y = -e * c1
+    local x1 = m11 * x + m12 * y
+    local y1 = m21 * x + m22 * y
+
+    local x = e * sa
+    local y = -e * ca
+    local x2 = m11 * x + m12 * y
+    local y2 = m21 * x + m22 * y
+
+    local v = 1 + cb2_2
+    local w2 = v / 3
+    local e = sb2_2 / v
+
+    local x = e * sa
+    local y = -e * ca
+    local x3 = m11 * x + m12 * y
+    local y3 = m21 * x + m22 * y
+
+    local x = e * s2
+    local y = -e * c2
+    local x4 = m11 * x + m12 * y
+    local y4 = m21 * x + m22 * y
+
+    print("w", w1, w2)
+
+    return bezier(
+        point3(qx, qy, 1),
+        point3(qx + x1, qy + y1, 1):scale(w1),
+        point3(sx - x2, sy - y2, 1):scale(w1),
+        point3(sx, sy, 1)),
+    bezier(
+        point3(sx, sy, 1),
+        point3(sx + x3, sy + y3, 1):scale(w2),
+        point3(px - x4, py - y4, 1):scale(w2),
+        point3(px, py, 1))
+  else
+    local v = 1 + cb2
+    local w = v / 3
+    local e = sb2 / v
+
+    local x = e * s1
+    local y = -e * c1
+    local x1 = m11 * x + m12 * y
+    local y1 = m21 * x + m22 * y
+
+    local x = e * s2
+    local y = -e * c2
+    local x2 = m11 * x + m12 * y
+    local y2 = m21 * x + m22 * y
+
+    return bezier(
+        point3(qx, qy, 1),
+        point3(qx + x1, qy + y1, 1):scale(w),
+        point3(px - x2, py - y2, 1):scale(w),
+        point3(px, py, 1))
+  end
 end
 
 -- tostring(self)

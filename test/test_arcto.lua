@@ -64,6 +64,9 @@ local function f(node, large_arc, sweep, stroke)
   local A = arcto(rx, ry, r, large_arc == 1, sweep == 1, p2)
   local b1, b2 = A:bezier(p1)
   g(node, b1, stroke)
+  if b2 then
+    g(node, b2, stroke)
+  end
 end
 
 local root = _"g" {}
@@ -71,7 +74,7 @@ local root = _"g" {}
 -- f(root, 0, 0, "#333")
 -- f(root, 0, 1, "#33C")
 f(root, 1, 0, "#C33")
--- f(root, 1, 1, "#C3C")
+f(root, 1, 1, "#C3C")
 
 local doc = xml_document(_"svg" {
   version = "1.1";
