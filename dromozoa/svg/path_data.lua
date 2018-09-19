@@ -26,6 +26,18 @@ local setmetatable = setmetatable
 local tostring = tostring
 local concat = table.concat
 
+local function ellipse(self, cx, cy, rx, ry)
+  local n = #self
+  local x = cx + rx
+  self[n + 1] = moveto(x, cy)
+  self[n + 2] = arcto(rx, ry, 0, false, true, cx, cy + ry)
+  self[n + 3] = arcto(rx, ry, 0, false, true, cx - rx, cy)
+  self[n + 4] = arcto(rx, ry, 0, false, true, cx, cy - ry)
+  self[n + 5] = arcto(rx, ry, 0, false, true, x, cy)
+  self[n + 6] = close_path()
+  return self
+end
+
 local class = { is_path_data = true }
 local metatable = {
   __index = class;
@@ -60,6 +72,26 @@ end
 function class:A(...)
   self[#self + 1] = arcto(...)
   return self
+end
+
+-- self:circle(number a, number b, number c)
+-- self:circle(tuple2 a, number b)
+function class:circle(a, b, c)
+  if c then
+    return ellipse(self, a, b, c, c)
+  else
+    return ellipse(self, a[1], a[2], b, b)
+  end
+end
+
+-- self:ellipse(number a, number b, number c, number d)
+-- self:ellipse(tuple2 a, tuple2 b)
+function class:ellipse(a, b, c, d)
+  if c then
+    return ellipse(self, a, b, c, d)
+  else
+    return ellipse(self, a[1], a[2], b[1], b[2])
+  end
 end
 
 function class:bezier(result)

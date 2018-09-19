@@ -38,6 +38,9 @@ local pd = path_data()
   :Z()
   :C(320, 120, 80, 160, 320, 200)
   :Z()
+  :circle(100, 500, 40)
+  :ellipse(200, 500, 30, 60)
+  :ellipse(vecmath.point2(300, 500), vecmath.vector2(40, 50))
 
 if verbose then
   print(tostring(pd))
