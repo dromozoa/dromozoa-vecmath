@@ -16,6 +16,7 @@
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
 local arcto = require "dromozoa.svg.arcto"
+local close_path = require "dromozoa.svg.close_path"
 local cubic_curveto = require "dromozoa.svg.cubic_curveto"
 local lineto = require "dromozoa.svg.lineto"
 local moveto = require "dromozoa.svg.moveto"
@@ -33,6 +34,11 @@ local metatable = {
 
 function class:M(...)
   self[#self + 1] = moveto(...)
+  return self
+end
+
+function class:Z()
+  self[#self + 1] = close_path()
   return self
 end
 
@@ -54,6 +60,24 @@ end
 function class:A(...)
   self[#self + 1] = arcto(...)
   return self
+end
+
+function class:bezier(result)
+  for i = 1, #result do
+    result[i] = nil
+  end
+  local s
+  local q
+  for i = 1, #self do
+    local segment = self[i]
+    if segment.is_moveto then
+      s = segment[1]
+      q = s
+    else
+      q = segment:bezier(s, q, result)
+    end
+  end
+  return result
 end
 
 function metatable:__tostring()

@@ -64,7 +64,8 @@ local function f(node, large_arc, sweep, stroke)
   }
 
   local A = arcto(rx, ry, r, large_arc == 1, sweep == 1, p2)
-  local result = A:bezier(nil, p1, {})
+  local result = {}
+  A:bezier(nil, p1, result)
   g(node, result[1], stroke)
   if result[2] then
     g(node, result[2], stroke)

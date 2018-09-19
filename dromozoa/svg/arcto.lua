@@ -183,7 +183,7 @@ function class:bezier(s, q, result)
         point3((tx + x2) * w, (ty + y2) * w, w),
         point3((px - x3) * w, (py - y3) * w, w),
         point3(px, py, 1))
-    return result
+    return p, result
   else
     local v = 1 + cb2
     local w = v / 3
@@ -204,7 +204,7 @@ function class:bezier(s, q, result)
         point3((qx + x1) * w, (qy + y1) * w, w),
         point3((px - x2) * w, (py - y2) * w, w),
         point3(px, py, 1))
-    return result
+    return p, result
   end
 end
 

@@ -17,6 +17,8 @@
 
 local point2 = require "dromozoa.vecmath.point2"
 
+local bezier = require "dromozoa.vecmath.bezier"
+
 local setmetatable = setmetatable
 
 local class = { is_quadratic_curveto = true }
@@ -50,6 +52,13 @@ function class:set(a, b, c, d)
     p2:set()
     return self
   end
+end
+
+function class:bezier(s, q, result)
+  local p1 = self[1]
+  local p2 = self[2]
+  result[#result + 1] = bezier(q, p1, p2)
+  return p2, result
 end
 
 -- tostring(self)

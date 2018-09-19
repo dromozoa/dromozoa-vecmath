@@ -15,58 +15,26 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-vecmath.  If not, see <http://www.gnu.org/licenses/>.
 
-local point2 = require "dromozoa.vecmath.point2"
+local setmetatable = setmetatable
 
 local bezier = require "dromozoa.vecmath.bezier"
 
-local setmetatable = setmetatable
-
-local class = { is_lineto = true }
+local class = { is_close_path = true }
 local metatable = { __index = class }
 
--- self:set(number a, number b)
--- self:set(tuple2 a)
--- self:set(lineto a)
--- self:set()
-function class:set(a, b)
-  local p = self[1]
-  if a then
-    if b then
-      p:set(a, b)
-      return self
-    else
-      if #a == 2 then
-        p:set(a)
-        return self
-      else
-        p:set(a[1])
-        return self
-      end
-    end
-  else
-    p:set()
-    return self
-  end
-end
-
 function class:bezier(s, q, result)
-  local p = self[1]
-  result[#result + 1] = bezier(q, p)
-  return p, result
+  result[#result + 1] = bezier(q, s)
+  return s, result
 end
 
 -- tostring(self)
 function metatable:__tostring()
-  local p = self[1]
-  return ("L%.17g,%.17g"):format(p[1], p[2])
+  return "Z"
 end
 
--- class(number a, number b)
--- class(tuple2 a)
--- class(lineto a)
 -- class()
 return setmetatable(class, {
-  __call = function (_, ...)
-    return setmetatable(class.set({ point2() }, ...), metatable)
+  __call = function ()
+    return setmetatable({}, metatable)
   end;
 })
