@@ -1,9 +1,9 @@
 rockspec_format = "3.0"
 package = "dromozoa-vecmath"
-version = "1.10-1"
+version = "1.11-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.10.tar.gz";
-  file = "dromozoa-vecmath-1.10.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.11.tar.gz";
+  file = "dromozoa-vecmath-1.11.tar.gz";
 }
 description = {
   summary = "Pure-Lua implementation of javax.vecmath package";
@@ -18,6 +18,14 @@ test = {
 build = {
   type = "builtin";
   modules = {
+    ["dromozoa.svg"] = "dromozoa/svg.lua";
+    ["dromozoa.svg.arcto"] = "dromozoa/svg/arcto.lua";
+    ["dromozoa.svg.close_path"] = "dromozoa/svg/close_path.lua";
+    ["dromozoa.svg.cubic_curveto"] = "dromozoa/svg/cubic_curveto.lua";
+    ["dromozoa.svg.lineto"] = "dromozoa/svg/lineto.lua";
+    ["dromozoa.svg.moveto"] = "dromozoa/svg/moveto.lua";
+    ["dromozoa.svg.path_data"] = "dromozoa/svg/path_data.lua";
+    ["dromozoa.svg.quadratic_curveto"] = "dromozoa/svg/quadratic_curveto.lua";
     ["dromozoa.vecmath"] = "dromozoa/vecmath.lua";
     ["dromozoa.vecmath.axis_angle4"] = "dromozoa/vecmath/axis_angle4.lua";
     ["dromozoa.vecmath.bernstein"] = "dromozoa/vecmath/bernstein.lua";
