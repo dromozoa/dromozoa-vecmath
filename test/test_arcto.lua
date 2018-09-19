@@ -20,8 +20,7 @@ local element = require "dromozoa.dom.element"
 local space_separated = require "dromozoa.dom.space_separated"
 local xml_document = require "dromozoa.dom.xml_document"
 
-local arcto = require "dromozoa.svg.arcto"
-local path_data = require "dromozoa.svg.path_data"
+local svg = require "dromozoa.svg"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
@@ -34,7 +33,7 @@ local ry = 50
 local r = 30
 
 local function g(node, b, stroke)
-  local pd = path_data()
+  local pd = svg.path_data()
   for i = 1, b:size() do
     local p = b:get(i, vecmath.point2())
     if verbose then
@@ -63,7 +62,7 @@ local function f(node, large_arc, sweep, stroke)
     stroke = stroke;
   }
 
-  local A = arcto(rx, ry, r, large_arc == 1, sweep == 1, p2)
+  local A = svg.arcto(rx, ry, r, large_arc == 1, sweep == 1, p2)
   local result = {}
   A:bezier(nil, p1, result)
   g(node, result[1], stroke)
