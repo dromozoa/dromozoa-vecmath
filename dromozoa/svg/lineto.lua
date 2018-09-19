@@ -51,7 +51,9 @@ end
 
 function class:bezier(s, q, result)
   local p = self[1]
-  result[#result + 1] = bezier(q, p)
+  if not q:equals(p) then
+    result[#result + 1] = bezier(q, p)
+  end
   return p, result
 end
 
