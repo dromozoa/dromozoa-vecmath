@@ -41,6 +41,8 @@ local pd = path_data()
   :circle(100, 500, 40)
   :ellipse(200, 500, 30, 60)
   :ellipse(vecmath.point2(300, 500), vecmath.vector2(40, 50))
+  :rect(400, 500, 40, 30)
+  :rect(500, 400, 50, 40, 25, 20)
 
 if verbose then
   print(tostring(pd))

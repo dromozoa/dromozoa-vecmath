@@ -26,6 +26,45 @@ local setmetatable = setmetatable
 local tostring = tostring
 local concat = table.concat
 
+local function rounded_rect(self, cx, cy, ux, uy, rx, ry)
+  if rx > ux then
+    rx = ux
+  end
+  if ry > uy then
+    ry = uy
+  end
+  local n = #self
+  local x1 = cx - ux
+  local x2 = cx + ux
+  local y1 = cy - uy
+  local y2 = cy + uy
+  self[n + 1] = moveto(x1 + rx, y1)
+  self[n + 2] = lineto(x2 - rx, y1)
+  self[n + 3] = arcto(rx, ry, 0, false, true, x2, y1 + ry)
+  self[n + 4] = lineto(x2, y2 - ry)
+  self[n + 5] = arcto(rx, ry, 0, false, true, x2 - rx, y2)
+  self[n + 6] = lineto(x1 + rx, y2)
+  self[n + 7] = arcto(rx, ry, 0, false, true, x1, y2 - ry)
+  self[n + 8] = lineto(x1, y1 + ry)
+  self[n + 9] = arcto(rx, ry, 0, false, true, x1 + rx, y1)
+  self[n + 10] = close_path()
+  return self
+end
+
+local function rect(self, cx, cy, ux, uy)
+  local n = #self
+  local x1 = cx - ux
+  local x2 = cx + ux
+  local y1 = cy - uy
+  local y2 = cy + uy
+  self[n + 1] = moveto(x1, y1)
+  self[n + 2] = lineto(x2, y1)
+  self[n + 3] = lineto(x2, y2)
+  self[n + 4] = lineto(x1, y2)
+  self[n + 5] = close_path()
+  return self
+end
+
 local function ellipse(self, cx, cy, rx, ry)
   local n = #self
   local x = cx + rx
@@ -72,6 +111,26 @@ end
 function class:A(...)
   self[#self + 1] = arcto(...)
   return self
+end
+
+-- self:rect(number a, number b, number c, number d, number e, number f)
+-- self:rect(number a, number b, number c, number d)
+-- self:rect(tuple2 a, tuple2 b, tuple2 c)
+-- self:rect(tuple2 a, tuple2 b)
+function class:rect(a, b, c, d, e, f)
+  if d then
+    if e then
+      return rounded_rect(self, a, b, c, d, e, f)
+    else
+      return rect(self, a, b, c, d)
+    end
+  else
+    if c then
+      return rounded_rect(self, a[1], a[2], b[1], b[2], c[1], c[2])
+    else
+      return rect(self, a[1], a[2], b[1], b[2])
+    end
+  end
 end
 
 -- self:circle(number a, number b, number c)
