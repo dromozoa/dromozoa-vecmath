@@ -23,7 +23,9 @@ local class = { is_close_path = true }
 local metatable = { __index = class }
 
 function class:bezier(s, q, result)
-  result[#result + 1] = bezier(q, s)
+  if not q:equals(s) then
+    result[#result + 1] = bezier(q, s)
+  end
   return s, result
 end
 

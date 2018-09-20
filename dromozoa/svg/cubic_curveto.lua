@@ -24,7 +24,7 @@ local setmetatable = setmetatable
 local class = { is_cubic_curveto = true }
 local metatable = { __index = class }
 
--- self:set(number a, number b, number c, number d, numer e, number f)
+-- self:set(number a, number b, number c, number d, number e, number f)
 -- self:set(tuple2 a, tuple2 b, tuple2 c)
 -- self:set(cubic_curveto a)
 -- self:set()
