@@ -43,6 +43,10 @@ local pd = path_data()
   :ellipse(vecmath.point2(300, 500), vecmath.vector2(40, 50))
   :rect(400, 500, 40, 30)
   :rect(500, 400, 50, 40, 25, 20)
+  :rect(vecmath.point2(500, 500), vecmath.vector2(50, 40), vecmath.vector2(50, 20))
+  :rect(500, 600, 50, 40, 25, 40)
+  :rect(500, 700, 50, 40, 0, 0)
+  :rect(500, 800, 50, 40, 666, 666)
 
 if verbose then
   print(tostring(pd))
@@ -90,12 +94,12 @@ local doc = xml_document(_"svg" {
   version = "1.1";
   xmlns = "http://www.w3.org/2000/svg";
   width = 640;
-  height = 640;
+  height = 960;
   _"rect" {
     x = 0;
     y = 0;
     width = 640;
-    height = 640;
+    height = 960;
     fill = "#CCC";
   };
   root;

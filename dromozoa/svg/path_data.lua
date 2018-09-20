@@ -26,48 +26,24 @@ local setmetatable = setmetatable
 local tostring = tostring
 local concat = table.concat
 
-local function rounded_rect(self, cx, cy, ux, uy, rx, ry)
-  if rx > ux then
-    rx = ux
-  end
-  if ry > uy then
-    ry = uy
-  end
-  local n = #self
-  local x1 = cx - ux
-  local x2 = cx + ux
-  local y1 = cy - uy
-  local y2 = cy + uy
-  self[n + 1] = moveto(x1 + rx, y1)
-  self[n + 2] = lineto(x2 - rx, y1)
-  self[n + 3] = arcto(rx, ry, 0, false, true, x2, y1 + ry)
-  self[n + 4] = lineto(x2, y2 - ry)
-  self[n + 5] = arcto(rx, ry, 0, false, true, x2 - rx, y2)
-  self[n + 6] = lineto(x1 + rx, y2)
-  self[n + 7] = arcto(rx, ry, 0, false, true, x1, y2 - ry)
-  self[n + 8] = lineto(x1, y1 + ry)
-  self[n + 9] = arcto(rx, ry, 0, false, true, x1 + rx, y1)
-  self[n + 10] = close_path()
-  return self
-end
-
 local function rect(self, cx, cy, ux, uy)
-  local n = #self
   local x1 = cx - ux
   local x2 = cx + ux
   local y1 = cy - uy
   local y2 = cy + uy
+  local n = #self
   self[n + 1] = moveto(x1, y1)
   self[n + 2] = lineto(x2, y1)
   self[n + 3] = lineto(x2, y2)
   self[n + 4] = lineto(x1, y2)
-  self[n + 5] = close_path()
+  self[n + 5] = lineto(x1, y1)
+  self[n + 6] = close_path()
   return self
 end
 
 local function ellipse(self, cx, cy, rx, ry)
-  local n = #self
   local x = cx + rx
+  local n = #self
   self[n + 1] = moveto(x, cy)
   self[n + 2] = arcto(rx, ry, 0, false, true, cx, cy + ry)
   self[n + 3] = arcto(rx, ry, 0, false, true, cx - rx, cy)
@@ -75,6 +51,78 @@ local function ellipse(self, cx, cy, rx, ry)
   self[n + 5] = arcto(rx, ry, 0, false, true, x, cy)
   self[n + 6] = close_path()
   return self
+end
+
+local function rounded_rect(self, cx, cy, ux, uy, rx, ry)
+  if rx > ux then
+    rx = ux
+  end
+  if ry > uy then
+    ry = uy
+  end
+  if rx == 0 or ry == 0 then
+    return rect(self, cx, cy, ux, uy)
+  end
+  if rx == ux then
+    if ry == uy then
+      return ellipse(self, cx, cy, rx, ry)
+    else
+      local x1 = cx - ux
+      local x2 = cx + ux
+      local y1 = cy - uy
+      local y2 = y1 + ry
+      local y4 = cy + uy
+      local y3 = y4 - ry
+      local n = #self
+      self[n + 1] = moveto(cx, y1)
+      self[n + 2] = arcto(rx, ry, 0, false, true, x2, y2)
+      self[n + 3] = lineto(x2, y3)
+      self[n + 4] = arcto(rx, ry, 0, false, true, cx, y4)
+      self[n + 5] = arcto(rx, ry, 0, false, true, x1, y3)
+      self[n + 6] = lineto(x1, y2)
+      self[n + 7] = arcto(rx, ry, 0, false, true, cx, y1)
+      self[n + 8] = close_path()
+      return self
+    end
+  elseif ry == uy then
+    local x1 = cx - ux
+    local x2 = x1 + rx
+    local x4 = cx + ux
+    local x3 = x4 - rx
+    local y1 = cy - uy
+    local y2 = cy + uy
+    local n = #self
+    self[n + 1] = moveto(x2, y1)
+    self[n + 2] = lineto(x3, y1)
+    self[n + 3] = arcto(rx, ry, 0, false, true, x4, cy)
+    self[n + 4] = arcto(rx, ry, 0, false, true, x3, y2)
+    self[n + 5] = lineto(x2, y2)
+    self[n + 6] = arcto(rx, ry, 0, false, true, x1, cy)
+    self[n + 7] = arcto(rx, ry, 0, false, true, x2, y1)
+    self[n + 8] = close_path()
+    return self
+  else
+    local x1 = cx - ux
+    local x2 = x1 + rx
+    local x4 = cx + ux
+    local x3 = x4 - rx
+    local y1 = cy - uy
+    local y2 = y1 + ry
+    local y4 = cy + uy
+    local y3 = y4 - ry
+    local n = #self
+    self[n + 1] = moveto(x2, y1)
+    self[n + 2] = lineto(x3, y1)
+    self[n + 3] = arcto(rx, ry, 0, false, true, x4, y2)
+    self[n + 4] = lineto(x4, y3)
+    self[n + 5] = arcto(rx, ry, 0, false, true, x3, y4)
+    self[n + 6] = lineto(x2, y4)
+    self[n + 7] = arcto(rx, ry, 0, false, true, x1, y3)
+    self[n + 8] = lineto(x1, y2)
+    self[n + 9] = arcto(rx, ry, 0, false, true, x2, y1)
+    self[n + 10] = close_path()
+    return self
+  end
 end
 
 local class = { is_path_data = true }
