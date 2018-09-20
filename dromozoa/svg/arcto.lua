@@ -22,7 +22,6 @@ local vector2 = require "dromozoa.vecmath.vector2"
 local bezier = require "dromozoa.vecmath.bezier"
 
 local setmetatable = setmetatable
-local type = type
 local cos = math.cos
 local sin = math.sin
 local sqrt = math.sqrt
@@ -33,8 +32,6 @@ local class = { is_arcto = true }
 local metatable = { __index = class }
 
 -- self:set(number a, number b, number c, boolean d, boolean e, number f, number g)
--- self:set(number a, number b, number c, boolean d, boolean e, tuple2 f)
--- self:set(tuple2 a, number b, boolean c, boolean d, number e, number f)
 -- self:set(tuple2 a, number b, boolean c, boolean d, tuple2 e)
 -- self:set(arcto a)
 -- self:set()
@@ -43,24 +40,16 @@ function class:set(a, b, c, d, e, f, g)
   local p = self[2]
   if a then
     if b then
-      if type(a) == "number" then
+      if f then
         r:set(a, b)
-        if g then
-          p:set(f, g)
-        else
-          p:set(f)
-        end
+        p:set(f, g)
         self.angle = c
         self.large_arc = d
         self.sweep = e
         return self
       else
         r:set(a)
-        if f then
-          p:set(e, f)
-        else
-          p:set(e)
-        end
+        p:set(e)
         self.angle = b
         self.large_arc = c
         self.sweep = d
