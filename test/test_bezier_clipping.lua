@@ -215,6 +215,18 @@ if verbose then
 end
 local r = check(B1, B2, 3)
 
+local B1 = vecmath.bezier():set_catmull_rom({50,50},{50,50},{50,150},{50,150})
+local B2 = vecmath.bezier({87.5,65},{12.5,65})
+local B3 = vecmath.bezier({12.5,135},{87.5,135})
+local r = check(B1, B2, 1)
+if verbose then
+  print("t", r[1][1])
+  print("u", r[2][1])
+end
+local B4 = vecmath.bezier(B1):clip(r[1][1], 1)
+local r = check(B1, B3, 1)
+-- local r = check(B4, B3, 1)
+
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
   ["xmlns:xlink"] ="http://www.w3.org/1999/xlink";
