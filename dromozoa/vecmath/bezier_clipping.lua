@@ -24,6 +24,8 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 local bezier_focus = require "dromozoa.vecmath.bezier_focus"
 local clip_both = require "dromozoa.vecmath.clip_both"
 
+local sort = table.sort
+
 -- by experimentations
 local t_epsilon = 1e-11
 local p_epsilon = 1e-9
@@ -41,7 +43,9 @@ local function fat_line(B1, B2)
   local b = px - p[1]
   local c = -(a * px + b * py)
 
+  print("z", a, b)
   if a == 0 and b == 0 then
+    print("Z", px, py)
     B2:get(1, p)
     local qx = p[1]
     local qy = p[2]
@@ -181,6 +185,8 @@ end
 local function clip(B1, B2)
   local a, b, c, d_min, d_max = fat_line(B2, B1)
 
+  print("fat_line", a, b, c, d_min, d_max)
+
   local n = B1:size()
   local m = n - 1
 
@@ -253,8 +259,8 @@ end
 local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
   local p1 = b1:eval(u1, point2())
   local p2 = b1:eval(u2, point2())
-  local q = b2:eval(u3, point2())
 
+  local q = b2:eval(u3, point2())
   if p1:epsilon_equals(q, p_epsilon) then
     merge(u1, u3, result)
   end
@@ -263,7 +269,6 @@ local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
 
   b2:eval(u4, q)
-
   if p1:epsilon_equals(q, p_epsilon) then
     merge(u1, u4, result)
   end
@@ -281,22 +286,40 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     return result
   end
 
+  print("U", u1, u2, u3, u4)
+
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
-  local t1, t2 = clip(B1, B2)
+  local t1
+  local t2
+  local a = u2 - u1
+  if a < t_epsilon then
+    t1 = 0
+    t2 = 1
+  else
+    t1, t2 = clip(B1, B2)
+  end
   if not t1 then
+    print "not clipped 1"
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
-  local a = u2 - u1
   local v1 = u1 + a * t1
   local v2 = u1 + a * t2
 
-  local t3, t4 = clip(B2, B1)
+  local t3
+  local t4
+  local b = u4 - u3
+  if b < t_epsilon then
+    t3 = 0
+    t4 = 1
+  else
+    t3, t4 = clip(B2, B1)
+  end
   if not t3 then
+    print "not clipped 2"
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
-  local b = u4 - u3
   local v3 = u3 + b * t3
   local v4 = u3 + b * t4
 
@@ -305,6 +328,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
+    print "clippped"
     return iterate(b1, b2, v1, v2, v3, v4, m, is_identical, result)
   end
 
@@ -318,11 +342,17 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
       if #F1 > 0 then
         local p = point2()
         local q = point2()
+        local F = {}
+        for i = 1, #F1 do
+          F[i] = { F1[i], F2[i] }
+        end
         if a < b then
+          sort(F, function (a, b) return a[2] < b[2] end)
           local u5 = u3
-          for i = 1, #F2 do
-            local u6 = F1[i]
-            local u7 = F2[i]
+          for i = 1, #F do
+            local f = F[i]
+            local u6 = f[1]
+            local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
             if p:epsilon_equals(q, p_epsilon) then
@@ -340,10 +370,12 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
           end
           return result
         else
+          sort(F, function (a, b) return a[1] < b[1] end)
           local u5 = u1
-          for i = 1, #F1 do
-            local u6 = F1[i]
-            local u7 = F2[i]
+          for i = 1, #F do
+            local f = F[i]
+            local u6 = f[1]
+            local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
             if p:epsilon_equals(q, p_epsilon) then
@@ -408,6 +440,8 @@ return function (b1, b2, t1, t2, t3, t4, result)
     result.is_identical = nil
     return result
   end
+
+  print "IDENTICAL"
 
   local t_min = U1[1]
   local t_max = t_min
