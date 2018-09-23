@@ -30,7 +30,7 @@ local sort = table.sort
 local t_epsilon = 1e-11
 local p_epsilon = 1e-9
 
-local function fat_line(B1, B2)
+local function fat_line(B1, B2, is_point)
   local n = B1:size()
   local p = point2()
 
@@ -43,8 +43,8 @@ local function fat_line(B1, B2)
   local b = px - p[1]
   local c = -(a * px + b * py)
 
-  print("z", a, b)
-  if a == 0 and b == 0 then
+  print("z", a, b, is_point)
+  if (a == 0 and b == 0) or is_point then
     print("Z", px, py)
     B2:get(1, p)
     local qx = p[1]
@@ -182,9 +182,7 @@ local function clip_max(H)
   end
 end
 
-local function clip(B1, B2)
-  local a, b, c, d_min, d_max = fat_line(B2, B1)
-
+local function clip(B1, a, b, c, d_min, d_max)
   print("fat_line", a, b, c, d_min, d_max)
 
   local n = B1:size()
@@ -291,14 +289,17 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
+  local a = u2 - u1
+  local b = u4 - u3
+  print("ab", a, b)
+
   local t1
   local t2
-  local a = u2 - u1
-  if a < t_epsilon then
+  if a <= t_epsilon then
     t1 = 0
     t2 = 1
   else
-    t1, t2 = clip(B1, B2)
+    t1, t2 = clip(B1, fat_line(B2, B1, b <= t_epsilon))
   end
   if not t1 then
     print "not clipped 1"
@@ -309,12 +310,11 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
 
   local t3
   local t4
-  local b = u4 - u3
-  if b < t_epsilon then
+  if b <= t_epsilon then
     t3 = 0
     t4 = 1
   else
-    t3, t4 = clip(B2, B1)
+    t3, t4 = clip(B2, fat_line(B1, B2, a <= t_epsilon))
   end
   if not t3 then
     print "not clipped 2"
