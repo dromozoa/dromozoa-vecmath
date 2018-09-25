@@ -21,6 +21,7 @@ local path_data = require "dromozoa.svg.path_data"
 
 local vecmath = require "dromozoa.vecmath"
 local bezier_clipping = require "dromozoa.vecmath.bezier_clipping"
+local svg = require "dromozoa.svg"
 
 local point2 = vecmath.point2
 local bezier = vecmath.bezier
@@ -68,11 +69,31 @@ local function draw_points(node, B, U, fill)
   end
 end
 
+local function draw_line(node, a, b, c, d, stroke)
+  if b ~= 0 then
+    local x1 = -320
+    local y1 = -(a * x1 + c + d) / b
+    local x2 = 320
+    local y2 = -(a * x2 + c + d) / b
+    if verbose then
+      print("draw_line", x1, y1, x2, y2)
+    end
+    node[#node + 1] = _"line" {
+      x1 = x1;
+      y1 = y1;
+      x2 = x2;
+      y2 = y2;
+      fill = "none";
+      stroke = stroke;
+    }
+  end
+end
+
 local root = _"g" {}
 
 local y = 0
 
-local function check(B1, B2, n, is_identical)
+local function check(B1, B2, n, is_identical, debug_code)
   local node = _"g" {
     transform = "translate(320,320)";
   }
@@ -104,6 +125,17 @@ local function check(B1, B2, n, is_identical)
 
   draw_points(node, B1, U1, "#66C")
   draw_points(node, B2, U2, "#C66")
+
+  if debug_code then
+    print("debug_code", debug_code)
+    if debug_code == 1 then
+      draw_line(node, 100, 100, -20000, 1250, "#F33")
+      draw_line(node, 100, 100, -20000, 0, "#F33")
+    elseif debug_code == 2 then
+      draw_line(node, 80, -480, -19200, -11377.777777778, "#F33")
+      draw_line(node, 80, -480, -19200, 45511.111111111, "#F33")
+    end
+  end
 
   local e2 = 0
   for i = 1, #U1 do
@@ -148,7 +180,7 @@ repeat
   local r = check(B1, B2, 1)
   local r = check(B1, B3, 2)
   local r = check(B1, B4, 3)
-  local r = check(B1, B5, 1)
+  local r = check(B1, B5, 1, nil, 2)
   local r = check(B4, B6, 9)
 
   local r = check(B7, B8, 2, true)
@@ -221,10 +253,6 @@ repeat
   local B2 = vecmath.bezier({87.5,65},{12.5,65})
   local B3 = vecmath.bezier({12.5,135},{87.5,135})
   local r = check(B1, B2, 1)
-  if verbose then
-    print("t", r[1][1])
-    print("u", r[2][1])
-  end
   local B4 = vecmath.bezier(B1):clip(r[1][1], 1)
   local r = check(B1, B3, 1)
   local r = check(B4, B3, 1)
@@ -232,16 +260,27 @@ repeat
   local B1 = vecmath.bezier():set_catmull_rom({100,50},{100,50},{150,150},{150,150})
   local B2 = vecmath.bezier({137.5,65},{62.5,65})
   local r = check(B1, B2, 1)
-  if verbose then
-    print("t", r[1][1])
-    print("u", r[2][1])
-  end
 
   local B1 = vecmath.bezier():set_catmull_rom({50,50},{50,50},{150,150},{150,150})
   local B2 = vecmath.bezier({87.5,65},{12.5,65})
   local B3 = vecmath.bezier({112.5,135},{187.5,135})
   local r = check(B1, B2, 1)
+  local B4 = vecmath.bezier(B1):clip(r[1][1], 1)
+  local r = check(B1, B3, 1)
+  local r = check(B4, B3, 1)
 
+  local B1 = vecmath.bezier():set_catmull_rom({150,50},{150,50},{50,150},{50,250})
+  local B2 = svg.path_data():M(135,65):A(7.5,7.5,0,false,true,127.5,57.5):bezier({})[1]
+  if verbose then
+    print(("=-"):rep(40))
+    for i = 1, B1:size() do
+      print("B1", i, tostring(B2:get(i, point2())))
+    end
+    for i = 1, B2:size() do
+      print("B2", i, tostring(B2:get(i, point2())))
+    end
+  end
+  local r = check(B1, B2, 1, nil, 1)
 until true
 
 local svg = _"svg" {
