@@ -134,6 +134,9 @@ local function check(B1, B2, n, is_identical, debug_code)
     elseif debug_code == 2 then
       draw_line(node, 80, -480, -19200, -11377.777777778, "#F33")
       draw_line(node, 80, -480, -19200, 45511.111111111, "#F33")
+    elseif debug_code == 3 then
+      draw_line(node, 100, -100, -0, 1250, "#F33")
+      draw_line(node, 100, -100, -0, 0, "#33F")
     end
   end
 
@@ -282,14 +285,20 @@ repeat
   end
   local r = check(B1, B2, 1, nil, 1)
 
-  do break end
-
   local B1 = vecmath.bezier():set_catmull_rom({0,50},{0,50},{150,150},{150,150})
   local B2 = svg.path_data():M(18.75,57.5):A(7.5,7.5,0,false,true,11.25,65):bezier({})[1]
   local r = check(B1, B2, 1)
 
   local B1 = vecmath.bezier():set_catmull_rom({400,50},{400,50},{550,150},{550,150})
   local B2 = svg.path_data():M(418.75,57.5):A(7.5,7.5,0,false,true,411.25,65):bezier({})[1]
+  local r = check(B1, B2, 1)
+
+  local B1 = vecmath.bezier():set_catmull_rom({50,-50},{50,50},{150,150},{150,150})
+  local B2 = svg.path_data():M(127.5,142.5):A(7.5,7.5,0,false,true,135,135):bezier({})[1]
+  local r = check(B1, B2, 1, nil, 3)
+
+  local B1 = vecmath.bezier():set_catmull_rom({50,250},{50,350},{150,450},{150,450})
+  local B2 = svg.path_data():M(127.5,442.5):A(7.5,7.5,0,false,true,135,435):bezier({})[1]
   local r = check(B1, B2, 1)
 until true
 

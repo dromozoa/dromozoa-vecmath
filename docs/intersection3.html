@@ -182,20 +182,17 @@
 を用いたほうがよい。
 </p>
 
-<h3>符号</h3>
+<h3>fat line</h3>
 
 <p>
-\(B\)を負にすると有理ベジェを扱う際に都合が良い。
+有理ベジェを扱う際、
+\(d_{\rm{min}}, d_{\rm{max}}\)に対応する
+\(c_{\rm{min}}, c_{\rm{max}}\)を用いる。
 \[\begin{aligned}
-  d' |\bm{v}|
-  &amp;= -d |\bm{v}| \\
-  &amp;= -(v_y x - v_x y - v_y p_x + v_x p_y) \\
-  &amp;= A' x + B' y + C' \\
-  A' &amp;= -A = -v_y \\
-  B' &amp;= -B = v_x \\
-  C' &amp;= -C = v_y p_x - v_x p_y \\
+  c_{\rm{min}} &amp;= c - d_{\rm{min}} \\
+  c_{\rm{max}} &amp;= c - d_{\rm{max}} \\
 \end{aligned}\]
-
+（\(d_{\rm{min}}\)は負であることに注意）
 </p>
 
 <h2>B&eacute;zier Focus</h2>
