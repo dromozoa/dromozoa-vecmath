@@ -29,7 +29,6 @@ local sort = table.sort
 -- by experimentations
 local t_epsilon = 1e-11
 local p_epsilon = 1e-9
-local r_epsilon = 1e-20
 
 local function fat_line(B1, B2, is_point)
   local n = B1:size()
@@ -196,8 +195,8 @@ local function clip(B1, a, b, c, d_min, d_max)
   local m = n - 1
 
   if B1:is_rational() then
-    local c1 = c + d_min + r_epsilon
-    local c2 = c - d_max - r_epsilon
+    local c1 = c + d_min
+    local c2 = c - d_max
     local P1 = {}
     local P2 = {}
     local p = point3()

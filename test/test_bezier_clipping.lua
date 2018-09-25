@@ -282,8 +282,14 @@ repeat
   end
   local r = check(B1, B2, 1, nil, 1)
 
+  do break end
+
   local B1 = vecmath.bezier():set_catmull_rom({0,50},{0,50},{150,150},{150,150})
   local B2 = svg.path_data():M(18.75,57.5):A(7.5,7.5,0,false,true,11.25,65):bezier({})[1]
+  local r = check(B1, B2, 1)
+
+  local B1 = vecmath.bezier():set_catmull_rom({400,50},{400,50},{550,150},{550,150})
+  local B2 = svg.path_data():M(418.75,57.5):A(7.5,7.5,0,false,true,411.25,65):bezier({})[1]
   local r = check(B1, B2, 1)
 until true
 
