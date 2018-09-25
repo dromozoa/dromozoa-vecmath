@@ -43,7 +43,7 @@ local function fat_line(B1, B2, is_point)
   local b = px - p[1]
   local c = -(a * px + b * py)
 
-  if (a == 0 and b == 0) or is_point then
+  if is_point then
     B2:get(1, p)
     local qx = p[1]
     local qy = p[2]
@@ -286,13 +286,16 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
   local a = u2 - u1
   local b = u4 - u3
 
+  local is_point_a = a <= t_epsilon
+  local is_point_b = b <= t_epsilon
+
   local t1
   local t2
-  if a <= t_epsilon then
+  if is_point_a then
     t1 = 0
     t2 = 1
   else
-    t1, t2 = clip(B1, fat_line(B2, B1, b <= t_epsilon))
+    t1, t2 = clip(B1, fat_line(B2, B1, is_point_b))
   end
   if not t1 then
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
@@ -302,11 +305,11 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
 
   local t3
   local t4
-  if b <= t_epsilon then
+  if is_point_b then
     t3 = 0
     t4 = 1
   else
-    t3, t4 = clip(B2, fat_line(B1, B2, a <= t_epsilon))
+    t3, t4 = clip(B2, fat_line(B1, B2, is_point_a))
   end
   if not t3 then
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
