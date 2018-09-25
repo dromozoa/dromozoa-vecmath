@@ -182,6 +182,19 @@
 を用いたほうがよい。
 </p>
 
+<h3>fat line</h3>
+
+<p>
+有理ベジェを扱う際、
+\(d_{\rm{min}}, d_{\rm{max}}\)に対応する
+\(c_{\rm{min}}, c_{\rm{max}}\)を用いる。
+\[\begin{aligned}
+  c_{\rm{min}} &amp;= c - d_{\rm{min}} \\
+  c_{\rm{max}} &amp;= c - d_{\rm{max}} \\
+\end{aligned}\]
+（\(d_{\rm{min}}\)は負であることに注意）
+</p>
+
 <h2>B&eacute;zier Focus</h2>
 
 <p>
@@ -416,6 +429,13 @@ Collinear Normal Theroremの逆を考えて、
     <td>29</td>
   </tr>
 </table>
+
+<h2>実装ノート</h2>
+
+<p>
+片方の曲線が先に収束した場合、
+収束した曲線について反復を打ち切ったほうがよいのではないか。
+</p>
 
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>

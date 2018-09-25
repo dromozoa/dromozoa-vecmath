@@ -24,11 +24,13 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 local bezier_focus = require "dromozoa.vecmath.bezier_focus"
 local clip_both = require "dromozoa.vecmath.clip_both"
 
+local sort = table.sort
+
 -- by experimentations
 local t_epsilon = 1e-11
-local p_epsilon = 1e-9
+local p_epsilon = 1e-7
 
-local function fat_line(B1, B2)
+local function fat_line(B1, B2, is_point)
   local n = B1:size()
   local p = point2()
 
@@ -41,7 +43,7 @@ local function fat_line(B1, B2)
   local b = px - p[1]
   local c = -(a * px + b * py)
 
-  if a == 0 and b == 0 then
+  if is_point then
     B2:get(1, p)
     local qx = p[1]
     local qy = p[2]
@@ -178,14 +180,12 @@ local function clip_max(H)
   end
 end
 
-local function clip(B1, B2)
-  local a, b, c, d_min, d_max = fat_line(B2, B1)
-
+local function clip(B1, a, b, c, d_min, d_max)
   local n = B1:size()
   local m = n - 1
 
   if B1:is_rational() then
-    local c1 = c + d_min
+    local c1 = c - d_min
     local c2 = c - d_max
     local P1 = {}
     local P2 = {}
@@ -253,22 +253,21 @@ end
 local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
   local p1 = b1:eval(u1, point2())
   local p2 = b1:eval(u2, point2())
-  local q = b2:eval(u3, point2())
 
+  local q = b2:eval(u3, point2())
   if p1:epsilon_equals(q, p_epsilon) then
-    merge(u1, u3, result)
+    return merge(u1, u3, result)
   end
   if p2:epsilon_equals(q, p_epsilon) then
-    merge(u2, u3, result)
+    return merge(u2, u3, result)
   end
 
   b2:eval(u4, q)
-
   if p1:epsilon_equals(q, p_epsilon) then
-    merge(u1, u4, result)
+    return merge(u1, u4, result)
   end
   if p2:epsilon_equals(q, p_epsilon) then
-    merge(u2, u4, result)
+    return merge(u2, u4, result)
   end
 
   return result
@@ -284,19 +283,37 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
-  local t1, t2 = clip(B1, B2)
+  local a = u2 - u1
+  local b = u4 - u3
+
+  local is_point_a = a <= t_epsilon
+  local is_point_b = b <= t_epsilon
+
+  local t1
+  local t2
+  if is_point_a then
+    t1 = 0
+    t2 = 1
+  else
+    t1, t2 = clip(B1, fat_line(B2, B1, is_point_b))
+  end
   if not t1 then
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
-  local a = u2 - u1
   local v1 = u1 + a * t1
   local v2 = u1 + a * t2
 
-  local t3, t4 = clip(B2, B1)
+  local t3
+  local t4
+  if is_point_b then
+    t3 = 0
+    t4 = 1
+  else
+    t3, t4 = clip(B2, fat_line(B1, B2, is_point_a))
+  end
   if not t3 then
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
-  local b = u4 - u3
   local v3 = u3 + b * t3
   local v4 = u3 + b * t4
 
@@ -318,11 +335,17 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
       if #F1 > 0 then
         local p = point2()
         local q = point2()
+        local F = {}
+        for i = 1, #F1 do
+          F[i] = { F1[i], F2[i] }
+        end
         if a < b then
+          sort(F, function (a, b) return a[2] < b[2] end)
           local u5 = u3
-          for i = 1, #F2 do
-            local u6 = F1[i]
-            local u7 = F2[i]
+          for i = 1, #F do
+            local f = F[i]
+            local u6 = f[1]
+            local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
             if p:epsilon_equals(q, p_epsilon) then
@@ -340,10 +363,12 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
           end
           return result
         else
+          sort(F, function (a, b) return a[1] < b[1] end)
           local u5 = u1
-          for i = 1, #F1 do
-            local u6 = F1[i]
-            local u7 = F2[i]
+          for i = 1, #F do
+            local f = F[i]
+            local u6 = f[1]
+            local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
             if p:epsilon_equals(q, p_epsilon) then
