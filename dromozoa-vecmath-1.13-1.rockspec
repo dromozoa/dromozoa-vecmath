@@ -1,9 +1,9 @@
 rockspec_format = "3.0"
 package = "dromozoa-vecmath"
-version = "1.12-1"
+version = "1.13-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.12.tar.gz";
-  file = "dromozoa-vecmath-1.12.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-vecmath/archive/v1.13.tar.gz";
+  file = "dromozoa-vecmath-1.13.tar.gz";
 }
 description = {
   summary = "Pure-Lua implementation of javax.vecmath package";
