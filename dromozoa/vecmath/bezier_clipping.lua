@@ -43,9 +43,7 @@ local function fat_line(B1, B2, is_point)
   local b = px - p[1]
   local c = -(a * px + b * py)
 
-  print("z", a, b, is_point)
   if (a == 0 and b == 0) or is_point then
-    print("Z", px, py)
     B2:get(1, p)
     local qx = p[1]
     local qy = p[2]
@@ -183,8 +181,6 @@ local function clip_max(H)
 end
 
 local function clip(B1, a, b, c, d_min, d_max)
-  print("fat_line", a, b, c, d_min, d_max)
-
   local n = B1:size()
   local m = n - 1
 
@@ -202,23 +198,15 @@ local function clip(B1, a, b, c, d_min, d_max)
       P1[i] = point2(t, u + w * c1)
       P2[i] = point2(t, u + w * c2)
     end
-    for i = 1, n do
-      print("P1", i, ("%.17g"):format(P1[i][2]))
-    end
-    for i = 1, n do
-      print("P2", i, ("%.17g"):format(P2[i][2]))
-    end
     local H = {}
     local t1, t2 = clip_min(quickhull(P1, H))
     if not t1 then
       return
     end
-    print("clip_min", t1, t2)
     local t3, t4 = clip_max(quickhull(P2, H))
     if not t3 then
       return
     end
-    print("clip_max", t3, t4)
     if t2 - t1 < t4 - t3 then
       return t1, t2
     else
@@ -230,7 +218,6 @@ local function clip(B1, a, b, c, d_min, d_max)
     for i = 1, n do
       B1:get(i, p)
       P[i] = point2((i - 1) / m, a * p[1] + b * p[2] + c)
-      print("P", i, tostring(P[i]))
     end
     return clip_both(quickhull(P), d_min, d_max)
   end
@@ -268,7 +255,6 @@ local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
   local p2 = b1:eval(u2, point2())
 
   local q = b2:eval(u3, point2())
-  print("p12q", tostring(p1), tostring(p2), tostring(q), p1:distance(q), p2:distance(q))
   if p1:epsilon_equals(q, p_epsilon) then
     return merge(u1, u3, result)
   end
@@ -277,7 +263,6 @@ local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
 
   b2:eval(u4, q)
-  print("p12q", tostring(p1), tostring(p2), tostring(q), p1:distance(q), p2:distance(q))
   if p1:epsilon_equals(q, p_epsilon) then
     return merge(u1, u4, result)
   end
@@ -295,14 +280,11 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     return result
   end
 
-  print("U", u1, u2, u3, u4)
-
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
   local a = u2 - u1
   local b = u4 - u3
-  print("ab", a, b)
 
   local t1
   local t2
@@ -313,10 +295,8 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     t1, t2 = clip(B1, fat_line(B2, B1, b <= t_epsilon))
   end
   if not t1 then
-    print "not clipped 1"
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
-  print(t1, t2)
   local v1 = u1 + a * t1
   local v2 = u1 + a * t2
 
@@ -329,10 +309,8 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     t3, t4 = clip(B2, fat_line(B1, B2, a <= t_epsilon))
   end
   if not t3 then
-    print "not clipped 2"
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
-  print(t3, t4)
   local v3 = u3 + b * t3
   local v4 = u3 + b * t4
 
@@ -341,7 +319,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
-    print "clippped"
     return iterate(b1, b2, v1, v2, v3, v4, m, is_identical, result)
   end
 
@@ -453,8 +430,6 @@ return function (b1, b2, t1, t2, t3, t4, result)
     result.is_identical = nil
     return result
   end
-
-  print "IDENTICAL"
 
   local t_min = U1[1]
   local t_max = t_min

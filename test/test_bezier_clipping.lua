@@ -127,7 +127,9 @@ local function check(B1, B2, n, is_identical, debug_code)
   draw_points(node, B2, U2, "#C66")
 
   if debug_code then
-    print("debug_code", debug_code)
+    if verbose then
+      print("debug_code", debug_code)
+    end
     if debug_code == 1 then
       draw_line(node, 100, 100, -20000, 1250, "#F33")
       draw_line(node, 100, 100, -20000, 0, "#F33")
