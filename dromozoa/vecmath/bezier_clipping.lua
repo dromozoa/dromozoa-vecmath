@@ -29,6 +29,7 @@ local sort = table.sort
 -- by experimentations
 local t_epsilon = 1e-11
 local p_epsilon = 1e-9
+local r_epsilon = 1e-20
 
 local function fat_line(B1, B2, is_point)
   local n = B1:size()
@@ -195,8 +196,8 @@ local function clip(B1, a, b, c, d_min, d_max)
   local m = n - 1
 
   if B1:is_rational() then
-    local c1 = c + d_min
-    local c2 = c - d_max
+    local c1 = c + d_min + r_epsilon
+    local c2 = c - d_max - r_epsilon
     local P1 = {}
     local P2 = {}
     local p = point3()
@@ -274,7 +275,7 @@ local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
   local p2 = b1:eval(u2, point2())
 
   local q = b2:eval(u3, point2())
-  print("p12q", tostring(p1), tostring(p2), tostring(q))
+  print("p12q", tostring(p1), tostring(p2), tostring(q), p1:distance(q), p2:distance(q))
   if p1:epsilon_equals(q, p_epsilon) then
     merge(u1, u3, result)
   end
@@ -283,7 +284,7 @@ local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
 
   b2:eval(u4, q)
-  print("p12q", tostring(p1), tostring(p2), tostring(q))
+  print("p12q", tostring(p1), tostring(p2), tostring(q), p1:distance(q), p2:distance(q))
   if p1:epsilon_equals(q, p_epsilon) then
     merge(u1, u4, result)
   end

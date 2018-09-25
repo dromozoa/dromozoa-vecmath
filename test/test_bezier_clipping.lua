@@ -27,7 +27,7 @@ local point2 = vecmath.point2
 local bezier = vecmath.bezier
 
 local verbose = os.getenv "VERBOSE" == "1"
-local epsilon = 1e-8
+local epsilon = 1e-7
 local epsilon_identical = 1e-5
 local not_check = os.getenv "NOT_CHECK" == "1"
 
@@ -281,6 +281,10 @@ repeat
     end
   end
   local r = check(B1, B2, 1, nil, 1)
+
+  local B1 = vecmath.bezier():set_catmull_rom({0,50},{0,50},{150,150},{150,150})
+  local B2 = svg.path_data():M(18.75,57.5):A(7.5,7.5,0,false,true,11.25,65):bezier({})[1]
+  local r = check(B1, B2, 1)
 until true
 
 local svg = _"svg" {
