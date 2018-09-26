@@ -28,7 +28,8 @@ local sort = table.sort
 
 -- by experimentations
 local t_epsilon = 1e-11
-local p_epsilon = 1e-7
+local p_epsilon = 1e-9
+local v_epsilon = 1e-13
 
 local function fat_line(B1, B2, is_point)
   local n = B1:size()
@@ -322,7 +323,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
-    return iterate(b1, b2, v1, v2, v3, v4, m, is_identical, result)
+    return iterate(b1, b2, v1 - v_epsilon, v2 + v_epsilon, v3 - v_epsilon, v4 + v_epsilon, m, is_identical, result)
   end
 
   if not is_identical then
