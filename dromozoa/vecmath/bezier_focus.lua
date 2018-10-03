@@ -19,10 +19,9 @@ local point2 = require "dromozoa.vecmath.point2"
 local vector2 = require "dromozoa.vecmath.vector2"
 
 local bezier = require "dromozoa.vecmath.bezier"
+local clip_both = require "dromozoa.vecmath.clip_both"
 local polynomial = require "dromozoa.vecmath.polynomial"
 local quickhull = require "dromozoa.vecmath.quickhull"
-
-local clip_both = require "dromozoa.vecmath.clip_both"
 
 local sqrt = math.sqrt
 

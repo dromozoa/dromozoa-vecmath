@@ -19,10 +19,9 @@ local point2 = require "dromozoa.vecmath.point2"
 local point3 = require "dromozoa.vecmath.point3"
 
 local bezier = require "dromozoa.vecmath.bezier"
-local quickhull = require "dromozoa.vecmath.quickhull"
-
 local bezier_focus = require "dromozoa.vecmath.bezier_focus"
 local clip_both = require "dromozoa.vecmath.clip_both"
+local quickhull = require "dromozoa.vecmath.quickhull"
 
 local sort = table.sort
 
