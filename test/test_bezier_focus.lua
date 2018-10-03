@@ -224,6 +224,10 @@ repeat
   local B1 = vecmath.bezier({-100,-300},{-50,1200},{0,-1800},{50,1200},{100,-300})
   local B2 = vecmath.bezier({-300,-100},{1200,-50},{-1800,0},{1200,50},{-300,100})
   local r = check(B1, B2, 29)
+
+  local B1 = vecmath.bezier({0,100},{200,100})
+  local B2 = vecmath.bezier({0,0},{200,0},{200,10})
+  local r = check(B1, B2, 1)
 until true
 
 local svg = _"svg" {

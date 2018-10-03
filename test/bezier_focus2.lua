@@ -24,19 +24,20 @@ local _ = dom.element
 
 local root = _"g" {}
 
+local r = 1000
 local w = math.cos(math.pi / 4)
 local b3 = vecmath.bezier(
-  { 1, 0, 1 },
-  { w, w, w },
-  { 0, 1, 1 })
+  { r,   0,   1 },
+  { r*w, r*w, w },
+  { 0,   r,   1 })
 
 local b4 = vecmath.bezier(
-  { 0,   -1,   1   },
-  { 2/3, -1/3, 1/3 },
-  { 2/3,  1/3, 1/3 },
-  { 0,    1,   1   })
+  { 0,     -r,   1   },
+  { r*2/3, -r/3, 1/3 },
+  { r*2/3,  r/3, 1/3 },
+  { 0,      r,   1   })
 
-local b = b3
+local b = b4
 local d = vecmath.bezier():deriv(b)
 
 local dot = {}
@@ -59,9 +60,21 @@ for i = 0, n do
   }
 end
 
-for i = 1, #dot do
-  print(("%.17g"):format(dot[i]))
+local min = dot[1]
+local max = min
+
+for i = 2, #dot do
+  local v = dot[i]
+  if min > v then
+    min = v
+  end
+  if max < v then
+    max = v
+  end
 end
+
+print(("%.17g"):format(min))
+print(("%.17g"):format(max))
 
 local svg = _"svg" {
   xmlns = "http://www.w3.org/2000/svg";
