@@ -227,7 +227,6 @@ local function merge(t1, t2, result)
   local U1 = result[1]
   local U2 = result[2]
   local n = #U1
-
   for i = 1, n do
     local a = U1[i] - t1
     if a < 0 then
@@ -243,7 +242,6 @@ local function merge(t1, t2, result)
       end
     end
   end
-
   n = n + 1
   U1[n] = t1
   U2[n] = t2

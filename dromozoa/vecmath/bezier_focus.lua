@@ -117,30 +117,36 @@ local function clip(B1, B2)
   end
 end
 
-local function merge(t1, t2, result)
-  local U1 = result[1]
-  local U2 = result[2]
-  local n = #U1
-
-  for i = 1, n do
-    local a = U1[i] - t1
-    if a < 0 then
-      a = -a
-    end
-    if a <= t_epsilon then
-      local b = U2[i] - t2
-      if b < 0 then
-        b = -b
-      end
-      if b <= t_epsilon then
-        return result
-      end
-    end
+local function merge(d1, d2, t1, t2, result)
+  local v1 = d1:eval(t1, vector2())
+  local v2 = d2:eval(t2, vector2())
+  local s = v1:cross(v2) / sqrt(v1:length_squared() * v2:length_squared())
+  if s < 0 then
+    s = -s
   end
-
-  n = n + 1
-  U1[n] = t1
-  U2[n] = t2
+  if s <= s_epsilon then
+    local U1 = result[1]
+    local U2 = result[2]
+    local n = #U1
+    for i = 1, n do
+      local a = U1[i] - t1
+      if a < 0 then
+        a = -a
+      end
+      if a <= t_epsilon then
+        local b = U2[i] - t2
+        if b < 0 then
+          b = -b
+        end
+        if b <= t_epsilon then
+          return result
+        end
+      end
+    end
+    n = n + 1
+    U1[n] = t1
+    U2[n] = t2
+  end
   return result
 end
 
@@ -191,43 +197,8 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   u4 = u3 + b * t4
   u3 = u3 + b * t3
 
-  -- if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
-  --   return result -- merge
-  -- end
-
-  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
-    local t1 = (u1 + u2) / 2
-    local t2 = (u3 + u4) / 2
-    local U2 = result[2]
-
-    local v1 = d1:eval(t1, vector2())
-    local v2 = d2:eval(t2, vector2())
-    local s = v1:cross(v2) / sqrt(v1:length_squared() * v2:length_squared())
-    if s < 0 then
-      s = -s
-    end
-    if s <= s_epsilon then
-      for i = 1, n do
-        local a = U1[i] - t1
-        if a < 0 then
-          a = -a
-        end
-        if a <= t_epsilon then
-          local b = U2[i] - t2
-          if b < 0 then
-            b = -b
-          end
-          if b <= t_epsilon then
-            return result
-          end
-        end
-      end
-
-      n = n + 1
-      U1[n] = t1
-      U2[n] = t2
-    end
-    return result
+  if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
+    return merge(d1, d2, (v1 + v2) / 2, (v3 + v4) / 2, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
