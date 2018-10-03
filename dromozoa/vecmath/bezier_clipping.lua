@@ -30,7 +30,7 @@ local t_epsilon = 1e-11
 local p_epsilon = 1e-9
 local v_epsilon = 1e-13
 
-local function fat_line(B1, B2, is_point)
+local function fat_line(B1, B2, is_converged)
   local n = B1:size()
   local p = point2()
 
@@ -43,7 +43,7 @@ local function fat_line(B1, B2, is_point)
   local b = px - p[1]
   local c = -(a * px + b * py)
 
-  if is_point then
+  if is_converged then
     B2:get(1, p)
     local qx = p[1]
     local qy = p[2]
@@ -285,17 +285,16 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
 
   local a = u2 - u1
   local b = u4 - u3
-
-  local is_point_a = a <= t_epsilon
-  local is_point_b = b <= t_epsilon
+  local is_converged_a = a <= t_epsilon
+  local is_converged_b = b <= t_epsilon
 
   local t1
   local t2
-  if is_point_a then
+  if is_converged_a then
     t1 = 0
     t2 = 1
   else
-    t1, t2 = clip(B1, fat_line(B2, B1, is_point_b))
+    t1, t2 = clip(B1, fat_line(B2, B1, is_converged_b))
   end
   if not t1 then
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
@@ -305,11 +304,11 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
 
   local t3
   local t4
-  if is_point_b then
+  if is_converged_b then
     t3 = 0
     t4 = 1
   else
-    t3, t4 = clip(B2, fat_line(B1, B2, is_point_a))
+    t3, t4 = clip(B2, fat_line(B1, B2, is_converged_a))
   end
   if not t3 then
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
