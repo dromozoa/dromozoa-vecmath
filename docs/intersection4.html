@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-vecmath</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+.note {
+  color: #999;
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
+
+<h1>交差判定</h1>
+
+<h2>機械イプシロン</h2>
+
+<pre>
+DBL_EPSILON = 2.22044604925031e-16;
+</pre>
+
+<h2>B&eacute;zier Clippingにおける端点の扱い</h2>
+
+<p>
+区間\((t_1, t_2)\)で定義される曲線の端点において、
+計算誤差によって正しく判定されない場合がある。
+そこで、区間\((t_1 - \epsilon, t_2 + \epsilon)\)を用いて判定する。
+\(\epsilon\)は、媒介変数\(t\)の収束条件よりも小さく、
+機械イプシロンよりも大きな定数とした。
+</p>
+
+<h2>B&eacute;zier Focusにおける内積の扱い</h2>
+
+<p>
+円弧を有理ベジェ曲線で表現し、
+中心から円周上の点へのベクトルと接線ベクトルの内積を計算した。
+</p>
+
+<table>
+  <tr>
+    <th rowspan="2">半径</th>
+    <th colspan="2">3次有理ベジェ曲線（90度）</th>
+    <th colspan="2">4次有理ベジェ曲線（180度）</th>
+  </tr>
+  <tr>
+    <th>最小</th>
+    <th>最大</th>
+    <th>最小</th>
+    <th>最大</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>-4.44e-16</td>
+    <td>3.33e-16</td>
+    <td>-6.66e-16</td>
+    <td>1.33e-15</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>-4.26e-14</td>
+    <td>2.84e-14</td>
+    <td>-8.53e-14</td>
+    <td>8.53e-14</td>
+  </tr>
+  <tr>
+    <td>100</td>
+    <td>-5.46e-12</td>
+    <td>0</td>
+    <td>-7.28e-12</td>
+    <td>1.09e-11</td>
+  </tr>
+  <tr>
+    <td>1000</td>
+    <td>-2.33e-10</td>
+    <td>8.15e-10</td>
+    <td>-4.66e-10</td>
+    <td>4.66e-10</td>
+  </tr>
+</table>
+
+<p>
+計算誤差の閾値を考えるにあたって、
+正規化されたベクトル\(\bm{u}\)と\(\bm{v}\)の内積を検討する。
+\[
+  \frac{\bm{u}}{\|\bm{u}\|} \cdot \frac{\bm{v}}{\|\bm{v}\|}
+  =
+  \frac{\bm{u} \cdot \bm{v}}{\|\bm{u}\| \|\bm{v}\|}
+\]
+ベクトル\(\bm{v}\)について\(L_1, L_2, L_\infty\)距離を定義できる。
+\[\begin{aligned}
+  \|\bm{v}\|_1 &amp;= |x| + |y| \\
+  \|\bm{v}\|_2 &amp;= \sqrt{x^2 + y^2} \\
+  \|\bm{v}\|_\infty &amp;= \max(|x|, |y|) \\
+
+  \frac{1}{\sqrt{2}} \|\bm{v}\|_2
+  &amp;\le
+  \|\bm{v}\|_\infty
+  \le
+  \|\bm{v}\|_2
+  \le
+  \|\bm{v}\|_1
+  \le
+  \sqrt{2} \|\bm{v}\|_2
+  \\
+\end{aligned}\]
+<a href="intersection3.html#distance">垂線と点の距離</a>の垂線が点\(\bm{F}\)を通る条件を
+\[
+  |d(t)| \le \|\bm{P}'(t)\| \|\bm{Q}(t)\| \epsilon
+\]
+に変更する。
+ふたつの距離をオーダーで考えると、
+\(\|\bm{P}'(t)\|\)は制御点間の距離になり、
+\(\|\bm{Q}(t)\|\)は曲線と焦点の距離になる。
+</p>
+
+<p>
+曲線\(\bm{P}(t)\)上に焦点\(\bm{F}\)が存在する場合は自明に\(d(t)=0\)となり、
+Collinear Normalとならない媒介変数の組が得られてしまうため、
+傾きを検査して取りのぞく必要がある。
+</p>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  renderMathInElement(document.body);
+});
+</script>
+</body>
+</html>
