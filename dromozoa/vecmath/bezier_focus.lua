@@ -26,7 +26,7 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 local sqrt = math.sqrt
 
 -- by experimentations
-local d_epsilon = 1e-11
+local d_epsilon = 1e-14
 local t_epsilon = 1e-6
 local s_epsilon = 1e-5
 
@@ -86,16 +86,62 @@ local function clip(B1, B2)
     F = B2
   end
   local P = {}
-  local p = point2()
+  local p1 = B1:get(1, point2())
+  local p2 = B1:get(B1:size(), point2())
+  local p3 = point2()
+  local d1 = p1:distance_l1(p2)
+  local d2 = 0
   for i = 1, F:size() do
-    local D = explicit_bezier(B1, F:get(i, p))
+    F:get(i, p3)
+    local d = p1:distance_l1(p3)
+    if d2 < d then
+      d2 = d
+    end
+    local d = p2:distance_l1(p3)
+    if d2 < d then
+      d2 = d
+    end
+    local D = explicit_bezier(B1, p3)
     for j = 1, D:size() do
       P[#P + 1] = D:get(j, point2())
     end
   end
   if P[1] then
-    return clip_both(quickhull(P), -d_epsilon, d_epsilon)
+    local d = d1 * d2
+    if d < 1 then
+      d = d_epsilon
+    else
+      d = d_epsilon * d
+    end
+    return clip_both(quickhull(P), -d, d)
   end
+end
+
+local function merge(t1, t2, result)
+  local U1 = result[1]
+  local U2 = result[2]
+  local n = #U1
+
+  for i = 1, n do
+    local a = U1[i] - t1
+    if a < 0 then
+      a = -a
+    end
+    if a <= t_epsilon then
+      local b = U2[i] - t2
+      if b < 0 then
+        b = -b
+      end
+      if b <= t_epsilon then
+        return result
+      end
+    end
+  end
+
+  n = n + 1
+  U1[n] = t1
+  U2[n] = t2
+  return result
 end
 
 local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
@@ -108,21 +154,46 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
-  local t1, t2 = clip(B1, B2)
-  if not t1 then
-    return result
-  end
   local a = u2 - u1
+  local b = u4 - u3
+  local is_converged_a = false -- a <= t_epsilon
+  local is_converged_b = false -- b <= t_epsilon
+
+  local t1
+  local t2
+  if is_converged_a then
+    t1 = 0
+    t2 = 1
+  else
+    t1, t2 = clip(B1, B2)
+  end
+  if not t1 then
+    return result -- merge
+  end
+  local v1 = u1 + a * t1
+  local v2 = u1 + a * t2
   u2 = u1 + a * t2
   u1 = u1 + a * t1
 
-  local t3, t4 = clip(B2, B1)
-  if not t3 then
-    return result
+  local t3
+  local t4
+  if is_converged_b then
+    t3 = 0
+    t4 = 0
+  else
+    t3, t4 = clip(B2, B1)
   end
-  local b = u4 - u3
+  if not t3 then
+    return result -- merge
+  end
+  local v3 = u3 + b * t3
+  local v4 = u3 + b * t4
   u4 = u3 + b * t4
   u3 = u3 + b * t3
+
+  -- if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
+  --   return result -- merge
+  -- end
 
   if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
     local t1 = (u1 + u2) / 2
