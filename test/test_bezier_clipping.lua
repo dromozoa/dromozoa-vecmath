@@ -178,7 +178,6 @@ repeat
   local z = math.cos(math.pi / 4)
   local B5 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
   local B6 = vecmath.bezier({-150,-50}, {400,-25}, {-400,25}, {150,50})
-
   local B7 = vecmath.bezier(B1):clip(0, 0.6)
   local B8 = vecmath.bezier(B1):clip(0.2, 1)
 
@@ -187,7 +186,6 @@ repeat
   local r = check(B1, B4, 3)
   local r = check(B1, B5, 1, nil, 2)
   local r = check(B4, B6, 9)
-
   local r = check(B7, B8, 2, true)
   if verbose then
     print(math.abs(r[1][1] - 1/3))

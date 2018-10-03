@@ -86,8 +86,9 @@ local function clip(B1, B2)
     F = B2
   end
   local P = {}
+  local p = point2()
   for i = 1, F:size() do
-    local D = explicit_bezier(B1, F:get(i, point2()))
+    local D = explicit_bezier(B1, F:get(i, p))
     for j = 1, D:size() do
       P[#P + 1] = D:get(j, point2())
     end
