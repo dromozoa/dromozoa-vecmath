@@ -28,6 +28,7 @@ local sort = table.sort
 -- by experimentations
 local t_epsilon = 1e-11
 local p_epsilon = 1e-9
+local q_epsilon = 1e-6
 local v_epsilon = 1e-13
 
 local function fat_line(B1, B2, is_converged)
@@ -278,6 +279,8 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     return result
   end
 
+  print("U", u1, u2, u3, u4)
+
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
@@ -295,6 +298,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     t1, t2 = clip(B1, fat_line(B2, B1, is_converged_b))
   end
   if not t1 then
+    print "NOT CLIPPED 1"
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
   local v1 = u1 + a * t1
@@ -309,12 +313,14 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
     t3, t4 = clip(B2, fat_line(B1, B2, is_converged_a))
   end
   if not t3 then
+    print "NOT CLIPPED 2"
     return merge_end_points(b1, b2, u1, u2, u3, u4, result)
   end
   local v3 = u3 + b * t3
   local v4 = u3 + b * t4
 
   if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
+    print("CLIPPED", (v1 + v2) / 2, (v3 + v4) / 2)
     return merge((v1 + v2) / 2, (v3 + v4) / 2, result)
   end
 
@@ -334,6 +340,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
         local q = point2()
         local F = {}
         for i = 1, #F1 do
+          print("F", i, F1[i], F2[i])
           F[i] = { F1[i], F2[i] }
         end
         if a < b then
@@ -345,7 +352,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
             local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
-            if p:epsilon_equals(q, p_epsilon) then
+            if p:epsilon_equals(q, q_epsilon) then
               merge(u6, u7, result)
               u5 = nil
             else
@@ -368,7 +375,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
             local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
-            if p:epsilon_equals(q, p_epsilon) then
+            if p:epsilon_equals(q, q_epsilon) then
               merge(u6, u7, result)
               u5 = nil
             else
@@ -430,6 +437,8 @@ return function (b1, b2, t1, t2, t3, t4, result)
     result.is_identical = nil
     return result
   end
+
+  print "IS_IDENTICAL"
 
   local t_min = U1[1]
   local t_max = t_min

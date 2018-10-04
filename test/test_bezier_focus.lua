@@ -86,7 +86,7 @@ local function check(B1, B2, n, is_identical)
 
   for i = 1, #U1 do
     if verbose then
-      print(("U %.17g\t%.17g"):format(U1[i], U2[i]))
+      print(("u %.17g\t%.17g"):format(U1[i], U2[i]))
     end
     local p = B1:eval(U1[i], point2())
     local q = B2:eval(U2[i], point2())
