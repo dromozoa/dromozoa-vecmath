@@ -27,8 +27,8 @@ local sqrt = math.sqrt
 
 -- by experimentations
 local d_epsilon = 1e-14
-local t_epsilon = 1e-6
-local s_epsilon = 1e-5
+local t_epsilon = 1e-7
+local s_epsilon = 1e-6
 
 local function explicit_bezier(B, p)
   local Z = B[3]
@@ -120,11 +120,11 @@ end
 local function merge(d1, d2, t1, t2, result)
   local v1 = d1:eval(t1, vector2())
   local v2 = d2:eval(t2, vector2())
-  local s = v1:cross(v2) / sqrt(v1:length_squared() * v2:length_squared())
+  local s = v1:cross(v2)
   if s < 0 then
     s = -s
   end
-  if s <= s_epsilon then
+  if s <= s_epsilon * v1:length_l1() * v2:length_l1() then
     local U1 = result[1]
     local U2 = result[2]
     local n = #U1
@@ -162,19 +162,17 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
 
   local a = u2 - u1
   local b = u4 - u3
-  local is_converged_a = false -- a <= t_epsilon
-  local is_converged_b = false -- b <= t_epsilon
 
   local t1
   local t2
-  if is_converged_a then
+  if a <= t_epsilon then
     t1 = 0
     t2 = 1
   else
     t1, t2 = clip(B1, B2)
   end
   if not t1 then
-    return result -- merge
+    return result
   end
   local v1 = u1 + a * t1
   local v2 = u1 + a * t2
@@ -183,14 +181,14 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
 
   local t3
   local t4
-  if is_converged_b then
+  if b <= t_epsilon then
     t3 = 0
-    t4 = 0
+    t4 = 1
   else
     t3, t4 = clip(B2, B1)
   end
   if not t3 then
-    return result -- merge
+    return result
   end
   local v3 = u3 + b * t3
   local v4 = u3 + b * t4
