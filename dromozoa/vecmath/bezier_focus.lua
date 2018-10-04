@@ -27,8 +27,8 @@ local sqrt = math.sqrt
 
 -- by experimentations
 local d_epsilon = 1e-14
-local t_epsilon = 1e-7
 local s_epsilon = 1e-6
+local t_epsilon = 1e-7
 
 local function explicit_bezier(B, p)
   local Z = B[3]
