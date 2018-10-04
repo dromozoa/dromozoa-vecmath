@@ -119,3 +119,29 @@ for i = 0, N do
     print(v2:length())
   end
 end
+
+if verbose then
+  print("b1 {\n" .. tostring(b1) .. "}")
+  print("b2 {\n" .. tostring(b2) .. "}")
+  print("b3 {\n" .. tostring(b3) .. "}")
+end
+
+local b1 = bezier({1, 1}, {2, 2}, {0.5, -0.5}, {0, 0})
+local b2 = bezier({1, 1, 0.25}, {2, 2, 1}, {0.5, -0.5, 2}, {0, 0, 0})
+if verbose then
+  print("b1 {\n" .. tostring(b1) .. "}")
+  print("b2 {\n" .. tostring(b2) .. "}")
+end
+
+assert(tostring(b1) == [[
+(1, 1)
+(2, 2)
+(0.5, -0.5)
+(0, 0)
+]])
+assert(tostring(b2) == [[
+(1, 1, 0.25)
+(2, 2, 1)
+(0.5, -0.5, 2)
+(0, 0, 0)
+]])

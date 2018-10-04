@@ -23,6 +23,26 @@ local polynomial = require "dromozoa.vecmath.polynomial"
 
 local setmetatable = setmetatable
 local type = type
+local concat = table.concat
+
+-- a:to_string()
+local function to_string(a)
+  local buffer = {}
+  local X = a[1]
+  local Y = a[2]
+  local Z = a[3]
+  if Z[1] then
+    for i = 1, #X do
+      buffer[i] = ("(%.17g, %.17g, %.17g)\n"):format(X[i], Y[i], Z[i])
+    end
+    return concat(buffer)
+  else
+    for i = 1, #X do
+      buffer[i] = ("(%.17g, %.17g)\n"):format(X[i], Y[i])
+    end
+    return concat(buffer)
+  end
+end
 
 -- a:get_tuple2(number b, point2 c)
 local function get_tuple2(a, b, c)
@@ -81,12 +101,16 @@ end
 
 local class = {
   is_bezier = true;
+  to_string = to_string;
   get_tuple2 = get_tuple2;
   get_tuple3 = get_tuple3;
   eval_tuple2 = eval_tuple2;
   eval_tuple3 = eval_tuple3;
 }
-local metatable = { __index = class }
+local metatable = {
+  __index = class;
+  __tostring = to_string;
+}
 
 -- a:set(point2 b, point2 c, ...)
 -- a:set(point3 b, point3 c, ...)
