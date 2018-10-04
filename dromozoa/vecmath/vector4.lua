@@ -73,6 +73,60 @@ function class.length_squared(a)
   return x * x + y * y + z * z + w * w
 end
 
+-- a:length_l1()
+function class.length_l1(a)
+  local x = a[1]
+  local y = a[2]
+  local z = a[3]
+  local w = a[4]
+  if x < 0 then x = -x end
+  if y < 0 then y = -y end
+  if z < 0 then z = -z end
+  if w < 0 then w = -w end
+  return x + y + z + w
+end
+
+-- a:length_linf()
+function class.length_linf(a, b)
+  local x = a[1]
+  local y = a[2]
+  local z = a[3]
+  local w = a[4]
+  if x < 0 then x = -x end
+  if y < 0 then y = -y end
+  if z < 0 then z = -z end
+  if w < 0 then w = -w end
+  if x > y then
+    if z > w then
+      if x > z then
+        return x
+      else
+        return z
+      end
+    else
+      if x > w then
+        return x
+      else
+        return w
+      end
+    end
+  else
+    if z > w then
+      if y > z then
+        return y
+      else
+        return z
+      end
+    else
+      if y > w then
+        return y
+      else
+        return w
+      end
+    end
+  end
+end
+
 -- a:dot(vector4 b)
 function class.dot(a, b)
   return a[1] * b[1] + a[2] * b[2] + a[3] * b[3] + a[4] * b[4]

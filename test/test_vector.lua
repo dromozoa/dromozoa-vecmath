@@ -51,3 +51,15 @@ assert(v1:cross(v2) == 1)
 local v1 = vector2(4, 3):normalize()
 local v2 = vector2(34, -12)
 assert(v1:cross(v2) == -30)
+
+local v = vector2(-1, -2)
+assert(v:length_l1() == 3)
+assert(v:length_linf() == 2)
+
+local v = vector3(-1, -2, -3)
+assert(v:length_l1() == 6)
+assert(v:length_linf() == 3)
+
+local v = vector4(-1, -2, -3, -4)
+assert(v:length_l1() == 10)
+assert(v:length_linf() == 4)

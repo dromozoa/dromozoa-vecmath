@@ -78,6 +78,40 @@ function class.length(a)
   return sqrt(x * x + y * y + z * z)
 end
 
+-- a:length_l1() [EX]
+function class.length_l1(a)
+  local x = a[1]
+  local y = a[2]
+  local z = a[3]
+  if x < 0 then x = -x end
+  if y < 0 then y = -y end
+  if z < 0 then z = -z end
+  return x + y + z
+end
+
+-- a:length_linf() [EX]
+function class.length_linf(a)
+  local x = a[1]
+  local y = a[2]
+  local z = a[3]
+  if x < 0 then x = -x end
+  if y < 0 then y = -y end
+  if z < 0 then z = -z end
+  if x > y then
+    if x > z then
+      return x
+    else
+      return z
+    end
+  else
+    if y > z then
+      return y
+    else
+      return z
+    end
+  end
+end
+
 -- a:angle(vector3 b)
 function class.angle(a, b)
   local ax = a[1]
