@@ -27,7 +27,7 @@ local point2 = vecmath.point2
 local bezier = vecmath.bezier
 
 local verbose = os.getenv "VERBOSE" == "1"
-local epsilon = 1e-7
+local epsilon = 1e-5
 local epsilon_identical = 1e-5
 local not_check = os.getenv "NOT_CHECK" == "1"
 
@@ -144,6 +144,9 @@ local function check(B1, B2, n, is_identical, debug_code)
 
   local e2 = 0
   for i = 1, #U1 do
+    if verbose then
+      print(("u %.17g\t%.17g"):format(U1[i], U2[i]))
+    end
     local p = B1:eval(U1[i], point2())
     local q = B2:eval(U2[i], point2())
     e2 = e2 + p:distance_squared(q)
@@ -178,7 +181,6 @@ repeat
   local z = math.cos(math.pi / 4)
   local B5 = vecmath.bezier({-200,-200,1}, {200*z,-200*z,z}, {200,200,1})
   local B6 = vecmath.bezier({-150,-50}, {400,-25}, {-400,25}, {150,50})
-
   local B7 = vecmath.bezier(B1):clip(0, 0.6)
   local B8 = vecmath.bezier(B1):clip(0.2, 1)
 
@@ -187,7 +189,6 @@ repeat
   local r = check(B1, B4, 3)
   local r = check(B1, B5, 1, nil, 2)
   local r = check(B4, B6, 9)
-
   local r = check(B7, B8, 2, true)
   if verbose then
     print(math.abs(r[1][1] - 1/3))

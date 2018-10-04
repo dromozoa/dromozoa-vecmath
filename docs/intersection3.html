@@ -36,7 +36,7 @@
   <li><a href="http://cagd.cs.byu.edu/~557/text/cagd.pdf">Computer Aided Geometric Design</a></li>
 </ul>
 
-<h2>垂線と点の距離</h2>
+<h2 name="distance">垂線と点の距離</h2>
 
 <p>
 曲線\(\bm{P}(t)\)の垂線が点\(\bm{F}\)を通らないような\(t\)の区間を考える。
@@ -46,14 +46,14 @@
 \]
 \(\bm{P}(t)\)が\(n\)次の有理ベジェ曲線であるとき
 \[\begin{aligned}
-  P(t) &amp;= (P_x(t), P_y(t)) \\
+  \bm{P}(t) &amp;= (P_x(t), P_y(t)) \\
   P_x(t) &amp;= \frac{p_x(t)}{p_z(t)} \\
   P_y(t) &amp;= \frac{p_y(t)}{p_z(t)} \\
   p_x(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i x_i \\
   p_y(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i y_i \\
   p_z(t) &amp;= \sum_{i=0}^n B_i^n(t) w_i \\
 
-  P'(t) &amp;= (P_x'(t), P_y'(t)) \\
+  \bm{P}'(t) &amp;= (P_x'(t), P_y'(t)) \\
   P_x'(t) &amp;= \frac{
     p_x'(t) p_z(t) - p_x(t) p_z'(t)
   }{
@@ -69,6 +69,7 @@
   p_y'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} y_{i+1} - w_i y_i) \\
   p_z'(t) &amp;= n \sum_{i=0}^{n-1} B_i^{n-1}(t) (w_{i+1} - w_i) \\
 
+  \bm{Q}(t) &amp;= (Q_x(t), Q_y(t)) \\
   Q_x(t)
   &amp;= \frac{p_x(t)}{p_z(t)} - F_x \\
   &amp;= \frac{p_x(t) - F_x p_z(t)}{p_z(t)} \\
