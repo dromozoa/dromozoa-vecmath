@@ -174,8 +174,6 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   if not t1 then
     return result
   end
-  local v1 = u1 + a * t1
-  local v2 = u1 + a * t2
 
   local t3
   local t4
@@ -188,15 +186,13 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   if not t3 then
     return result
   end
-  local v3 = u3 + b * t3
-  local v4 = u3 + b * t4
 
-  if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
-    return merge(d1, d2, (v1 + v2) / 2, (v3 + v4) / 2, result)
+  if a * (t2 - t1) <= t_epsilon and b * (t4 - t3) <= t_epsilon then
+    return merge(d1, d2, u1 + a * (t1 + t2) / 2, u3 + b * (t3 + t4) / 2, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
-    return iterate(b1, b2, d1, d2, v1, v2, v3, v4, m, result)
+    return iterate(b1, b2, d1, d2, u1 + a * t1, u1 + a * t2, u3 + b * t3, u3 + b * t4, m, result)
   end
 
   if a < b then
