@@ -28,8 +28,10 @@ local sort = table.sort
 -- by experimentations
 local t_epsilon = 1e-11
 local p_epsilon = 1e-9
-local q_epsilon = 1e-6
+local q_epsilon = 1e-6 -- TODO remove?
 local v_epsilon = 1e-13
+
+local d_epsilon = 1e-7
 
 local function fat_line(B1, B2, is_converged)
   local n = B1:size()
@@ -336,8 +338,10 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
       is_identical = true
     else
       if #F1 > 0 then
-        local p = point2()
-        local q = point2()
+        local p = b1:eval(u1, point2())
+        local q = b2:eval(u2, point2())
+        local d = d_epsilon * p:distance_l1(q)
+
         local F = {}
         for i = 1, #F1 do
           print("F", i, F1[i], F2[i])
@@ -352,7 +356,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
             local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
-            if p:epsilon_equals(q, q_epsilon) then
+            if p:epsilon_equals(q, d) then
               merge(u6, u7, result)
               u5 = nil
             else
@@ -375,7 +379,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
             local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
-            if p:epsilon_equals(q, q_epsilon) then
+            if p:epsilon_equals(q, d) then
               merge(u6, u7, result)
               u5 = nil
             else
