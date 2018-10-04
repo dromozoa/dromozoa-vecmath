@@ -176,8 +176,6 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   end
   local v1 = u1 + a * t1
   local v2 = u1 + a * t2
-  u2 = u1 + a * t2
-  u1 = u1 + a * t1
 
   local t3
   local t4
@@ -192,15 +190,13 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   end
   local v3 = u3 + b * t3
   local v4 = u3 + b * t4
-  u4 = u3 + b * t4
-  u3 = u3 + b * t3
 
   if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
     return merge(d1, d2, (v1 + v2) / 2, (v3 + v4) / 2, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
-    return iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
+    return iterate(b1, b2, d1, d2, v1, v2, v3, v4, m, result)
   end
 
   if a < b then
@@ -241,7 +237,7 @@ return function (b1, b2, t1, t2, t3, t4, result)
   local d1 = bezier(b1):deriv()
   local d2 = bezier(b2):deriv()
   local m = (b1:size() - 1) * (b2:size() - 1)
-  local m = m * (m - 1) / 2
+  m = m * (m - 1) / 2
   iterate(b1, b2, d1, d2, t1, t2, t3, t4, m, result)
 
   local n = #U1

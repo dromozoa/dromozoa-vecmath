@@ -146,9 +146,7 @@ repeat
   local r = check(B1, B3, 1)
   local r = check(B1, B4, 2)
   local r = check(B1, B5, 1)
-  local r = check(B4, B6, 16) -- TODO check
-  -- local r = check(B4, B6, 15)
-  -- local r = check(B4, B6, 11)
+  local r = check(B4, B6, 16)
 
   local r = check(B7, B8, 2, true)
 
@@ -214,12 +212,10 @@ repeat
 
   local B1 = vecmath.bezier({-150,-200},{0,600},{150,-200})
   local B2 = vecmath.bezier({-200,-150},{600,0},{-200,150})
-  local r = check(B1, B2, 5) -- TODO check?
-  -- local r = check(B1, B2, 4)
+  local r = check(B1, B2, 5)
 
   local B1 = vecmath.bezier({-150,-200},{0,600},{150,-200})
   local B2 = vecmath.bezier({-300,-150},{1200,-50},{-1200,50},{300,150})
-  -- local r = check(B1, B2, 6) -- TODO check?
   local r = check(B1, B2, 7)
 
   local B1 = vecmath.bezier({-150,-300},{-50,1200},{50,-1200},{150,300})
@@ -228,9 +224,7 @@ repeat
 
   local B1 = vecmath.bezier({-100,-300},{-50,1200},{0,-1800},{50,1200},{100,-300})
   local B2 = vecmath.bezier({-300,-100},{1200,-50},{-1800,0},{1200,50},{-300,100})
-  -- local r = check(B1, B2, 29) -- TODO check?
-  local r = check(B1, B2, 28)
-  -- local r = check(B1, B2, 27)
+  local r = check(B1, B2, 29)
 
   local B1 = vecmath.bezier({0,100},{200,100})
   local B2 = vecmath.bezier({0,0},{200,0},{200,10})
