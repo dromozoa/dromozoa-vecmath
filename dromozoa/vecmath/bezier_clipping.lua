@@ -26,8 +26,8 @@ local quickhull = require "dromozoa.vecmath.quickhull"
 local sort = table.sort
 
 -- by experimentations
-local t_epsilon = 1e-11
-local v_epsilon = 1e-13
+local t_epsilon = 1e-10
+local v_epsilon = 1e-12
 local d_epsilon = 1e-7
 
 local function fat_line(B1, B2, is_converged)
