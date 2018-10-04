@@ -248,6 +248,29 @@ local function merge(t1, t2, result)
   return result
 end
 
+local function merge_end_points(b1, b2, u1, u2, u3, u4, d, result)
+  local p1 = b1:eval(u1, point2())
+  local p2 = b1:eval(u2, point2())
+
+  local q = b2:eval(u3, point2())
+  if p1:epsilon_equals(q, d) then
+    return merge(u1, u3, result)
+  end
+  if p2:epsilon_equals(q, d) then
+    return merge(u2, u3, result)
+  end
+
+  b2:eval(u4, q)
+  if p1:epsilon_equals(q, d) then
+    return merge(u1, u4, result)
+  end
+  if p2:epsilon_equals(q, d) then
+    return merge(u2, u4, result)
+  end
+
+  return result
+end
+
 local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, d, result)
   local U1 = result[1]
   local n = #U1
@@ -272,10 +295,8 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, d, result)
     t1, t2 = clip(B1, fat_line(B2, B1, is_converged_b))
   end
   if not t1 then
-    return result
+    return merge_end_points(b1, b2, u1, u2, u3, u4, d, result)
   end
-  local v1 = u1 + a * t1
-  local v2 = u1 + a * t2
 
   local t3
   local t4
@@ -286,17 +307,31 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, d, result)
     t3, t4 = clip(B2, fat_line(B1, B2, is_converged_a))
   end
   if not t3 then
-    return result
+    return merge_end_points(b1, b2, u1, u2, u3, u4, d, result)
   end
-  local v3 = u3 + b * t3
-  local v4 = u3 + b * t4
 
-  if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
-    return merge((v1 + v2) / 2, (v3 + v4) / 2, result)
+  if a * (t2 - t1) <= t_epsilon and b * (t4 - t3) <= t_epsilon then
+    return merge(u1 + a * (t1 + t2) / 2, u3 + b * (t3 + t4) / 2, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
-    return iterate(b1, b2, v1 - v_epsilon, v2 + v_epsilon, v3 - v_epsilon, v4 + v_epsilon, m, is_identical, d, result)
+    local v1 = u1 + a * t1
+    local v2 = u1 + a * t2
+    local v3 = u3 + b * t3
+    local v4 = u3 + b * t4
+    if t1 > 0 then
+      v1 = v1 - v_epsilon
+    end
+    if t2 < 1 then
+      v2 = v2 + v_epsilon
+    end
+    if t3 > 0 then
+      v3 = v3 - v_epsilon
+    end
+    if t4 < 1 then
+      v4 = v4 + v_epsilon
+    end
+    return iterate(b1, b2, v1, v2, v3, v4, m, is_identical, d, result)
   end
 
   if not is_identical then

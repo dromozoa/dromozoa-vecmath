@@ -307,6 +307,10 @@ repeat
   local B1 = vecmath.bezier({200,50},{150,100})
   local B2 = svg.path_data():M(192,66):A(8,8,0,false,true,184,58):bezier({})[1]
   local r = check(B1, B2, 1)
+
+  local B1 = vecmath.bezier({50,75},{100,37.5})
+  local B2 = svg.path_data():M(58,63):A(4,4,0,false,true,62,67):bezier({})[1]
+  local r = check(B1, B2, 1)
 until true
 
 local svg = _"svg" {
