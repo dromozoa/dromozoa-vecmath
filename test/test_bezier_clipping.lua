@@ -144,7 +144,9 @@ local function check(B1, B2, n, is_identical, debug_code)
 
   local e2 = 0
   for i = 1, #U1 do
-    print(("u %.17g\t%.17g"):format(U1[i], U2[i]))
+    if verbose then
+      print(("u %.17g\t%.17g"):format(U1[i], U2[i]))
+    end
     local p = B1:eval(U1[i], point2())
     local q = B2:eval(U2[i], point2())
     e2 = e2 + p:distance_squared(q)

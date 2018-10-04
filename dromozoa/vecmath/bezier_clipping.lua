@@ -255,8 +255,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, d, result)
     return result
   end
 
-  print("U", u1, u2, u3, u4)
-
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
@@ -274,7 +272,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, d, result)
     t1, t2 = clip(B1, fat_line(B2, B1, is_converged_b))
   end
   if not t1 then
-    print "NOT CLIPPED 1"
     return result
   end
   local v1 = u1 + a * t1
@@ -289,14 +286,12 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, d, result)
     t3, t4 = clip(B2, fat_line(B1, B2, is_converged_a))
   end
   if not t3 then
-    print "NOT CLIPPED 2"
     return result
   end
   local v3 = u3 + b * t3
   local v4 = u3 + b * t4
 
   if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
-    print("CLIPPED", (v1 + v2) / 2, (v3 + v4) / 2)
     return merge((v1 + v2) / 2, (v3 + v4) / 2, result)
   end
 
@@ -316,7 +311,6 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, d, result)
         local q = point2()
         local F = {}
         for i = 1, #F1 do
-          print("F", i, F1[i], F2[i])
           F[i] = { F1[i], F2[i] }
         end
         if a < b then
@@ -426,8 +420,6 @@ return function (b1, b2, t1, t2, t3, t4, result)
     result.is_identical = nil
     return result
   end
-
-  print "IS_IDENTICAL"
 
   local t_min = U1[1]
   local t_max = t_min
