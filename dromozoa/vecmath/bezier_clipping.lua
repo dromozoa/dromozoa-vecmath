@@ -19,19 +19,18 @@ local point2 = require "dromozoa.vecmath.point2"
 local point3 = require "dromozoa.vecmath.point3"
 
 local bezier = require "dromozoa.vecmath.bezier"
-local quickhull = require "dromozoa.vecmath.quickhull"
-
 local bezier_focus = require "dromozoa.vecmath.bezier_focus"
 local clip_both = require "dromozoa.vecmath.clip_both"
+local quickhull = require "dromozoa.vecmath.quickhull"
 
 local sort = table.sort
 
 -- by experimentations
-local t_epsilon = 1e-11
-local p_epsilon = 1e-9
-local v_epsilon = 1e-13
+local t_epsilon = 1e-10
+local v_epsilon = 1e-12
+local d_epsilon = 1e-7
 
-local function fat_line(B1, B2, is_point)
+local function fat_line(B1, B2, is_converged)
   local n = B1:size()
   local p = point2()
 
@@ -44,7 +43,7 @@ local function fat_line(B1, B2, is_point)
   local b = px - p[1]
   local c = -(a * px + b * py)
 
-  if is_point then
+  if is_converged then
     B2:get(1, p)
     local qx = p[1]
     local qy = p[2]
@@ -228,7 +227,6 @@ local function merge(t1, t2, result)
   local U1 = result[1]
   local U2 = result[2]
   local n = #U1
-
   for i = 1, n do
     local a = U1[i] - t1
     if a < 0 then
@@ -244,37 +242,13 @@ local function merge(t1, t2, result)
       end
     end
   end
-
   n = n + 1
   U1[n] = t1
   U2[n] = t2
   return result
 end
 
-local function merge_end_points(b1, b2, u1, u2, u3, u4, result)
-  local p1 = b1:eval(u1, point2())
-  local p2 = b1:eval(u2, point2())
-
-  local q = b2:eval(u3, point2())
-  if p1:epsilon_equals(q, p_epsilon) then
-    return merge(u1, u3, result)
-  end
-  if p2:epsilon_equals(q, p_epsilon) then
-    return merge(u2, u3, result)
-  end
-
-  b2:eval(u4, q)
-  if p1:epsilon_equals(q, p_epsilon) then
-    return merge(u1, u4, result)
-  end
-  if p2:epsilon_equals(q, p_epsilon) then
-    return merge(u2, u4, result)
-  end
-
-  return result
-end
-
-local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
+local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, d, result)
   local U1 = result[1]
   local n = #U1
   if n > m then
@@ -286,34 +260,33 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
 
   local a = u2 - u1
   local b = u4 - u3
-
-  local is_point_a = a <= t_epsilon
-  local is_point_b = b <= t_epsilon
+  local is_converged_a = a <= t_epsilon
+  local is_converged_b = b <= t_epsilon
 
   local t1
   local t2
-  if is_point_a then
+  if is_converged_a then
     t1 = 0
     t2 = 1
   else
-    t1, t2 = clip(B1, fat_line(B2, B1, is_point_b))
+    t1, t2 = clip(B1, fat_line(B2, B1, is_converged_b))
   end
   if not t1 then
-    return merge_end_points(b1, b2, u1, u2, u3, u4, result)
+    return result
   end
   local v1 = u1 + a * t1
   local v2 = u1 + a * t2
 
   local t3
   local t4
-  if is_point_b then
+  if is_converged_b then
     t3 = 0
     t4 = 1
   else
-    t3, t4 = clip(B2, fat_line(B1, B2, is_point_a))
+    t3, t4 = clip(B2, fat_line(B1, B2, is_converged_a))
   end
   if not t3 then
-    return merge_end_points(b1, b2, u1, u2, u3, u4, result)
+    return result
   end
   local v3 = u3 + b * t3
   local v4 = u3 + b * t4
@@ -323,7 +296,7 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
-    return iterate(b1, b2, v1 - v_epsilon, v2 + v_epsilon, v3 - v_epsilon, v4 + v_epsilon, m, is_identical, result)
+    return iterate(b1, b2, v1 - v_epsilon, v2 + v_epsilon, v3 - v_epsilon, v4 + v_epsilon, m, is_identical, d, result)
   end
 
   if not is_identical then
@@ -349,18 +322,18 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
             local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
-            if p:epsilon_equals(q, p_epsilon) then
+            if p:epsilon_equals(q, d) then
               merge(u6, u7, result)
               u5 = nil
             else
               if u5 then
-                iterate(b1, b2, u1, u2, u5, u7, m, is_identical, result)
+                iterate(b1, b2, u1, u2, u5, u7, m, is_identical, d, result)
               end
               u5 = u7
             end
           end
           if u5 then
-            iterate(b1, b2, u1, u2, u5, u4, m, is_identical, result)
+            iterate(b1, b2, u1, u2, u5, u4, m, is_identical, d, result)
           end
           return result
         else
@@ -372,18 +345,18 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
             local u7 = f[2]
             b1:eval(u6, p)
             b2:eval(u7, q)
-            if p:epsilon_equals(q, p_epsilon) then
+            if p:epsilon_equals(q, d) then
               merge(u6, u7, result)
               u5 = nil
             else
               if u5 then
-                iterate(b1, b2, u5, u6, u3, u4, m, is_identical, result)
+                iterate(b1, b2, u5, u6, u3, u4, m, is_identical, d, result)
               end
               u5 = u6
             end
           end
           if u5 then
-            iterate(b1, b2, u5, u2, u3, u4, m, is_identical, result)
+            iterate(b1, b2, u5, u2, u3, u4, m, is_identical, d, result)
           end
           return result
         end
@@ -393,12 +366,12 @@ local function iterate(b1, b2, u1, u2, u3, u4, m, is_identical, result)
 
   if a < b then
     local u5 = (u3 + u4) / 2
-    iterate(b1, b2, u1, u2, u3, u5, m, is_identical, result)
-    return iterate(b1, b2, u1, u2, u5, u4, m, is_identical, result)
+    iterate(b1, b2, u1, u2, u3, u5, m, is_identical, d, result)
+    return iterate(b1, b2, u1, u2, u5, u4, m, is_identical, d, result)
   else
     local u5 = (u1 + u2) / 2
-    iterate(b1, b2, u1, u5, u3, u4, m, is_identical, result)
-    return iterate(b1, b2, u5, u2, u3, u4, m, is_identical, result)
+    iterate(b1, b2, u1, u5, u3, u4, m, is_identical, d, result)
+    return iterate(b1, b2, u5, u2, u3, u4, m, is_identical, d, result)
   end
 end
 
@@ -426,8 +399,21 @@ return function (b1, b2, t1, t2, t3, t4, result)
     U2[i] = nil
   end
 
-  local m = (b1:size() - 1) * (b2:size() - 1)
-  iterate(b1, b2, t1, t2, t3, t4, m, false, result)
+  local m = b1:size()
+  local n = b2:size()
+  local p = b1:get(1, point2())
+  local q = b1:get(m, point2())
+  local d1 = p:distance(q)
+  b2:get(1, p)
+  b2:get(n, p)
+  local d2 = p:distance(q)
+  local d = d1
+  if d < d2 then
+    d = d2
+  end
+  d = d_epsilon * d
+  local m = (m - 1) * (n - 1)
+  iterate(b1, b2, t1, t2, t3, t4, m, false, d, result)
 
   local n = #U1
   if n <= m then
@@ -462,7 +448,7 @@ return function (b1, b2, t1, t2, t3, t4, result)
 
   local b3 = bezier(b1):reverse()
   local b4 = bezier(b2):reverse()
-  iterate(b3, b4, 1 - t2, 1 - t1, 1 - t4, 1 - t3, 1, true, result)
+  iterate(b3, b4, 1 - t2, 1 - t1, 1 - t4, 1 - t3, 1, true, d, result)
 
   for i = 1, #U1 do
     local t = 1 - U1[i]

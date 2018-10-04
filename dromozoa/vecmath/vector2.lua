@@ -46,6 +46,28 @@ function class.length_squared(a)
   return x * x + y * y
 end
 
+-- a:length_l1() [EX]
+function class.length_l1(a)
+  local x = a[1]
+  local y = a[2]
+  if x < 0 then x = -x end
+  if y < 0 then y = -y end
+  return x + y
+end
+
+-- a:length_linf() [EX]
+function class.length_linf(a)
+  local x = a[1]
+  local y = a[2]
+  if x < 0 then x = -x end
+  if y < 0 then y = -y end
+  if x > y then
+    return x
+  else
+    return y
+  end
+end
+
 -- a:normalize(vector2 b)
 -- a:normalize()
 function class.normalize(a, b)

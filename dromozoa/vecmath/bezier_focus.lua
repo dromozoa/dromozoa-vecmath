@@ -19,17 +19,16 @@ local point2 = require "dromozoa.vecmath.point2"
 local vector2 = require "dromozoa.vecmath.vector2"
 
 local bezier = require "dromozoa.vecmath.bezier"
+local clip_both = require "dromozoa.vecmath.clip_both"
 local polynomial = require "dromozoa.vecmath.polynomial"
 local quickhull = require "dromozoa.vecmath.quickhull"
-
-local clip_both = require "dromozoa.vecmath.clip_both"
 
 local sqrt = math.sqrt
 
 -- by experimentations
-local d_epsilon = 1e-11
-local t_epsilon = 1e-6
-local s_epsilon = 1e-5
+local d_epsilon = 1e-14
+local s_epsilon = 1e-6
+local t_epsilon = 1e-7
 
 local function explicit_bezier(B, p)
   local Z = B[3]
@@ -87,15 +86,68 @@ local function clip(B1, B2)
     F = B2
   end
   local P = {}
+  local p1 = B1:get(1, point2())
+  local p2 = B1:get(B1:size(), point2())
+  local p3 = point2()
+  local d1 = p1:distance_l1(p2)
+  local d2 = 0
   for i = 1, F:size() do
-    local D = explicit_bezier(B1, F:get(i, point2()))
+    F:get(i, p3)
+    local d = p1:distance_l1(p3)
+    if d2 < d then
+      d2 = d
+    end
+    local d = p2:distance_l1(p3)
+    if d2 < d then
+      d2 = d
+    end
+    local D = explicit_bezier(B1, p3)
     for j = 1, D:size() do
       P[#P + 1] = D:get(j, point2())
     end
   end
   if P[1] then
-    return clip_both(quickhull(P), -d_epsilon, d_epsilon)
+    local d = d1 * d2
+    if d < 1 then
+      d = d_epsilon
+    else
+      d = d_epsilon * d
+    end
+    return clip_both(quickhull(P), -d, d)
   end
+end
+
+local function merge(d1, d2, t1, t2, result)
+  local v1 = d1:eval(t1, vector2())
+  local v2 = d2:eval(t2, vector2())
+  local s = v1:cross(v2)
+  if s < 0 then
+    s = -s
+  end
+  if s <= s_epsilon * v1:length_l1() * v2:length_l1() then
+    local U1 = result[1]
+    local U2 = result[2]
+    local n = #U1
+    for i = 1, n do
+      local a = U1[i] - t1
+      if a < 0 then
+        a = -a
+      end
+      if a <= t_epsilon then
+        local b = U2[i] - t2
+        if b < 0 then
+          b = -b
+        end
+        if b <= t_epsilon then
+          return result
+        end
+      end
+    end
+    n = n + 1
+    U1[n] = t1
+    U2[n] = t2
+  end
+  return result
 end
 
 local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
@@ -108,59 +160,43 @@ local function iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
   local B1 = bezier(b1):clip(u1, u2)
   local B2 = bezier(b2):clip(u3, u4)
 
-  local t1, t2 = clip(B1, B2)
+  local a = u2 - u1
+  local b = u4 - u3
+
+  local t1
+  local t2
+  if a <= t_epsilon then
+    t1 = 0
+    t2 = 1
+  else
+    t1, t2 = clip(B1, B2)
+  end
   if not t1 then
     return result
   end
-  local a = u2 - u1
-  u2 = u1 + a * t2
-  u1 = u1 + a * t1
+  local v1 = u1 + a * t1
+  local v2 = u1 + a * t2
 
-  local t3, t4 = clip(B2, B1)
+  local t3
+  local t4
+  if b <= t_epsilon then
+    t3 = 0
+    t4 = 1
+  else
+    t3, t4 = clip(B2, B1)
+  end
   if not t3 then
     return result
   end
-  local b = u4 - u3
-  u4 = u3 + b * t4
-  u3 = u3 + b * t3
+  local v3 = u3 + b * t3
+  local v4 = u3 + b * t4
 
-  if u2 - u1 <= t_epsilon and u4 - u3 <= t_epsilon then
-    local t1 = (u1 + u2) / 2
-    local t2 = (u3 + u4) / 2
-    local U2 = result[2]
-
-    local v1 = d1:eval(t1, vector2())
-    local v2 = d2:eval(t2, vector2())
-    local s = v1:cross(v2) / sqrt(v1:length_squared() * v2:length_squared())
-    if s < 0 then
-      s = -s
-    end
-    if s <= s_epsilon then
-      for i = 1, n do
-        local a = U1[i] - t1
-        if a < 0 then
-          a = -a
-        end
-        if a <= t_epsilon then
-          local b = U2[i] - t2
-          if b < 0 then
-            b = -b
-          end
-          if b <= t_epsilon then
-            return result
-          end
-        end
-      end
-
-      n = n + 1
-      U1[n] = t1
-      U2[n] = t2
-    end
-    return result
+  if v2 - v1 <= t_epsilon and v4 - v3 <= t_epsilon then
+    return merge(d1, d2, (v1 + v2) / 2, (v3 + v4) / 2, result)
   end
 
   if t2 - t1 <= 0.8 or t4 - t3 <= 0.8 then
-    return iterate(b1, b2, d1, d2, u1, u2, u3, u4, m, result)
+    return iterate(b1, b2, d1, d2, v1, v2, v3, v4, m, result)
   end
 
   if a < b then
@@ -201,7 +237,7 @@ return function (b1, b2, t1, t2, t3, t4, result)
   local d1 = bezier(b1):deriv()
   local d2 = bezier(b2):deriv()
   local m = (b1:size() - 1) * (b2:size() - 1)
-  local m = m * (m - 1) / 2
+  m = m * (m - 1) / 2
   iterate(b1, b2, d1, d2, t1, t2, t3, t4, m, result)
 
   local n = #U1

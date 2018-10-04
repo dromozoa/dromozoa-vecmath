@@ -43,6 +43,7 @@ return {
   bezier = require "dromozoa.vecmath.bezier";
   bezier_clipping = require "dromozoa.vecmath.bezier_clipping";
   bezier_focus = require "dromozoa.vecmath.bezier_focus";
+  clip_both = require "dromozoa.vecmath.clip_both";
   colors = require "dromozoa.vecmath.colors";
   matrix2 = require "dromozoa.vecmath.matrix2";
   polynomial = require "dromozoa.vecmath.polynomial";
